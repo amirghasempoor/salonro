@@ -1,0 +1,41 @@
+FROM docker.arvancloud.ir/composer:latest AS builder
+
+WORKDIR /app
+
+COPY composer.json composer.lock ./
+
+RUN composer install \
+    --no-dev \
+    --no-scripts \
+    --no-autoloader \
+    --prefer-dist
+
+COPY . .
+
+RUN composer dump-autoload --optimize --classmap-authoritative
+
+FROM php:8.5.3-fpm-alpine3.23 AS application
+
+RUN apk update && apk add --no-cache \
+    bash \
+    curl \
+    libpng \
+    libpng-dev \
+    libjpeg-turbo-dev \
+    freetype-dev \
+    libwebp-dev \
+    libxml2-dev \
+    unzip \
+    libzip-dev \
+    libpq-dev \
+    && docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp \
+    && docker-php-ext-install pdo_pgsql gd zip
+
+WORKDIR /var/www/payment
+
+COPY --from=builder /app /var/www/payment
+
+RUN chown -R www-data:www-data /var/www/payment \
+    && chmod -R 665 storage bootstrap/cache
+
+CMD ["php-fpm"]
