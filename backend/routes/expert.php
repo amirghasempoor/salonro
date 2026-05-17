@@ -1,7 +1,8 @@
 <?php
 
-use App\User\Controllers\AuthController;
-use App\User\Controllers\ReservationManagementController;
+use App\Expert\Controllers\AuthController;
+use App\Expert\Controllers\ProfileController;
+use App\Expert\Controllers\ReservationManagementController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('auth')
@@ -12,7 +13,19 @@ Route::prefix('auth')
         Route::post('send_otp', 'sendOtp')->name('sendOtp');
         Route::post('login_with_otp', 'loginWithOtp')->name('loginWithOtp');
         Route::post('login_with_password', 'loginWithPassword')->name('loginWithPassword');
-        Route::post('logout', 'logout')->middleware('auth:web')->name('logout');
+        Route::post('logout', 'logout')->middleware('auth:expert')->name('logout');
+    });
+
+Route::prefix('profile')
+    ->name('profile.')
+    ->controller(ProfileController::class)
+    ->group(function () {
+        Route::get('info', 'info')->name('info');
+        Route::post('edit', 'edit')->name('edit');
+        Route::post('change_password', 'changePassword')->name('changePassword');
+        Route::post('change_avatar', 'changeAvatar')->name('changeAvatar');
+        Route::post('upload_portfolio', 'uploadPortfolio')->name('uploadPortfolio');
+        Route::post('define_working_hour', 'defineWorkingHour')->name('defineWorkingHour');
     });
 
 Route::prefix('reservations')
