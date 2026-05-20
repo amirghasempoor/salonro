@@ -2,9 +2,7 @@
 
 namespace App\User\Controllers;
 
-use App\Enums\Roles;
 use App\Expert\Requests\Auth\SendOtpRequest;
-use App\Facades\File\File;
 use App\Facades\Otp\OtpFacade;
 use App\Http\Controllers\Controller;
 use App\Traits\ApiResponse;
@@ -24,23 +22,15 @@ class AuthController extends Controller
 
     public function register(RegisterRequest $request): JsonResponse
     {
-        $avatar = $request->avatar ?
-            File::save($request->avatar, '/users/avatars')
-            : null;
-
         $user = User::query()->create([
             'full_name' => $request->first_name . ' ' . $request->last_name,
             'first_name' => $request->first_name,
             'last_name' => $request->last_name,
             'phone_number' => $request->phone_number,
             'password' => Hash::make($request->password),
-            'province_id' => $request->province_id,
-            'city_id' => $request->city_id,
-            'avatar' => $avatar,
-            'email' => 'test',
         ]);
 
-        $user->assignRole(Roles::User->value);
+        Auth::guard('web')->login($user);
 
         $request->session()->regenerateToken();
 

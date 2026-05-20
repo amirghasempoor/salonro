@@ -20,8 +20,12 @@ return new class extends Migration
             $table->string('email')->nullable();
             $table->string('password');
             $table->string('avatar')->nullable();
-            $table->foreignId('province_id')->constrained('provinces');
-            $table->foreignId('city_id')->constrained('cities');
+            $table->foreignId('province_id')->nullable()->constrained('provinces');
+            $table->string('province_name')->nullable();
+            $table->foreignId('city_id')->nullable()->constrained('cities');
+            $table->string('city_name')->nullable();
+            $table->tinyInteger('kyc_status')->default(0);
+            $table->tinyInteger('level')->default(0);
             $table->timestamps();
         });
 
