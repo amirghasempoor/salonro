@@ -21,9 +21,12 @@ return new class extends Migration
             $table->string('hall_name');
             $table->foreignId('state_id')->constrained('reservation_states')->cascadeOnDelete();
             $table->string('state_name');
-            $table->dateTime('from_date');
-            $table->dateTime('to_date');
-            $table->string('services');
+            $table->dateTime('start_time');
+            $table->dateTime('finish_time');
+            $table->float('total_price');
+            $table->unsignedBigInteger('cancelled_by_id')->nullable();
+            $table->string('cancelled_by_type')->nullable();
+            $table->string('cancelled_reason')->nullable();
             $table->timestamps();
         });
     }

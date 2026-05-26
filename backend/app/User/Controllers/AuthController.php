@@ -23,7 +23,6 @@ class AuthController extends Controller
     public function register(RegisterRequest $request): JsonResponse
     {
         $user = User::query()->create([
-            'full_name' => $request->first_name . ' ' . $request->last_name,
             'first_name' => $request->first_name,
             'last_name' => $request->last_name,
             'phone_number' => $request->phone_number,
@@ -51,6 +50,10 @@ class AuthController extends Controller
         if (OtpFacade::verify($request->phone_number, $request->verification_code))
         {
             OtpFacade::deactivate($request->phone_number, $request->verification_code);
+
+            $user = User::query()->firstWhere('phone_number', $request->phone_number);
+
+            Auth::guard('web')->login($user);
 
             $request->session()->regenerateToken();
 

@@ -3,6 +3,8 @@
 namespace App\User\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Models\City;
+use App\Models\Province;
 use App\Traits\ApiResponse;
 use App\User\Requests\Profile\ChangePasswordRequest;
 use App\User\Requests\Profile\EditRequest;
@@ -17,16 +19,26 @@ class ProfileController extends Controller
 
     public function info(): JsonResponse
     {
-        return $this->successResponse(new UserResource(auth()->user()));
+        return $this->successResponse(new UserResource(Auth::guard('web')->user()));
     }
 
     public function edit(EditRequest $request): JsonResponse
     {
+        $province = Province::query()->find($request->province_id);
+        $city = City::query()->find($request->city_id);
+
         Auth::guard('web')->user()->update([
-            'full_name' => $request->first_name . ' ' . $request->last_name,
             'first_name' => $request->first_name,
             'last_name' => $request->last_name,
             'phone_number' => $request->phone_number,
+            'email' => $request->email,
+            'gender' => $request->gender,
+            'birth_date' => $request->birth_date,
+            'province_id' => $province->id,
+            'city_id' => $city->id,
+            'province_name' => $province->name,
+            'city_name' => $city->name,
+            'kyc_status' => 1
         ]);
 
         return $this->successResponse();

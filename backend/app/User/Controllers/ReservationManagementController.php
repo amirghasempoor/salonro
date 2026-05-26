@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Expert;
 use App\Models\Hall;
 use App\Models\Reservation;
+use App\Models\Service;
 use App\Traits\ApiResponse;
 use App\User\Requests\Reservation\StoreRequest;
 use App\User\Requests\Reservation\UpdateRequest;
@@ -23,7 +24,7 @@ class ReservationManagementController extends Controller
     public function index(Request $request): JsonResponse
     {
         $query = Reservation::query()
-            ->where('user_id', '=', Auth::guard('web')->user()->id);
+            ->where('user_id', '=', Auth::guard('web')->id());
 
         $data = DataTableFacade::run(
             $query,
@@ -46,19 +47,25 @@ class ReservationManagementController extends Controller
 
                 $reservation = Reservation::query()->create([
                     'user_id' => $user->id,
-                    'user_name' => $user->full_name,
+                    'user_name' => $user->first_name . ' ' . $user->last_name,
                     'expert_id' => $request->expert_id,
-                    'expert_name' => Expert::query()->find($request->expert_id)->full_name,
+                    'expert_name' => Expert::query()->find($request->expert_id)->last_name,
                     'hall_id' => $request->hall_id,
                     'hall_name' => Hall::query()->find($request->hall_id)->name,
                     'state_id' => ReservationStates::Reserve->value,
                     'state_name' => ReservationStates::Reserve->label(),
-                    'from_date' => $request->from_date,
-                    'to_date' => $request->to_date,
-                    'services' => $request->services,
+                    'start_time' => $request->start_time,
+                    'finish_time' => $request->finish_time,
+                    'total_price' => $request->total_price,
                 ]);
 
-                $reservation->services()->attach($request->services);
+                foreach ($request->services as $service) {
+                    $reservation->services()->attach($service['id'], [
+                        'service_name' => $service['name'],
+                        'price' => $service['price'],
+                        'duration' => $service['duration'],
+                    ]);
+                }
             });
 
             return $this->successResponse();
@@ -82,10 +89,18 @@ class ReservationManagementController extends Controller
                     'expert_name' => Expert::query()->find($request->expert_id)->full_name,
                     'hall_id' => $request->hall_id,
                     'hall_name' => Hall::query()->find($request->hall_id)->name,
-                    'from_date' => $request->from_date,
-                    'to_date' => $request->to_date,
-                    'services' => $request->services,
+                    'start_time' => $request->start_time,
+                    'finish_time' => $request->finish_time,
+                    'total_price' => $request->total_price,
                 ]);
+
+                foreach ($request->services as $service) {
+                    $reservation->services()->sync($service['id'], [
+                        'service_name' => $service['name'],
+                        'price' => $service['price'],
+                        'duration' => $service['duration'],
+                    ]);
+                }
             });
 
             return $this->successResponse();

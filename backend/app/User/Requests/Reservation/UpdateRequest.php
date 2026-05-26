@@ -28,8 +28,11 @@ class UpdateRequest extends FormRequest
             'services' => 'required|array',
             'services.*.id' => 'required|exists:services,id',
             'services.*.name' => 'required|string|max:255',
-            'from_date' => 'required|date',
-            'to_date' => 'required|date',
+            'services.*.price' => 'required',
+            'services.*.duration' => 'required',
+            'start_time' => 'required|date',
+            'finish_time' => 'required|date',
+            'total_price' => 'required',
         ];
     }
 }

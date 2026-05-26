@@ -14,7 +14,7 @@ class UserResource extends JsonResource
             'last_name' => $this->resource->last_name,
             'avatar' => $this->resource->avatar,
             'phone_number' => $this->resource->phone_number,
-            'role' => $this->resource->getRoleNames()->first(),
+            'kyc_status' => $this->resource->kyc_status,
         ];
     }
 }
