@@ -23,14 +23,14 @@ class UpdateRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'phone_number' => 'required|string',
-            'first_name' => 'required|string|max:255',
-            'last_name' => 'required|string|max:255',
             'services' => 'required|array',
             'services.*.id' => 'required|exists:services,id',
             'services.*.name' => 'required|string|max:255',
-            'from_date' => 'required|date',
-            'to_date' => 'required|date',
+            'services.*.price' => 'required',
+            'services.*.duration' => 'required',
+            'start_time' => 'required|date',
+            'finish_time' => 'required|date',
+            'total_price' => 'required',
         ];
     }
 }

@@ -1,6 +1,7 @@
 <?php
 
 use App\User\Controllers\AuthController;
+use App\User\Controllers\ProfileController;
 use App\User\Controllers\ReservationManagementController;
 use Illuminate\Support\Facades\Route;
 
@@ -13,6 +14,16 @@ Route::prefix('auth')
         Route::post('login_with_otp', 'loginWithOtp')->name('loginWithOtp');
         Route::post('login_with_password', 'loginWithPassword')->name('loginWithPassword');
         Route::post('logout', 'logout')->middleware('auth:web')->name('logout');
+    });
+
+Route::prefix('profile')
+    ->name('profile.')
+    ->middleware('auth:web')
+    ->controller(ProfileController::class)
+    ->group(function () {
+        Route::get('info', 'info')->name('info');
+        Route::post('edit', 'edit')->name('edit');
+        Route::post('change_password', 'changePassword')->name('changePassword');
     });
 
 Route::prefix('reservations')

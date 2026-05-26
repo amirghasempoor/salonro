@@ -54,9 +54,10 @@ class ReservationManagementController extends Controller
                 $expert = Auth::guard('expert')->user();
 
                 $user = User::query()->firstOrCreate(
-                    ['phone_number' => $request->phone_number],
                     [
-                        'full_name' => $request->first_name . ' ' . $request->last_name,
+                        'phone_number' => $request->phone_number
+                    ],
+                    [
                         'first_name' => $request->first_name,
                         'last_name' => $request->last_name
                     ]
@@ -64,19 +65,25 @@ class ReservationManagementController extends Controller
 
                 $reservation = Reservation::query()->create([
                     'user_id' => $user->id,
-                    'user_name' => $request->first_name . ' ' . $request->last_name,
+                    'user_name' => $user->first_name . ' ' . $user->last_name,
                     'expert_id' => $expert->id,
-                    'expert_name' => $expert->full_name,
+                    'expert_name' => $expert->last_name,
                     'hall_id' => $request->hall_id,
                     'hall_name' => Hall::query()->find($request->hall_id)->name,
                     'state_id' => ReservationStates::Reserve->value,
                     'state_name' => ReservationStates::Reserve->label(),
-                    'from_date' => $request->from_date,
-                    'to_date' => $request->to_date,
-                    'services' => $request->services,
+                    'start_time' => $request->start_time,
+                    'finish_time' => $request->finish_time,
+                    'total_price' => $request->total_price,
                 ]);
 
-                $reservation->services()->attach($request->services);
+                foreach ($request->services as $service) {
+                    $reservation->services()->attach($service['id'], [
+                        'service_name' => $service['name'],
+                        'price' => $service['price'],
+                        'duration' => $service['duration'],
+                    ]);
+                }
             });
 
             return $this->successResponse();
@@ -101,10 +108,19 @@ class ReservationManagementController extends Controller
     {
         try {
             DB::transaction(function () use ($request, $reservation) {
-                $user = User::query()->firstWhere('phone_number', '=', $request->phone_number);
                 $reservation->update([
-
+                    'start_time' => $request->start_time,
+                    'finish_time' => $request->finish_time,
+                    'total_price' => $request->total_price,
                 ]);
+
+                foreach ($request->services as $service) {
+                    $reservation->services()->attach($service['id'], [
+                        'service_name' => $service['name'],
+                        'price' => $service['price'],
+                        'duration' => $service['duration'],
+                    ]);
+                }
             });
 
             return $this->successResponse();
