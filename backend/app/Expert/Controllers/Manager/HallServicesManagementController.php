@@ -2,19 +2,18 @@
 
 namespace App\Expert\Controllers\Manager;
 
-use App\Expert\Requests\Manager\Hall\StoreRequest;
-use App\Expert\Requests\Manager\Hall\UpdateRequest;
+use App\Expert\Requests\Manager\HallService\StoreRequest;
+use App\Expert\Requests\Manager\HallService\UpdateRequest;
 use App\Facades\DataTable\DataTableFacade;
 use App\Http\Controllers\Controller;
-use App\Models\Expert;
 use App\Models\Hall;
+use App\Models\Service;
 use App\Traits\ApiResponse;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
-class HallManagementController extends Controller
+class HallServicesManagementController extends Controller
 {
     use ApiResponse;
     /**
@@ -22,9 +21,7 @@ class HallManagementController extends Controller
      */
     public function index(Request $request): JsonResponse
     {
-        $query = Expert::query()
-            ->find(Auth::guard('expert')->user()->id)
-            ->halls();
+        $query = Service::query()->where('hall_id', '=', $request->hall_id);
 
         $data = DataTableFacade::run(
             $query,
@@ -32,7 +29,7 @@ class HallManagementController extends Controller
             allowedFilters: ['*'],
             allowedSortings: ['*'],
             allowedSelects: [
-                'id', 'name', 'lat', 'lng', 'address',
+                'id', 'name', 'duration', 'price'
             ]
         );
 
@@ -46,17 +43,13 @@ class HallManagementController extends Controller
     {
         try {
             DB::transaction(function () use ($request) {
-                Hall::query()->create([
+                Service::query()->create([
                     'name' => $request->name,
-                    'owner_id' => Auth::guard('expert')->user()->id,
-                    'lat' => $request->lat,
-                    'lng' => $request->lng,
-                    'address' => $request->address,
-                    'postal_code' => $request->postal_code,
-                    'telephone' => $request->telephone,
-                    'province_id' => $request->province_id,
-                    'city_id' => $request->city_id,
+                    'hall_id' => $request->hall_id,
+                    'category_id' => $request->category_id,
                     'description' => $request->description,
+                    'duration' => $request->duration,
+                    'price' => $request->price
                 ]);
             });
 
@@ -70,27 +63,25 @@ class HallManagementController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Hall $hall): JsonResponse
+    public function show(Service $service): JsonResponse
     {
-        return $this->successResponse($hall);
+        return $this->successResponse($service);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateRequest $request, Hall $hall): JsonResponse
+    public function update(UpdateRequest $request, Service $service): JsonResponse
     {
         try {
-            DB::transaction(function () use ($request, $hall) {
-                $hall->update([
+            DB::transaction(function () use ($request, $service) {
+                $service->update([
                     'name' => $request->name,
-                    'lat' => $request->lat,
-                    'lng' => $request->lng,
-                    'address' => $request->address,
-                    'postal_code' => $request->postal_code,
-                    'telephone' => $request->telephone,
-                    'province_id' => $request->province_id,
-                    'city_id' => $request->city_id,
+                    'category_id' => $request->category_id,
+                    'description' => $request->description,
+                    'duration' => $request->duration,
+                    'price' => $request->price,
+                    'is_active' => $request->is_active
                 ]);
             });
 
@@ -105,12 +96,11 @@ class HallManagementController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Hall $hall): JsonResponse
+    public function destroy(Service $service): JsonResponse
     {
         try {
-            DB::transaction(function () use ($hall) {
-                $hall->experts()->detach();
-                $hall->delete();
+            DB::transaction(function () use ($service) {
+                $service->delete();
             });
             return $this->successResponse();
         } catch (\Throwable $e) {

@@ -3,10 +3,9 @@
 namespace App\Expert\Controllers\Manager;
 
 use App\Enums\Roles;
-use App\Expert\Requests\Expert\StoreRequest;
-use App\Expert\Requests\Expert\UpdateRequest;
+use App\Expert\Requests\Manager\Expert\StoreRequest;
+use App\Expert\Requests\Manager\Expert\UpdateRequest;
 use App\Facades\DataTable\DataTableFacade;
-use App\Facades\File\File;
 use App\Http\Controllers\Controller;
 use App\Models\Expert;
 use App\Models\Hall;
@@ -27,8 +26,7 @@ class ExpertManagementController extends Controller
     {
         $query = Hall::query()
             ->firstWhere('id', '=', $request->hall_id)
-            ->experts()
-            ->get(['id', 'full_name']);
+            ->experts();
 
         $data = DataTableFacade::run(
             $query,
@@ -47,20 +45,13 @@ class ExpertManagementController extends Controller
     {
         try {
             DB::transaction(function () use ($request) {
-                $avatar = $request->avatar ?
-                    File::save($request->avatar, '/experts/avatars')
-                    : null;
-
                 $expert = Expert::query()->create([
-                    'full_name' => $request->first_name . ' ' . $request->last_name,
                     'first_name' => $request->first_name,
                     'last_name' => $request->last_name,
                     'phone_number' => $request->phone_number,
                     'password' => Hash::make($request->password),
-                    'email' => $request->email,
-                    'province_id' => $request->province_id,
-                    'city_id' => $request->city_id,
-                    'avatar' => $avatar,
+                    'province_id' => Hall::query()->find($request->hall_id)->province_id,
+                    'city_id' => Hall::query()->find($request->hall_id)->city_id,
                 ]);
 
                 $expert->assignRole(Roles::Expert->value);
@@ -87,15 +78,10 @@ class ExpertManagementController extends Controller
     {
         try {
             DB::transaction(function () use ($request, $expert) {
-                $expert = Expert::query()->create([
-                    'full_name' => $request->first_name . ' ' . $request->last_name,
+                Expert::query()->create([
                     'first_name' => $request->first_name,
                     'last_name' => $request->last_name,
                     'phone_number' => $request->phone_number,
-                    'password' => Hash::make($request->password),
-                    'email' => $request->email,
-                    'province_id' => $request->province_id,
-                    'city_id' => $request->city_id,
                 ]);
             });
 
