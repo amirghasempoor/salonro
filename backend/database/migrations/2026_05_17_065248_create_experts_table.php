@@ -13,15 +13,19 @@ return new class extends Migration
     {
         Schema::create('experts', function (Blueprint $table) {
             $table->id();
-            $table->string('full_name');
             $table->string('first_name');
             $table->string('last_name');
             $table->string('phone_number');
-            $table->string('email');
+            $table->string('email')->nullable();
             $table->string('password');
             $table->string('avatar')->nullable();
             $table->foreignId('province_id')->constrained('provinces');
             $table->foreignId('city_id')->constrained('cities');
+            $table->unsignedTinyInteger('gender')->nullable();
+            $table->date('birth_date')->nullable();
+            $table->boolean('is_verified')->default(false);
+            $table->boolean('is_active')->default(true);
+            $table->string('bio')->nullable();
             $table->timestamps();
         });
     }

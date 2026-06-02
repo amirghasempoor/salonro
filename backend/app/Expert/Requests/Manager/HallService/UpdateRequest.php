@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Expert\Requests\Hall;
+namespace App\Expert\Requests\Manager\HallService;
 
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
-class StoreRequest extends FormRequest
+class UpdateRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -24,15 +24,12 @@ class StoreRequest extends FormRequest
     {
         return [
             'name' => 'required|string|max:255',
-            'owner_name' => 'required|string|max:255',
-            'owner_national_id' => 'required|string',
-            'lat' => 'required|string',
-            'lng' => 'required|string',
-            'address' => 'required|string',
-            'postal_code' => 'required|string',
-            'telephone' => 'required|string',
-            'province_id' => 'required|exists:provinces,id',
-            'city_id' => 'required|exists:cities,id',
+            'hall_id' => 'required|integer|exists:halls,id',
+            'category_id' => 'required|integer|exists:service_categories,id',
+            'description' => 'string|max:255',
+            'duration' => 'required|integer|between:1,1000000',
+            'price' => 'required|integer|between:1,1000000',
+            'is_active' => 'required|boolean',
         ];
     }
 }

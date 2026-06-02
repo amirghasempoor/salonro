@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Expert\Requests\Expert;
+namespace App\Expert\Requests\Manager\HallService;
 
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
@@ -23,13 +23,12 @@ class StoreRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'first_name' => 'required|string|max:255',
-            'last_name' => 'required|string|max:255',
-            'password' => 'required|string|min:8|confirmed',
-            'phone_number' => 'required|string|max:255|unique:users,phone_number',
-            'province_id' => 'required|exists:provinces,id',
-            'city_id' => 'required|exists:cities,id',
-            'avatar' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'name' => 'required|string|max:255',
+            'hall_id' => 'required|integer|exists:halls,id',
+            'category_id' => 'required|integer|exists:service_categories,id',
+            'description' => 'string|max:255',
+            'duration' => 'required|integer|between:1,1000000',
+            'price' => 'required|integer|between:1,1000000',
         ];
     }
 }

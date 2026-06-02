@@ -14,8 +14,8 @@ return new class extends Migration
         Schema::create('halls', function (Blueprint $table) {
             $table->id();
             $table->string('name');
+            $table->foreignId('owner_id')->constrained('experts');
             $table->string('owner_name');
-            $table->string('owner_national_id');
             $table->string('lat');
             $table->string('lng');
             $table->string('address');
@@ -23,6 +23,8 @@ return new class extends Migration
             $table->string('telephone');
             $table->foreignId('province_id')->constrained('provinces');
             $table->foreignId('city_id')->constrained('cities');
+            $table->boolean('is_active')->default(true);
+            $table->string('description')->nullable();
             $table->timestamps();
         });
     }
