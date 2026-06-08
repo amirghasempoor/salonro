@@ -16,8 +16,10 @@ use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Spatie\Permission\Models\Role;
+use Throwable;
 
 class AuthController extends Controller
 {
@@ -59,16 +61,28 @@ class AuthController extends Controller
         return $this->successResponse();
     }
 
+    /**
+     * @throws Throwable
+     */
     public function loginWithOtp(LoginWithOtpRequest $request): JsonResponse
     {
         if (OtpFacade::verify($request->phone_number, $request->verification_code))
         {
-            OtpFacade::deactivate($request->phone_number, $request->verification_code);
+            DB::transaction(function () use ($request) {
+                $expert = Expert::query()->firstOrCreate([
+                    'phone_number' => $request->phone_number,
+                    ]);
 
-            $request->session()->regenerateToken();
+                Auth::guard('expert')->login($expert);
+
+                OtpFacade::deactivate($request->phone_number, $request->verification_code);
+
+                $request->session()->regenerateToken();
+            });
 
             return $this->successResponse();
         }
+
         return $this->errorResponse(__('messages.incorrect_otp'));
     }
 

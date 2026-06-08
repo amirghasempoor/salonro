@@ -15,12 +15,13 @@ class ExpertResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'first_name' => $this->first_name,
-            'last_name' => $this->last_name,
-            'avatar' => $this->avatar,
-            'phone_number' => $this->phone_number,
-            'role' => $this->getRoleNames()->first(),
-            'halls' => HallResource::collection($this->halls)
+            'first_name' => $this->resource->first_name,
+            'last_name' => $this->resource->last_name,
+            'avatar' => $this->resource->avatar,
+            'phone_number' => $this->resource->phone_number,
+            'role' => $this->resource->getRoleNames()->first(),
+            'halls' => HallResource::collection($this->resource->halls),
+            'is_verified' => $this->resource->is_verified
         ];
     }
 }
