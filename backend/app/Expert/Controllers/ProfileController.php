@@ -21,13 +21,12 @@ class ProfileController extends Controller
 
     public function info(): JsonResponse
     {
-        return $this->successResponse(new ExpertResource(auth()->user()));
+        return $this->successResponse(new ExpertResource(Auth::guard('expert')->user()));
     }
 
-    public function edit(EditRequest $request): JsonResponse
+    public function update(EditRequest $request): JsonResponse
     {
         Auth::guard('expert')->user()->update([
-            'full_name' => $request->first_name . ' ' . $request->last_name,
             'first_name' => $request->first_name,
             'last_name' => $request->last_name,
             'phone_number' => $request->phone_number,

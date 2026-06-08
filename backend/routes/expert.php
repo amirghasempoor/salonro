@@ -21,7 +21,7 @@ Route::prefix('profile')
     ->controller(ProfileController::class)
     ->group(function () {
         Route::get('info', 'info')->name('info');
-        Route::post('edit', 'edit')->name('edit');
+        Route::post('update', 'update')->name('update');
         Route::post('change_password', 'changePassword')->name('changePassword');
         Route::post('change_avatar', 'changeAvatar')->name('changeAvatar');
         Route::post('upload_portfolio', 'uploadPortfolio')->name('uploadPortfolio');
