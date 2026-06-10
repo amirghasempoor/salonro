@@ -18,6 +18,7 @@ Route::prefix('auth')
 
 Route::prefix('profile')
     ->name('profile.')
+    ->middleware(['auth:expert'])
     ->controller(ProfileController::class)
     ->group(function () {
         Route::get('info', 'info')->name('info');
@@ -30,6 +31,7 @@ Route::prefix('profile')
 
 Route::prefix('reservations')
     ->name('reservation.')
+    ->middleware(['auth:expert'])
     ->controller(ReservationManagementController::class)
     ->group(function () {
         Route::get('/', 'index')->name('index');

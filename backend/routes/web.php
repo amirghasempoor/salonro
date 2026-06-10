@@ -28,6 +28,7 @@ Route::prefix('profile')
 
 Route::prefix('reservations')
     ->name('reservation.')
+    ->middleware('auth:web')
     ->controller(ReservationManagementController::class)
     ->group(function () {
         Route::get('/', 'index')->name('index');

@@ -1,6 +1,6 @@
 services:
   nginx:
-    image: nginx:stable-alpine3.23-perl
+    image: docker.arvancloud.ir/nginx:stable-alpine3.23-perl
     container_name: salonro-nginx
     restart: unless-stopped
     ports:
@@ -12,7 +12,7 @@ services:
       - payment
 
   redis:
-    image: redis:8.6.0-alpine3.23
+    image: docker.arvancloud.ir/redis:8.6.0-alpine3.23
     container_name: salonro-redis
     restart: unless-stopped
     tty: true
@@ -20,7 +20,7 @@ services:
       - payment
 
   postgres:
-    image: postgres:18.2-alpine3.23
+    image: docker.arvancloud.ir/postgres:18.2-alpine3.23
     container_name: salonro-db
     restart: unless-stopped
     ports:
