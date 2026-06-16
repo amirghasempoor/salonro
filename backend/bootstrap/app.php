@@ -10,13 +10,12 @@ return Application::configure(basePath: dirname(__DIR__))
         commands: __DIR__.'/../routes/console.php',
         health: '/up',
         then: function () {
-            Route::middleware('auth:expert')
-                ->prefix('expert')
+            Route::prefix('expert')
                 ->group(base_path('routes/expert.php'));
         },
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        $middleware->web()->preventRequestForgery(['*',]);
+        $middleware->web()->preventRequestForgery(['*']);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //
