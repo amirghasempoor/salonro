@@ -21,7 +21,7 @@ WORKDIR /var/www/salonro
 
 COPY . .
 
-RUN chmod -R 775 /var/www/salonro/storage /var/www/salonro/bootstrap/cache
+RUN chmod -R 777 /var/www/salonro/storage /var/www/salonro/bootstrap/cache
 
 # Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer

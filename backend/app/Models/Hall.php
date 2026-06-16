@@ -6,6 +6,7 @@ use Database\Factories\HallFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 class Hall extends Model
 {
@@ -17,5 +18,10 @@ class Hall extends Model
     public function experts(): BelongsToMany
     {
         return $this->belongsToMany(Expert::class);
+    }
+
+    public function images(): MorphMany
+    {
+        return $this->morphMany(Image::class, 'imageable');
     }
 }
