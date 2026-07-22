@@ -6,6 +6,7 @@ use Database\Factories\ExpertFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Spatie\Permission\Traits\HasRoles;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -22,8 +23,13 @@ class Expert extends Authenticatable
         return $this->belongsToMany(Hall::class);
     }
 
-    public function images(): MorphMany
+    public function images(): MorphToMany
     {
-        return $this->morphMany(Image::class, 'imageable');
+        return $this->morphToMany(Image::class, 'imageable');
+    }
+
+    public function workingHours(): MorphToMany
+    {
+        return $this->morphToMany(WorkingHour::class, 'hourable');
     }
 }

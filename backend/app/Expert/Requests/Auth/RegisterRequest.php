@@ -25,9 +25,9 @@ class RegisterRequest extends FormRequest
         return [
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
-            'email' => 'string|email|max:255|unique:users,email',
+            'email' => 'string|email|max:255|unique:experts,email',
             'password' => 'required|string|min:8|confirmed',
-            'phone_number' => 'required|string|max:255|unique:users,phone_number',
+            'phone_number' => 'required|string|max:255|unique:experts,phone_number',
             'province_id' => 'required|exists:provinces,id',
             'city_id' => 'required|exists:cities,id',
             'avatar' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',

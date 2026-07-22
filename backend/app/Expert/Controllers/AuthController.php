@@ -7,6 +7,7 @@ use App\Expert\Requests\Auth\LoginWithOtpRequest;
 use App\Expert\Requests\Auth\LoginWithPasswordRequest;
 use App\Expert\Requests\Auth\RegisterRequest;
 use App\Expert\Requests\Auth\SendOtpRequest;
+use App\Expert\Resources\ExpertResource;
 use App\Facades\File\File;
 use App\Facades\Otp\OtpFacade;
 use App\Http\Controllers\Controller;
@@ -68,19 +69,23 @@ class AuthController extends Controller
     {
         if (OtpFacade::verify($request->phone_number, $request->verification_code))
         {
-            DB::transaction(function () use ($request) {
+            $expert = DB::transaction(function () use ($request) {
                 $expert = Expert::query()->firstOrCreate([
                     'phone_number' => $request->phone_number,
                     ]);
+
+                $expert->assignRole(Roles::Expert->value);
 
                 Auth::guard('expert')->login($expert);
 
                 OtpFacade::deactivate($request->phone_number, $request->verification_code);
 
                 $request->session()->regenerateToken();
+
+                return $expert;
             });
 
-            return $this->successResponse();
+            return $this->successResponse(new ExpertResource($expert));
         }
 
         return $this->errorResponse(__('messages.incorrect_otp'));

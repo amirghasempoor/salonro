@@ -25,7 +25,9 @@ class EditRequest extends FormRequest
         return [
             'first_name' => 'required|string',
             'last_name' => 'required|string',
-            'phone_number' => 'required|regex:/^09\d{9}$/|numeric|digits:11|unique:experts,phone_number',
+            'avatar' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'bio' => 'string|max:255',
+            'password' => 'required|string|regex:/^(?=.*[a-zA-Z])(?=.*\d).+$/|min:8',
         ];
     }
 }

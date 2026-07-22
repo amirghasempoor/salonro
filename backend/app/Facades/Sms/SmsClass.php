@@ -2,11 +2,10 @@
 
 namespace App\Facades\Sms;
 
+use App\Models\SmsHistory;
 use Exception;
 use Illuminate\Support\Facades\Log;
 use Ipe\Sdk\Facades\SmsIr;
-use SoapFault;
-use SoapClient;
 
 class SmsClass
 {
@@ -14,7 +13,7 @@ class SmsClass
 
     public function __construct()
     {
-        $this->lineNumber = config('smsIrVariables.lineNumber');
+        $this->lineNumber = config('smsIr.lineNumber');
     }
 
     /**

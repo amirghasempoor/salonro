@@ -29,7 +29,11 @@ class ProfileController extends Controller
         Auth::guard('expert')->user()->update([
             'first_name' => $request->first_name,
             'last_name' => $request->last_name,
-            'phone_number' => $request->phone_number,
+            'avatar' => $request->avatar,
+            'birth_date' => $request->birth_date,
+            'bio' => $request->bio,
+            'is_verified' => true,
+            'password' => Hash::make($request->password),
         ]);
 
         return $this->successResponse();

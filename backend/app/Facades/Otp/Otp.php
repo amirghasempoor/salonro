@@ -6,8 +6,6 @@ use Exception;
 use App\Facades\Sms\Sms;
 use Carbon\Carbon;
 use App\Models\Otp as OtpModel;
-use SoapFault;
-use SoapClient;
 
 class Otp
 {
@@ -29,7 +27,7 @@ class Otp
 
         $otp = OtpModel::query()->create([
             'phone_number' => $phone_number,
-            'verification_code' => rand(100000, 999999),
+            'verification_code' => rand(1000, 9999),
             'expired_at' => Carbon::now()->addMinute(2),
         ]);
 
@@ -55,7 +53,7 @@ class Otp
         $otp = OtpModel::query()->where([
             ['phone_number', $phone_number],
             ['used', 0],
-            ['created_at', '>', Carbon::now()->tomorrow()->toDateTimeString()], // check 1 day expired time
+            ['created_at', '>', Carbon::now()->subDay()], // check 1 day expired time
             ['verification_code', $verification_code]
         ])->firstOrFail();
 
