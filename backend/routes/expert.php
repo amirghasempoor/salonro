@@ -1,6 +1,7 @@
 <?php
 
 use App\Expert\Controllers\AuthController;
+use App\Expert\Controllers\Manager\HallManagementController;
 use App\Expert\Controllers\ProfileController;
 use App\Expert\Controllers\ReservationManagementController;
 use Illuminate\Support\Facades\Route;
@@ -27,6 +28,18 @@ Route::prefix('profile')
         Route::post('change_avatar', 'changeAvatar')->name('changeAvatar');
         Route::post('upload_portfolio', 'uploadPortfolio')->name('uploadPortfolio');
         Route::post('define_working_hour', 'defineWorkingHour')->name('defineWorkingHour');
+    });
+
+Route::prefix('halls')
+    ->name('hall.')
+    ->middleware(['auth:expert'])
+    ->controller(HallManagementController::class)
+    ->group(function () {
+        Route::get('/', 'index')->name('index');
+        Route::post('/', 'store')->name('store');
+        Route::get('/{reservation}', 'show')->name('show');
+        Route::post('/{reservation}', 'update')->name('update');
+        Route::delete('/{reservation}', 'destroy')->name('destroy');
     });
 
 Route::prefix('reservations')

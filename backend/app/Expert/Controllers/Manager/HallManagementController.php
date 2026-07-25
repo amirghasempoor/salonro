@@ -46,7 +46,7 @@ class HallManagementController extends Controller
     {
         try {
             DB::transaction(function () use ($request) {
-                Hall::query()->create([
+                $hall = Hall::query()->create([
                     'name' => $request->name,
                     'owner_id' => Auth::guard('expert')->user()->id,
                     'lat' => $request->lat,
@@ -58,6 +58,8 @@ class HallManagementController extends Controller
                     'city_id' => $request->city_id,
                     'description' => $request->description,
                 ]);
+
+                $hall->services()->createMany($request->services);
             });
 
             return $this->successResponse();

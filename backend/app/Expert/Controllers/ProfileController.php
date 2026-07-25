@@ -26,11 +26,14 @@ class ProfileController extends Controller
 
     public function update(EditRequest $request): JsonResponse
     {
+        $avatar = $request->avatar ?
+            File::save($request->avatar, '/experts/avatars')
+            : null;
+
         Auth::guard('expert')->user()->update([
             'first_name' => $request->first_name,
             'last_name' => $request->last_name,
-            'avatar' => $request->avatar,
-            'birth_date' => $request->birth_date,
+            'avatar' => $avatar,
             'bio' => $request->bio,
             'is_verified' => true,
             'password' => Hash::make($request->password),
