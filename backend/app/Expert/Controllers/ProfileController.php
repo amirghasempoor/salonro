@@ -80,9 +80,9 @@ class ProfileController extends Controller
 
         foreach ($request->portfolio as $portfolio)
         {
-            $path = File::save($portfolio, "portfolios/{$expert->id}");
+            $path = File::save($portfolio['image'], "portfolios/{$expert->id}");
 
-            $expert->images()->create(['path' => $path]);
+            $expert->images()->create(['url' => $path, 'title' => $portfolio['title']]);
         }
         return $this->successResponse();
     }

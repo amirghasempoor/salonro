@@ -2,6 +2,7 @@
 
 use App\Expert\Controllers\AuthController;
 use App\Expert\Controllers\Manager\HallManagementController;
+use App\Expert\Controllers\Manager\ServiceCategoryManagementController;
 use App\Expert\Controllers\ProfileController;
 use App\Expert\Controllers\ReservationManagementController;
 use Illuminate\Support\Facades\Route;
@@ -48,6 +49,19 @@ Route::prefix('reservations')
     ->controller(ReservationManagementController::class)
     ->group(function () {
         Route::get('/', 'index')->name('index');
+        Route::post('/', 'store')->name('store');
+        Route::get('/{reservation}', 'show')->name('show');
+        Route::post('/{reservation}', 'update')->name('update');
+        Route::delete('/{reservation}', 'destroy')->name('destroy');
+    });
+
+Route::prefix('service_categories')
+    ->name('service_categories.')
+    ->middleware(['auth:expert'])
+    ->controller(ServiceCategoryManagementController::class)
+    ->group(function () {
+        Route::get('/', 'index')->name('index');
+        Route::get('/', 'list')->name('list');
         Route::post('/', 'store')->name('store');
         Route::get('/{reservation}', 'show')->name('show');
         Route::post('/{reservation}', 'update')->name('update');

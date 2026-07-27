@@ -36,7 +36,7 @@ class StoreRequest extends FormRequest
             'services.*.name' => 'required|string|max:255',
             'services.*.duration' => 'required',
             'services.*.price' => 'required',
-            'services.*.category_id' => 'required',
+            'services.*.category_id' => 'required|exists:service_categories,id',
         ];
     }
 }

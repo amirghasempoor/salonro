@@ -5,10 +5,8 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class WorkingHour extends Model
+class Permission extends Model
 {
-    /** @use HasFactory<\Database\Factories\WorkingHourFactory> */
+    /** @use HasFactory<\Database\Factories\PermissionFactory> */
     use HasFactory;
-
-    protected $guarded = ['id'];
 }

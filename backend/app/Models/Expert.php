@@ -24,13 +24,13 @@ class Expert extends Authenticatable
         return $this->belongsToMany(Hall::class);
     }
 
-    public function images(): MorphToMany
+    public function images(): MorphMany
     {
-        return $this->morphToMany(Image::class, 'imageable');
+        return $this->morphMany(Image::class, 'imageable');
     }
 
-    public function workingHours(): MorphToMany
+    public function workingHours(): MorphMany
     {
-        return $this->morphToMany(WorkingHour::class, 'hourable');
+        return $this->morphMany(WorkingHour::class, 'hourable');
     }
 }

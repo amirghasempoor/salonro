@@ -15,6 +15,8 @@ return new class extends Migration
             $table->id();
             $table->foreignId('province_id')->constrained('provinces');
             $table->string('name');
+            $table->decimal('center_lat', 6, 4)->nullable();
+            $table->decimal('center_lng', 6, 4)->nullable();
             $table->timestamps();
         });
     }

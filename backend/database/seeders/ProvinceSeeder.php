@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 
 class ProvinceSeeder extends Seeder
 {
@@ -12,6 +13,7 @@ class ProvinceSeeder extends Seeder
      */
     public function run(): void
     {
-        //
+        $sqlFile = file_get_contents(storage_path('/sqlFiles/provinces.sql'));
+        DB::unprepared($sqlFile);
     }
 }

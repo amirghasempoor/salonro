@@ -9,4 +9,6 @@ class ServiceCategory extends Model
 {
     /** @use HasFactory<\Database\Factories\ServiceCategoryFactory> */
     use HasFactory;
+
+    protected $guarded = ['id'];
 }

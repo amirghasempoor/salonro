@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Expert\Requests\Manager\Hall;
+namespace App\Expert\Requests\Manager\ServiceCategory;
 
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
@@ -23,15 +23,11 @@ class UpdateRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => 'required|string|max:255',
-            'lat' => 'required|string',
-            'lng' => 'required|string',
-            'address' => 'required|string',
-            'postal_code' => 'required|string',
-            'telephone' => 'required|string',
-            'province_id' => 'required|exists:provinces,id',
-            'city_id' => 'required|exists:cities,id',
-            'description' => 'string',
+            'cat_id' => 'required|int',
+            'cat_name' => 'required|string',
+            'sub_cat_id' => 'required|int',
+            'sub_cat_name' => 'required|string',
+            'icon' => 'image|mimes:jpeg,png,jpg,gif,svg',
         ];
     }
 }
