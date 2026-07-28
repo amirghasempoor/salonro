@@ -43,7 +43,7 @@ return [
             'provider' => 'users',
         ],
         'expert' => [
-            'driver' => 'session',
+            'driver' => 'sanctum',
             'provider' => 'experts',
         ]
     ],

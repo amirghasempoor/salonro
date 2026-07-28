@@ -24,8 +24,6 @@ class UpdateRequest extends FormRequest
     {
         return [
             'name' => 'required|string|max:255',
-            'owner_name' => 'required|string|max:255',
-            'owner_national_id' => 'required|string',
             'lat' => 'required|string',
             'lng' => 'required|string',
             'address' => 'required|string',
@@ -33,6 +31,7 @@ class UpdateRequest extends FormRequest
             'telephone' => 'required|string',
             'province_id' => 'required|exists:provinces,id',
             'city_id' => 'required|exists:cities,id',
+            'description' => 'string',
         ];
     }
 }

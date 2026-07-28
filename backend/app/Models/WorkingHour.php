@@ -9,4 +9,6 @@ class WorkingHour extends Model
 {
     /** @use HasFactory<\Database\Factories\WorkingHourFactory> */
     use HasFactory;
+
+    protected $guarded = ['id'];
 }

@@ -10,7 +10,7 @@ use InvalidArgumentException;
 
 class File
 {
-    public function save(HttpFile|UploadedFile $file, string $path, string $name = null, string $disk = 'public'): string
+    public static function save(HttpFile|UploadedFile $file, string $path, string $name = null, string $disk = 'public'): string
     {
         return Storage::disk($disk)->putFileAs(
             $path,
@@ -26,7 +26,7 @@ class File
      * @return void
      * @throws InvalidArgumentException when filePath is empty.
      */
-    public function delete(string $filePath, bool $url_is_absolute = false, string $disk = 'public'): void
+    public static function delete(string $filePath, bool $url_is_absolute = false, string $disk = 'public'): void
     {
         if (!$filePath){
             throw new InvalidArgumentException('File path is invalid.');
@@ -53,7 +53,7 @@ class File
         return false;
     }
 
-    public function tail($file_path, $lines = 100, $buffer = 2048): bool|string
+    public static function tail($file_path, $lines = 100, $buffer = 2048): bool|string
     {
         // Open file
         $file = @fopen($file_path, "rb");
@@ -106,7 +106,7 @@ class File
         return trim($output);
     }
 
-    public function deleteDirectory(string $path, string $disk = 'public'): void
+    public static function deleteDirectory(string $path, string $disk = 'public'): void
     {
         Storage::disk($disk)->deleteDirectory($path);
     }

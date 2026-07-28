@@ -24,7 +24,8 @@ class UploadPortfolioRequest extends FormRequest
     {
         return [
             'portfolio' => 'required|array',
-            'portfolio.*' => 'required|file|mimes:jpg,jpeg,png,gif',
+            'portfolio.*.image' => 'required|file|mimes:jpg,jpeg,png,gif',
+            'portfolio.*.title' => 'required|string',
         ];
     }
 }

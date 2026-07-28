@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
+use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -14,7 +15,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 class Expert extends Authenticatable
 {
     /** @use HasFactory<ExpertFactory> */
-    use HasFactory, HasRoles;
+    use HasFactory, HasRoles, HasApiTokens;
 
     protected $guarded = ['id'];
 
@@ -23,13 +24,18 @@ class Expert extends Authenticatable
         return $this->belongsToMany(Hall::class);
     }
 
-    public function images(): MorphToMany
+    public function images(): MorphMany
     {
-        return $this->morphToMany(Image::class, 'imageable');
+        return $this->morphMany(Image::class, 'imageable');
     }
 
-    public function workingHours(): MorphToMany
+    public function workingHours(): MorphMany
     {
-        return $this->morphToMany(WorkingHour::class, 'hourable');
+        return $this->morphMany(WorkingHour::class, 'hourable');
+    }
+
+    public function services(): BelongsToMany
+    {
+        return $this->belongsToMany(Service::class);
     }
 }

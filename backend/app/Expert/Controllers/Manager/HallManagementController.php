@@ -24,16 +24,13 @@ class HallManagementController extends Controller
     {
         $query = Expert::query()
             ->find(Auth::guard('expert')->user()->id)
-            ->halls();
+            ->halls()->select(['owner_name', 'name', 'lat', 'lng', 'address']);
 
         $data = DataTableFacade::run(
             $query,
             $request,
             allowedFilters: ['*'],
             allowedSortings: ['*'],
-            allowedSelects: [
-                'id', 'name', 'lat', 'lng', 'address',
-            ]
         );
 
         return response()->json($data);
@@ -46,9 +43,11 @@ class HallManagementController extends Controller
     {
         try {
             DB::transaction(function () use ($request) {
-                Hall::query()->create([
+                $owner = Auth::guard('expert')->user();
+                $hall = Hall::query()->create([
                     'name' => $request->name,
-                    'owner_id' => Auth::guard('expert')->user()->id,
+                    'owner_id' => $owner->id,
+                    'owner_name' => $owner->last_name,
                     'lat' => $request->lat,
                     'lng' => $request->lng,
                     'address' => $request->address,
@@ -58,6 +57,8 @@ class HallManagementController extends Controller
                     'city_id' => $request->city_id,
                     'description' => $request->description,
                 ]);
+
+                $hall->services()->createMany($request->services);
             });
 
             return $this->successResponse();
@@ -72,7 +73,7 @@ class HallManagementController extends Controller
      */
     public function show(Hall $hall): JsonResponse
     {
-        return $this->successResponse($hall);
+        return $this->successResponse($hall->load('services'));
     }
 
     /**
@@ -91,6 +92,7 @@ class HallManagementController extends Controller
                     'telephone' => $request->telephone,
                     'province_id' => $request->province_id,
                     'city_id' => $request->city_id,
+                    'description' => $request->description,
                 ]);
             });
 
@@ -110,6 +112,7 @@ class HallManagementController extends Controller
         try {
             DB::transaction(function () use ($hall) {
                 $hall->experts()->detach();
+                $hall->services()->delete();
                 $hall->delete();
             });
             return $this->successResponse();

@@ -44,13 +44,12 @@ class AuthController extends Controller
             'avatar' => $avatar,
         ]);
 
-        $expert->assignRole(
-            $request->role == 1 ? Roles::Expert->value : Roles::Manager->value
-        );
+        $expert->assignRole($request->role == 1 ? Roles::Expert->value : Roles::Manager->value);
 
-        $request->session()->regenerateToken();
-
-        return $this->successResponse();
+        return $this->successResponse([
+            'token' => $expert->createToken("EXPERT_TOKEN", ['*'], now()->addWeek())->plainTextToken,
+            'role' => $expert->getRoleNames()->first(),
+        ]);
     }
 
     /**
@@ -76,16 +75,16 @@ class AuthController extends Controller
 
                 $expert->assignRole(Roles::Expert->value);
 
-                Auth::guard('expert')->login($expert);
-
                 OtpFacade::deactivate($request->phone_number, $request->verification_code);
-
-                $request->session()->regenerateToken();
 
                 return $expert;
             });
 
-            return $this->successResponse(new ExpertResource($expert));
+            return $this->successResponse([
+                'token' => $expert->createToken("EXPERT_TOKEN", ['*'], now()->addWeek())->plainTextToken,
+                'is_verified' => $expert->is_verified,
+                'role' => $expert->getRoleNames()->first(),
+            ]);
         }
 
         return $this->errorResponse(__('messages.incorrect_otp'));
@@ -93,20 +92,26 @@ class AuthController extends Controller
 
     public function loginWithPassword(LoginWithPasswordRequest $request): JsonResponse
     {
-        if (Auth::guard('expert')->attempt($request->only('phone_number', 'password')))
+        $expert = Expert::query()->where('phone_number', '=', $request->phone_number)->first();
+
+        if (!Hash::check($request->password, $expert->password))
         {
-            $request->session()->regenerate();
-            return $this->successResponse();
+            return $this->errorResponse(__('messages.invalid_credential'));
         }
 
-        return $this->errorResponse(__('messages.invalid_credentials'));
+        $token = $expert->createToken("EXPERT_TOKEN", ['*'], now()->addWeek())->plainTextToken;
+
+        return $this->successResponse([
+            'token' => $token,
+            'is_verified' => $expert->is_verified,
+            'role' => $expert->getRoleNames()->first(),
+        ]);
     }
 
-    public function logout(Request $request): JsonResponse
+    public function logout(): JsonResponse
     {
-        Auth::guard('expert')->logout();
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
+        Auth::guard('expert')->user()->currentAccessToken()->delete();
+
         return $this->successResponse();
     }
 }

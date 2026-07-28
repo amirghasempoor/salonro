@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Expert\Requests\Manager\Expert;
+namespace App\Expert\Requests\Manager\ServiceCategory;
 
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
@@ -23,10 +23,11 @@ class StoreRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'first_name' => 'required|string|max:255',
-            'last_name' => 'required|string|max:255',
-            'password' => 'required|string|min:8|confirmed',
-            'phone_number' => 'required|string|max:255|unique:experts,phone_number',
+            'cat_id' => 'required|int',
+            'cat_name' => 'required|string',
+            'sub_cat_id' => 'required|int',
+            'sub_cat_name' => 'required|string',
+            'icon' => 'image|mimes:jpeg,png,jpg,gif,svg',
         ];
     }
 }
