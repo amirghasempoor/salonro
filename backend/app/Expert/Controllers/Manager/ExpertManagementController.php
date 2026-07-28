@@ -22,10 +22,10 @@ class ExpertManagementController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(Request $request): JsonResponse
+    public function index(Request $request, int $hall_id): JsonResponse
     {
         $query = Hall::query()
-            ->firstWhere('id', '=', $request->hall_id)
+            ->firstWhere('id', '=', $hall_id)
             ->experts();
 
         $data = DataTableFacade::run(
@@ -45,16 +45,19 @@ class ExpertManagementController extends Controller
     {
         try {
             DB::transaction(function () use ($request) {
+                $hall = Hall::query()->where('id', '=', $request->query('hall_id'))->firstOrFail();
                 $expert = Expert::query()->create([
                     'first_name' => $request->first_name,
                     'last_name' => $request->last_name,
                     'phone_number' => $request->phone_number,
                     'password' => Hash::make($request->password),
-                    'province_id' => Hall::query()->find($request->hall_id)->province_id,
-                    'city_id' => Hall::query()->find($request->hall_id)->city_id,
+                    'province_id' => $hall->province_id,
+                    'city_id' => $hall->city_id,
                 ]);
 
                 $expert->assignRole(Roles::Expert->value);
+                $hall->experts()->attach($expert->id, ['joined_at' => now(),]);
+                $expert->services()->sync($request->services);
             });
 
             return $this->successResponse();
@@ -68,7 +71,7 @@ class ExpertManagementController extends Controller
      */
     public function show(Expert $expert): JsonResponse
     {
-        return $this->successResponse($expert);
+        return $this->successResponse($expert->load('services'));
     }
 
     /**
@@ -78,7 +81,7 @@ class ExpertManagementController extends Controller
     {
         try {
             DB::transaction(function () use ($request, $expert) {
-                Expert::query()->create([
+                $expert->update([
                     'first_name' => $request->first_name,
                     'last_name' => $request->last_name,
                     'phone_number' => $request->phone_number,

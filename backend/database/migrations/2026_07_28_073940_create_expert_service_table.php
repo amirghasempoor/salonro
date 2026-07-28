@@ -11,12 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('expert_hall', function (Blueprint $table) {
+        Schema::create('expert_service', function (Blueprint $table) {
             $table->id();
             $table->foreignId('expert_id')->constrained('experts');
-            $table->foreignId('hall_id')->constrained('halls');
-            $table->boolean('is_active')->default(true);
-            $table->dateTime('joined_at')->nullable();
+            $table->foreignId('service_id')->constrained('services');
             $table->timestamps();
         });
     }
@@ -26,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('expert_hall');
+        Schema::dropIfExists('expert_service');
     }
 };

@@ -33,4 +33,9 @@ class Expert extends Authenticatable
     {
         return $this->morphMany(WorkingHour::class, 'hourable');
     }
+
+    public function services(): BelongsToMany
+    {
+        return $this->belongsToMany(Service::class);
+    }
 }

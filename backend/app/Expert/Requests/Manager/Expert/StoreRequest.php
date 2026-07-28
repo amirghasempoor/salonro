@@ -26,9 +26,7 @@ class StoreRequest extends FormRequest
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
             'password' => 'required|string|min:8|confirmed',
-            'phone_number' => 'required|string|max:255|unique:users,phone_number',
-            'province_id' => 'required|exists:provinces,id',
-            'city_id' => 'required|exists:cities,id',
+            'phone_number' => 'required|string|max:255|unique:experts,phone_number',
         ];
     }
 }

@@ -1,6 +1,7 @@
 <?php
 
 use App\Expert\Controllers\AuthController;
+use App\Expert\Controllers\Manager\ExpertManagementController;
 use App\Expert\Controllers\Manager\HallManagementController;
 use App\Expert\Controllers\Manager\ServiceCategoryManagementController;
 use App\Expert\Controllers\ProfileController;
@@ -66,4 +67,16 @@ Route::prefix('service_categories')
         Route::get('/{reservation}', 'show')->name('show');
         Route::post('/{reservation}', 'update')->name('update');
         Route::delete('/{reservation}', 'destroy')->name('destroy');
+    });
+
+Route::prefix('staff')
+    ->name('staff.')
+    ->middleware(['auth:expert'])
+    ->controller(ExpertManagementController::class)
+    ->group(function () {
+        Route::post('/', 'store')->name('store');
+        Route::get('/{hall}', 'index')->name('index');
+        Route::get('/{expert}', 'show')->name('show');
+        Route::post('/{expert}', 'update')->name('update');
+        Route::delete('/{expert}', 'destroy')->name('destroy');
     });
