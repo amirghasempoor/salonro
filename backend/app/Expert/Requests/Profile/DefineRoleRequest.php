@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Expert\Requests\Manager\HallService;
+namespace App\Expert\Requests\Profile;
 
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
-class StoreRequest extends FormRequest
+class DefineRoleRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -23,10 +23,7 @@ class StoreRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'category_id' => 'required|integer|exists:service_categories,id',
-            'description' => 'string|max:255',
-            'duration' => 'required|integer|between:1,1000000',
-            'price' => 'required|integer|between:1,1000000',
+            'role' => 'required|exists:roles,id|in:2,3',
         ];
     }
 }

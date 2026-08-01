@@ -16,6 +16,8 @@ class Hall extends Model
 
     protected $guarded = ['id'];
 
+    protected $hidden = ['pivot'];
+
     public function experts(): BelongsToMany
     {
         return $this->belongsToMany(Expert::class);

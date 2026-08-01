@@ -73,8 +73,6 @@ class AuthController extends Controller
                     'phone_number' => $request->phone_number,
                     ]);
 
-                $expert->assignRole(Roles::Expert->value);
-
                 OtpFacade::deactivate($request->phone_number, $request->verification_code);
 
                 return $expert;

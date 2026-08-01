@@ -18,6 +18,7 @@ class Expert extends Authenticatable
     use HasFactory, HasRoles, HasApiTokens;
 
     protected $guarded = ['id'];
+    protected $hidden = ['pivot'];
 
     public function halls(): BelongsToMany
     {

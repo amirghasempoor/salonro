@@ -42,7 +42,7 @@ class HallManagementController extends Controller
     public function store(StoreRequest $request): JsonResponse
     {
         try {
-            DB::transaction(function () use ($request) {
+            $hall = DB::transaction(function () use ($request) {
                 $owner = Auth::guard('expert')->user();
                 $hall = Hall::query()->create([
                     'name' => $request->name,
@@ -59,9 +59,13 @@ class HallManagementController extends Controller
                 ]);
 
                 $hall->services()->createMany($request->services);
+
+                return $hall;
             });
 
-            return $this->successResponse();
+            return $this->successResponse([
+                'hall_id' => $hall->id,
+            ]);
         }
         catch (\Throwable $e) {
             return $this->errorResponse($e->getMessage());

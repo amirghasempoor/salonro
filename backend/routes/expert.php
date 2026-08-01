@@ -3,6 +3,7 @@
 use App\Expert\Controllers\AuthController;
 use App\Expert\Controllers\Manager\ExpertManagementController;
 use App\Expert\Controllers\Manager\HallManagementController;
+use App\Expert\Controllers\Manager\HallServicesManagementController;
 use App\Expert\Controllers\Manager\ServiceCategoryManagementController;
 use App\Expert\Controllers\ProfileController;
 use App\Expert\Controllers\ReservationManagementController;
@@ -30,6 +31,7 @@ Route::prefix('profile')
         Route::post('change_avatar', 'changeAvatar')->name('changeAvatar');
         Route::post('upload_portfolio', 'uploadPortfolio')->name('uploadPortfolio');
         Route::post('define_working_hour', 'defineWorkingHour')->name('defineWorkingHour');
+        Route::post('define_role', 'defineRole')->name('defineRole');
     });
 
 Route::prefix('halls')
@@ -62,7 +64,7 @@ Route::prefix('service_categories')
     ->controller(ServiceCategoryManagementController::class)
     ->group(function () {
         Route::get('/', 'index')->name('index');
-        Route::get('/', 'list')->name('list');
+        Route::get('/list', 'list')->name('list');
         Route::post('/', 'store')->name('store');
         Route::get('/{reservation}', 'show')->name('show');
         Route::post('/{reservation}', 'update')->name('update');
@@ -74,9 +76,21 @@ Route::prefix('staff')
     ->middleware(['auth:expert'])
     ->controller(ExpertManagementController::class)
     ->group(function () {
-        Route::post('/', 'store')->name('store');
         Route::get('/{hall}', 'index')->name('index');
+        Route::post('/{hall}', 'store')->name('store');
         Route::get('/{expert}', 'show')->name('show');
         Route::post('/{expert}', 'update')->name('update');
         Route::delete('/{expert}', 'destroy')->name('destroy');
+    });
+
+Route::prefix('services')
+    ->name('services.')
+    ->middleware(['auth:expert'])
+    ->controller(HallServicesManagementController::class)
+    ->group(function () {
+        Route::get('/{hall}', 'index')->name('index');
+        Route::post('/{hall}', 'store')->name('store');
+        Route::get('/{service}', 'show')->name('show');
+        Route::post('/{service}', 'update')->name('update');
+        Route::delete('/{service}', 'destroy')->name('destroy');
     });

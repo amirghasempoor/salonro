@@ -23,7 +23,6 @@ class UpdateRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => 'required|string|max:255',
             'hall_id' => 'required|integer|exists:halls,id',
             'category_id' => 'required|integer|exists:service_categories,id',
             'description' => 'string|max:255',

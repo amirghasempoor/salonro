@@ -38,12 +38,27 @@ class ServiceCategoryManagementController extends Controller
 
     public function list(): JsonResponse
     {
-        $categories = ServiceCategory::query()
-            ->orderBy('cat_id')
-            ->groupBy('cat_id')
+        $rows = ServiceCategory::query()->orderBy('cat_id')
+            ->orderBy('sub_cat_id')
             ->get();
 
-        return $this->successResponse($categories);
+        $categories = $rows->groupBy('cat_id')->map(function ($group) {
+                $first = $group->first();
+                return [
+                    'cat_id' => $first->cat_id,
+                    'title' => $first->cat_name,
+                    'icon'  => $first->icon,
+                    'templates' => $group->map(function ($row) {
+                        return [
+                            'id' => $row->id,
+                            'sub_cat_id'   => $row->sub_cat_id,
+                            'name' => $row->sub_cat_name,
+                        ];
+                    })->values(),
+                ];
+            })->values();
+
+        return response()->json($categories);
     }
 
     /**
