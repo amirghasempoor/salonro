@@ -13,7 +13,6 @@ return new class extends Migration
     {
         Schema::create('services', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
             $table->foreignId('hall_id')->constrained('halls');
             $table->foreignId('category_id')->constrained('service_categories');
             $table->string('description')->nullable();

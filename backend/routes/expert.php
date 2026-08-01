@@ -3,6 +3,7 @@
 use App\Expert\Controllers\AuthController;
 use App\Expert\Controllers\Manager\ExpertManagementController;
 use App\Expert\Controllers\Manager\HallManagementController;
+use App\Expert\Controllers\Manager\HallServicesManagementController;
 use App\Expert\Controllers\Manager\ServiceCategoryManagementController;
 use App\Expert\Controllers\ProfileController;
 use App\Expert\Controllers\ReservationManagementController;
@@ -62,7 +63,7 @@ Route::prefix('service_categories')
     ->controller(ServiceCategoryManagementController::class)
     ->group(function () {
         Route::get('/', 'index')->name('index');
-        Route::get('/', 'list')->name('list');
+        Route::get('/list', 'list')->name('list');
         Route::post('/', 'store')->name('store');
         Route::get('/{reservation}', 'show')->name('show');
         Route::post('/{reservation}', 'update')->name('update');
@@ -79,4 +80,17 @@ Route::prefix('staff')
         Route::get('/{expert}', 'show')->name('show');
         Route::post('/{expert}', 'update')->name('update');
         Route::delete('/{expert}', 'destroy')->name('destroy');
+    });
+
+Route::prefix('services')
+    ->name('services.')
+    ->middleware(['auth:expert'])
+    ->controller(HallServicesManagementController::class)
+    ->group(function () {
+//        Route::get('/', 'list')->name('list');
+        Route::post('/', 'store')->name('store');
+        Route::get('/{hall_id}', 'index')->name('index');
+        Route::get('/{service}', 'show')->name('show');
+        Route::post('/{service}', 'update')->name('update');
+        Route::delete('/{service}', 'destroy')->name('destroy');
     });
