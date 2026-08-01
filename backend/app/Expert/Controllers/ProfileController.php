@@ -2,8 +2,10 @@
 
 namespace App\Expert\Controllers;
 
+use App\Enums\Roles;
 use App\Expert\Requests\Profile\ChangeAvatarRequest;
 use App\Expert\Requests\Profile\ChangePasswordRequest;
+use App\Expert\Requests\Profile\DefineRoleRequest;
 use App\Expert\Requests\Profile\DefineWorkingHourRequest;
 use App\Expert\Requests\Profile\EditRequest;
 use App\Expert\Requests\Profile\UploadPortfolioRequest;
@@ -99,6 +101,13 @@ class ProfileController extends Controller
                 'to' => $workingHour['to'],
             ]);
         }
+        return $this->successResponse();
+    }
+
+    public function defineRole(DefineRoleRequest $request): JsonResponse
+    {
+        $expert = Auth::guard('expert')->user();
+        $expert->assignRole(Roles::labels($request->role));
         return $this->successResponse();
     }
 }

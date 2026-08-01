@@ -31,6 +31,7 @@ Route::prefix('profile')
         Route::post('change_avatar', 'changeAvatar')->name('changeAvatar');
         Route::post('upload_portfolio', 'uploadPortfolio')->name('uploadPortfolio');
         Route::post('define_working_hour', 'defineWorkingHour')->name('defineWorkingHour');
+        Route::post('define_role', 'defineRole')->name('defineRole');
     });
 
 Route::prefix('halls')
@@ -75,8 +76,8 @@ Route::prefix('staff')
     ->middleware(['auth:expert'])
     ->controller(ExpertManagementController::class)
     ->group(function () {
-        Route::post('/', 'store')->name('store');
         Route::get('/{hall}', 'index')->name('index');
+        Route::post('/{hall}', 'store')->name('store');
         Route::get('/{expert}', 'show')->name('show');
         Route::post('/{expert}', 'update')->name('update');
         Route::delete('/{expert}', 'destroy')->name('destroy');
@@ -87,9 +88,8 @@ Route::prefix('services')
     ->middleware(['auth:expert'])
     ->controller(HallServicesManagementController::class)
     ->group(function () {
-//        Route::get('/', 'list')->name('list');
-        Route::post('/', 'store')->name('store');
-        Route::get('/{hall_id}', 'index')->name('index');
+        Route::get('/{hall}', 'index')->name('index');
+        Route::post('/{hall}', 'store')->name('store');
         Route::get('/{service}', 'show')->name('show');
         Route::post('/{service}', 'update')->name('update');
         Route::delete('/{service}', 'destroy')->name('destroy');

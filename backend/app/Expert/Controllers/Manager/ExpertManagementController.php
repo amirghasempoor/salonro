@@ -22,17 +22,14 @@ class ExpertManagementController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(Request $request, int $hall_id): JsonResponse
+    public function index(Request $request, Hall $hall): JsonResponse
     {
-        $query = Hall::query()
-            ->firstWhere('id', '=', $hall_id)
-            ->experts();
-
         $data = DataTableFacade::run(
-            $query,
+            $hall->experts(),
             $request,
             allowedFilters: ['*'],
             allowedSortings: ['*'],
+            allowedSelects: ['experts.id', 'first_name', 'last_name', 'phone_number', 'avatar'],
         );
 
         return response()->json($data);
@@ -41,16 +38,14 @@ class ExpertManagementController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreRequest $request): JsonResponse
+    public function store(StoreRequest $request, Hall $hall): JsonResponse
     {
         try {
-            DB::transaction(function () use ($request) {
-                $hall = Hall::query()->where('id', '=', $request->query('hall_id'))->firstOrFail();
+            DB::transaction(function () use ($request, $hall) {
                 $expert = Expert::query()->create([
                     'first_name' => $request->first_name,
                     'last_name' => $request->last_name,
                     'phone_number' => $request->phone_number,
-                    'password' => Hash::make($request->password),
                     'province_id' => $hall->province_id,
                     'city_id' => $hall->city_id,
                 ]);

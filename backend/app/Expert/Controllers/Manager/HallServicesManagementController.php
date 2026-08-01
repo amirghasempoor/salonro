@@ -19,9 +19,9 @@ class HallServicesManagementController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(Request $request, int $hall_id): JsonResponse
+    public function index(Request $request, int $hall): JsonResponse
     {
-        $query = Service::query()->where('hall_id', '=', $hall_id);
+        $query = Service::query()->where('hall_id', '=', $hall);
 
         $data = DataTableFacade::run(
             $query,
@@ -39,12 +39,11 @@ class HallServicesManagementController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreRequest $request): JsonResponse
+    public function store(StoreRequest $request, Hall $hall): JsonResponse
     {
         try {
-            DB::transaction(function () use ($request) {
-                Service::query()->create([
-                    'hall_id' => $request->query('hall_id'),
+            DB::transaction(function () use ($request, $hall) {
+                $hall->services()->create([
                     'category_id' => $request->category_id,
                     'description' => $request->description,
                     'duration' => $request->duration,
