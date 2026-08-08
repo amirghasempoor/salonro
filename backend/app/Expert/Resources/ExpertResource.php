@@ -22,7 +22,7 @@ class ExpertResource extends JsonResource
             'phone_number' => $this->resource->phone_number,
             'role' => $this->resource->getRoleNames()->first(),
             'halls' => $this->when($this->resource->getRoleNames()->first() == Roles::Manager->value,
-                HallResource::collection($this->resource->halls)
+                $this->resource->halls->pluck('id')->values()
             ),
             'is_verified' => $this->resource->is_verified
         ];

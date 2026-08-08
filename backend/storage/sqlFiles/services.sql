@@ -1,4 +1,4 @@
-INSERT INTO service_categories
+INSERT INTO services
 (cat_id, cat_name, sub_cat_id, sub_cat_name, icon, created_at, updated_at)
 VALUES
 -- Hair

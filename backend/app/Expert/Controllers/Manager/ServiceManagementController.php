@@ -9,13 +9,13 @@ use App\Facades\File\File;
 use App\Http\Controllers\Controller;
 use App\Models\Expert;
 use App\Models\Hall;
-use App\Models\ServiceCategory;
+use App\Models\Service;
 use App\Traits\ApiResponse;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
-class ServiceCategoryManagementController extends Controller
+class ServiceManagementController extends Controller
 {
     use ApiResponse;
     /**
@@ -24,7 +24,7 @@ class ServiceCategoryManagementController extends Controller
     public function index(Request $request): JsonResponse
     {
         $data = DataTableFacade::run(
-            ServiceCategory::query(),
+            Service::query(),
             $request,
             allowedFilters: ['*'],
             allowedSortings: ['*'],
@@ -38,7 +38,7 @@ class ServiceCategoryManagementController extends Controller
 
     public function list(): JsonResponse
     {
-        $rows = ServiceCategory::query()->orderBy('cat_id')
+        $rows = Service::query()->orderBy('cat_id')
             ->orderBy('sub_cat_id')
             ->get();
 
@@ -68,7 +68,7 @@ class ServiceCategoryManagementController extends Controller
     {
         try {
             DB::transaction(function () use ($request) {
-                ServiceCategory::query()->create([
+                Service::query()->create([
                     'cat_id' => $request->cat_id,
                     'cat_name' => $request->cat_name,
                     'sub_cat_id' => $request->sub_cat_id,
@@ -87,7 +87,7 @@ class ServiceCategoryManagementController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(ServiceCategory $category): JsonResponse
+    public function show(Service $category): JsonResponse
     {
         return $this->successResponse($category);
     }
@@ -95,7 +95,7 @@ class ServiceCategoryManagementController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateRequest $request, ServiceCategory $category): JsonResponse
+    public function update(UpdateRequest $request, Service $category): JsonResponse
     {
         try {
             DB::transaction(function () use ($request, $category) {
@@ -119,7 +119,7 @@ class ServiceCategoryManagementController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(ServiceCategory $category): JsonResponse
+    public function destroy(Service $category): JsonResponse
     {
         $category->delete();
         return $this->successResponse();
