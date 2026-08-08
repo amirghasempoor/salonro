@@ -27,7 +27,7 @@ class EditRequest extends FormRequest
             'last_name' => 'required|string',
             'avatar' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             'bio' => 'string|max:255',
-            'password' => 'required|string|regex:/^(?=.*[a-zA-Z])(?=.*\d).+$/|min:8|confirmed',
+            'password' => 'required|string|regex:/^(?=.*[a-zA-Z])(?=.*\d).+$/|min:8',
         ];
     }
 }

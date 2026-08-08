@@ -58,7 +58,14 @@ class HallManagementController extends Controller
                     'description' => $request->description,
                 ]);
 
-                $hall->services()->createMany($request->services);
+                foreach ($request->services as $service) {
+                    $hall->services()->attach($service['service_id'], [
+                        'price' => $service['price'],
+                        'duration' => $service['duration'],
+                    ]);
+                }
+
+                $hall->experts()->attach($owner->id);
 
                 return $hall;
             });
@@ -123,5 +130,10 @@ class HallManagementController extends Controller
         } catch (\Throwable $e) {
             return $this->errorResponse($e->getMessage());
         }
+    }
+
+    public function services(Hall $hall): JsonResponse
+    {
+        return $this->successResponse($hall->services()->get(['services.id', 'sub_cat_name']));
     }
 }

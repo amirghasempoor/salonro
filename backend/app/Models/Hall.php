@@ -28,8 +28,8 @@ class Hall extends Model
         return $this->morphMany(Image::class, 'imageable');
     }
 
-    public function services(): HasMany
+    public function services(): BelongsToMany
     {
-        return $this->hasMany(Service::class);
+        return $this->belongsToMany(Service::class);
     }
 }

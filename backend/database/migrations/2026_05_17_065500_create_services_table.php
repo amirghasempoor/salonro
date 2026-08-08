@@ -13,12 +13,11 @@ return new class extends Migration
     {
         Schema::create('services', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('hall_id')->constrained('halls');
-            $table->foreignId('category_id')->constrained('service_categories');
-            $table->string('description')->nullable();
-            $table->float('duration');
-            $table->float('price');
-            $table->boolean('is_active')->default(true);
+            $table->unsignedTinyInteger('cat_id');
+            $table->string('cat_name');
+            $table->unsignedTinyInteger('sub_cat_id');
+            $table->string('sub_cat_name');
+            $table->string('icon')->nullable();
             $table->timestamps();
         });
     }
