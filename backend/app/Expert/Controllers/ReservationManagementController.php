@@ -8,18 +8,18 @@ use App\Expert\Requests\Reservation\StoreRequest;
 use App\Expert\Requests\Reservation\UpdateRequest;
 use App\Facades\DataTable\DataTableFacade;
 use App\Http\Controllers\Controller;
-use App\Traits\ApiResponse;
 use App\Models\Hall;
 use App\Models\Reservation;
 use App\Models\User;
+use App\Traits\ApiResponse;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class ReservationManagementController extends Controller
 {
     use ApiResponse;
+
     /**
      * Display a listing of the resource.
      */
@@ -37,7 +37,7 @@ class ReservationManagementController extends Controller
             allowedFilters: ['*'],
             allowedSortings: ['*'],
             allowedSelects: [
-                'id', 'user_name', 'state_name', 'from_date', 'to_date',
+                'id', 'user_name', 'state_name', 'start_time', 'finish_time',
             ]
         );
 
@@ -55,19 +55,19 @@ class ReservationManagementController extends Controller
 
                 $user = User::query()->firstOrCreate(
                     [
-                        'phone_number' => $request->phone_number
+                        'phone_number' => $request->phone_number,
                     ],
                     [
                         'first_name' => $request->first_name,
-                        'last_name' => $request->last_name
+                        'last_name' => $request->last_name,
                     ]
                 );
 
                 $reservation = Reservation::query()->create([
                     'user_id' => $user->id,
-                    'user_name' => $user->first_name . ' ' . $user->last_name,
+                    'user_name' => $user->first_name.' '.$user->last_name,
                     'expert_id' => $expert->id,
-                    'expert_name' => $expert->last_name,
+                    'expert_name' => $expert->full_name,
                     'hall_id' => $request->hall_id,
                     'hall_name' => Hall::query()->find($request->hall_id)->name,
                     'state_id' => ReservationStates::Reserve->value,
@@ -87,8 +87,7 @@ class ReservationManagementController extends Controller
             });
 
             return $this->successResponse();
-        }
-        catch (\Throwable $e) {
+        } catch (\Throwable $e) {
             return $this->errorResponse($e->getMessage());
         }
     }
@@ -124,9 +123,7 @@ class ReservationManagementController extends Controller
             });
 
             return $this->successResponse();
-        }
-        catch (\Throwable $e)
-        {
+        } catch (\Throwable $e) {
             return $this->errorResponse($e->getMessage());
         }
     }
@@ -141,6 +138,7 @@ class ReservationManagementController extends Controller
                 $reservation->services()->detach();
                 $reservation->delete();
             });
+
             return $this->successResponse();
         } catch (\Throwable $e) {
             return $this->errorResponse($e->getMessage());

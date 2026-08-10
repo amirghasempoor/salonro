@@ -5,8 +5,8 @@ namespace App\User\Controllers;
 use App\Expert\Requests\Auth\SendOtpRequest;
 use App\Facades\Otp\OtpFacade;
 use App\Http\Controllers\Controller;
-use App\Traits\ApiResponse;
 use App\Models\User;
+use App\Traits\ApiResponse;
 use App\User\Requests\Auth\LoginWithOtpRequest;
 use App\User\Requests\Auth\LoginWithPasswordRequest;
 use App\User\Requests\Auth\RegisterRequest;
@@ -42,13 +42,13 @@ class AuthController extends Controller
     public function sendOtp(SendOtpRequest $request): JsonResponse
     {
         OtpFacade::generate($request->phone_number, __('messages.otp'));
+
         return $this->successResponse();
     }
 
     public function loginWithOtp(LoginWithOtpRequest $request): JsonResponse
     {
-        if (OtpFacade::verify($request->phone_number, $request->verification_code))
-        {
+        if (OtpFacade::verify($request->phone_number, $request->verification_code)) {
             OtpFacade::deactivate($request->phone_number, $request->verification_code);
 
             $user = User::query()->firstWhere('phone_number', $request->phone_number);
@@ -59,14 +59,15 @@ class AuthController extends Controller
 
             return $this->successResponse();
         }
+
         return $this->errorResponse(__('messages.incorrect_otp'));
     }
 
     public function loginWithPassword(LoginWithPasswordRequest $request): JsonResponse
     {
-        if (Auth::guard('web')->attempt($request->only('phone_number', 'password')))
-        {
+        if (Auth::guard('web')->attempt($request->only('phone_number', 'password'))) {
             $request->session()->regenerate();
+
             return $this->successResponse();
         }
 
@@ -78,6 +79,7 @@ class AuthController extends Controller
         Auth::guard('web')->logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
+
         return $this->successResponse();
     }
 }

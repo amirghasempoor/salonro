@@ -24,7 +24,7 @@ class ExpertResource extends JsonResource
             'halls' => $this->when($this->resource->getRoleNames()->first() == Roles::Manager->value,
                 $this->resource->halls->pluck('id')->values()
             ),
-            'is_verified' => $this->resource->is_verified
+            'is_verified' => $this->resource->is_verified,
         ];
     }
 }

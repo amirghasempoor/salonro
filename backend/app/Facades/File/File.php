@@ -2,33 +2,29 @@
 
 namespace App\Facades\File;
 
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\File as HttpFile;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
 
 class File
 {
-    public static function save(HttpFile|UploadedFile $file, string $path, string $name = null, string $disk = 'public'): string
+    public static function save(HttpFile|UploadedFile $file, string $path, ?string $name = null, string $disk = 'public'): string
     {
         return Storage::disk($disk)->putFileAs(
             $path,
             $file,
-            $name ?? Str::uuid() . '.' . $file->extension()
+            $name ?? Str::uuid().'.'.$file->extension()
         );
     }
 
     /**
-     * @param string $filePath
-     * @param bool $url_is_absolute
-     * @param string $disk
-     * @return void
      * @throws InvalidArgumentException when filePath is empty.
      */
     public static function delete(string $filePath, bool $url_is_absolute = false, string $disk = 'public'): void
     {
-        if (!$filePath){
+        if (! $filePath) {
             throw new InvalidArgumentException('File path is invalid.');
         }
 
@@ -50,13 +46,14 @@ class File
 
             return true;
         }
+
         return false;
     }
 
     public static function tail($file_path, $lines = 100, $buffer = 2048): bool|string
     {
         // Open file
-        $file = @fopen($file_path, "rb");
+        $file = @fopen($file_path, 'rb');
         if ($file === false) {
             return false;
         }
@@ -84,7 +81,7 @@ class File
             fseek($file, -$seek, SEEK_CUR);
 
             // Read a chunk and prepend it to our output
-            $output = ($chunk = fread($file, $seek)) . $output;
+            $output = ($chunk = fread($file, $seek)).$output;
 
             // Jump back to where we started reading
             fseek($file, -mb_strlen($chunk, '8bit'), SEEK_CUR);
@@ -103,6 +100,7 @@ class File
 
         // Close file and return
         fclose($file);
+
         return trim($output);
     }
 

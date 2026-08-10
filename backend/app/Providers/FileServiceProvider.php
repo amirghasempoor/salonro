@@ -13,7 +13,7 @@ class FileServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->app->bind('file', function () {
-            return new File();
+            return new File;
         });
     }
 

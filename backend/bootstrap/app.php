@@ -3,6 +3,7 @@
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use Illuminate\Routing\Middleware\SubstituteBindings;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -12,7 +13,7 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
         then: function () {
             Route::prefix('expert')
-                ->middleware(\Illuminate\Routing\Middleware\SubstituteBindings::class)
+                ->middleware(SubstituteBindings::class)
                 ->group(base_path('routes/expert.php'));
         },
     )

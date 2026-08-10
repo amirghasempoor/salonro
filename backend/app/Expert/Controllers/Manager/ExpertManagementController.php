@@ -13,7 +13,6 @@ use App\Traits\ApiResponse;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Hash;
 
 class ExpertManagementController extends Controller
 {
@@ -51,7 +50,7 @@ class ExpertManagementController extends Controller
                 ]);
 
                 $expert->assignRole(Roles::Expert->value);
-                $hall->experts()->attach($expert->id, ['joined_at' => now(),]);
+                $hall->experts()->attach($expert->id, ['joined_at' => now()]);
                 $expert->services()->sync($request->services);
             });
 
@@ -64,7 +63,7 @@ class ExpertManagementController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Expert $expert): JsonResponse
+    public function show(Hall $hall, Expert $expert): JsonResponse
     {
         return $this->successResponse($expert->load('services'));
     }
@@ -72,7 +71,7 @@ class ExpertManagementController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateRequest $request, Expert $expert): JsonResponse
+    public function update(UpdateRequest $request, Hall $hall, Expert $expert): JsonResponse
     {
         try {
             DB::transaction(function () use ($request, $expert) {
@@ -92,9 +91,18 @@ class ExpertManagementController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Expert $expert): JsonResponse
+    public function destroy(Hall $hall, Expert $expert): JsonResponse
     {
-        $expert->delete();
-        return $this->successResponse();
+        try {
+            DB::transaction(function () use ($expert) {
+                $expert->halls()->detach();
+                $expert->services()->detach();
+                $expert->delete();
+            });
+
+            return $this->successResponse();
+        } catch (\Throwable $e) {
+            return $this->errorResponse($e->getMessage());
+        }
     }
 }

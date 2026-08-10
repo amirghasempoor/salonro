@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\Province;
 use App\Traits\ApiResponse;
-use Illuminate\Http\Request;
 
 class ProvinceController extends Controller
 {

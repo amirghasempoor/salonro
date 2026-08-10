@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Expert;
 use App\Models\User;
 
 return [
@@ -45,7 +46,7 @@ return [
         'expert' => [
             'driver' => 'sanctum',
             'provider' => 'experts',
-        ]
+        ],
     ],
 
     /*
@@ -72,7 +73,7 @@ return [
         ],
         'experts' => [
             'driver' => 'eloquent',
-            'model' => env('AUTH_MODEL', App\Models\Expert::class),
+            'model' => env('AUTH_MODEL', Expert::class),
         ],
 
         // 'users' => [

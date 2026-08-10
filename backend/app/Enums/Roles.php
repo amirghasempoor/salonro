@@ -17,6 +17,7 @@ enum Roles: string
             3 => 'manager',
             4 => 'user',
         ];
+
         return $map[$id];
     }
 }

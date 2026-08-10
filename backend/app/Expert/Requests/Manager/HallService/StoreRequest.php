@@ -23,8 +23,8 @@ class StoreRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'category_id' => 'required|integer|exists:service_categories,id',
-            'description' => 'string|max:255',
+            'service_id' => 'required|integer|exists:services,id',
+            'description' => 'nullable|string|max:255',
             'duration' => 'required|integer|between:1,1000000',
             'price' => 'required|integer|between:1,1000000',
         ];

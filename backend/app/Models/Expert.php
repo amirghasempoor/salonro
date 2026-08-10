@@ -4,21 +4,25 @@ namespace App\Models;
 
 use Database\Factories\ExpertFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
-use Illuminate\Database\Eloquent\Relations\MorphToMany;
+use Illuminate\Foundation\Auth\User as Authenticatable;
 use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
-use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Expert extends Authenticatable
 {
     /** @use HasFactory<ExpertFactory> */
-    use HasFactory, HasRoles, HasApiTokens;
+    use HasApiTokens, HasFactory, HasRoles;
 
     protected $guarded = ['id'];
+
     protected $hidden = ['pivot'];
+
+    public function getFullNameAttribute(): string
+    {
+        return trim($this->first_name.' '.$this->last_name);
+    }
 
     public function halls(): BelongsToMany
     {

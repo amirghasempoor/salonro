@@ -2,8 +2,8 @@
 
 namespace App\Services\DataTable\Validators;
 
-use App\Services\DataTable\Enums\SearchType;
 use App\Services\DataTable\Enums\DataType;
+use App\Services\DataTable\Enums\SearchType;
 use App\Services\DataTable\Exceptions\InvalidFilterException;
 use App\Services\DataTable\Filter\Filter;
 
@@ -11,14 +11,12 @@ class FilterValidator
 {
     private static $instance;
 
-    private function __construct()
-    {
-    }
+    private function __construct() {}
 
     public static function getInstance(): FilterValidator
     {
-        if (!isset(self::$instance)) {
-            self::$instance = new static();
+        if (! isset(self::$instance)) {
+            self::$instance = new static;
         }
 
         return self::$instance;
@@ -26,21 +24,21 @@ class FilterValidator
 
     public function isValid(Filter $filter, array $allowedFilters): bool
     {
-        if (!$this->isAllowed($filter, $allowedFilters)) {
+        if (! $this->isAllowed($filter, $allowedFilters)) {
             $filterId = $filter->getId();
             throw new InvalidFilterException($filter->getId(), "filtering field `$filterId` is not allowed.");
         }
 
-        if (!$this->isValidSearchFunction($filter)) {
+        if (! $this->isValidSearchFunction($filter)) {
             $searchFunction = $filter->getFn();
             throw new InvalidFilterException($searchFunction, "search function `$searchFunction` is invalid.");
         }
 
         if ($this->isValidDataType($filter) == -1) {
-            throw new InvalidFilterException(null, "datatype property is not set in `filters` array.");
+            throw new InvalidFilterException(null, 'datatype property is not set in `filters` array.');
         }
 
-        if (!$this->isValidDataType($filter)) {
+        if (! $this->isValidDataType($filter)) {
             $datatype = $filter->getDatatype();
             throw new InvalidFilterException($datatype, "datatype `$datatype` is invalid.");
         }
@@ -56,13 +54,15 @@ class FilterValidator
     protected function isValidSearchFunction(Filter $filter): bool
     {
         $searchFunction = $filter->getFn();
+
         return isset($searchFunction) && in_array($searchFunction, SearchType::values());
     }
 
     protected function isValidDataType(Filter $filter): int
     {
-        if (!property_exists($filter, 'datatype'))
+        if (! property_exists($filter, 'datatype')) {
             return -1;
+        }
 
         return $filter->getDatatype() && in_array($filter->getDatatype(), DataType::values()) ? 1 : 0;
     }

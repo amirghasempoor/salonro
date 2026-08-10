@@ -13,7 +13,7 @@ class OtpServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->app->bind('Otp', function () {
-            return new Otp();
+            return new Otp;
         });
     }
 

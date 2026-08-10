@@ -67,9 +67,9 @@ Route::prefix('service_categories')
         Route::get('/', 'index')->name('index');
         Route::get('/list', 'list')->name('list');
         Route::post('/', 'store')->name('store');
-        Route::get('/{reservation}', 'show')->name('show');
-        Route::post('/{reservation}', 'update')->name('update');
-        Route::delete('/{reservation}', 'destroy')->name('destroy');
+        Route::get('/{category}', 'show')->name('show');
+        Route::post('/{category}', 'update')->name('update');
+        Route::delete('/{category}', 'destroy')->name('destroy');
     });
 
 Route::prefix('staff')
@@ -79,9 +79,9 @@ Route::prefix('staff')
     ->group(function () {
         Route::get('/{hall}', 'index')->name('index');
         Route::post('/{hall}', 'store')->name('store');
-        Route::get('/{expert}', 'show')->name('show');
-        Route::post('/{expert}', 'update')->name('update');
-        Route::delete('/{expert}', 'destroy')->name('destroy');
+        Route::get('/{hall}/{expert}', 'show')->name('show');
+        Route::post('/{hall}/{expert}', 'update')->name('update');
+        Route::delete('/{hall}/{expert}', 'destroy')->name('destroy');
     });
 
 Route::prefix('services')
@@ -91,7 +91,7 @@ Route::prefix('services')
     ->group(function () {
         Route::get('/{hall}', 'index')->name('index');
         Route::post('/{hall}', 'store')->name('store');
-        Route::get('/{service}', 'show')->name('show');
-        Route::post('/{service}', 'update')->name('update');
-        Route::delete('/{service}', 'destroy')->name('destroy');
+        Route::get('/{hall}/{hallService}', 'show')->name('show');
+        Route::post('/{hall}/{hallService}', 'update')->name('update');
+        Route::delete('/{hall}/{hallService}', 'destroy')->name('destroy');
     });
