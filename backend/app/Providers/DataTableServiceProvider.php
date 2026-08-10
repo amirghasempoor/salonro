@@ -13,7 +13,7 @@ class DataTableServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->app->bind('datatable', function () {
-            return new DataTable();
+            return new DataTable;
         });
     }
 

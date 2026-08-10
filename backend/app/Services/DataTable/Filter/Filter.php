@@ -2,6 +2,7 @@
 
 namespace App\Services\DataTable\Filter;
 
+use App\Services\DataTable\Exceptions\InvalidFilterException;
 use App\Services\DataTable\Validators\FilterValidator;
 
 class Filter
@@ -9,21 +10,15 @@ class Filter
     private static FilterValidator $filterValidator;
 
     /**
-     * @param string $id
-     * @param string|int|array $value
-     * @param string $fn
-     * @param string $datatype
-     * @param array $allowedFilters
-     * @throws \App\Services\DataTable\Exceptions\InvalidFilterException
+     * @throws InvalidFilterException
      */
     public function __construct(
-        private string           $id,
+        private string $id,
         private string|int|array $value,
-        private string           $fn,
-        private string           $datatype,
+        private string $fn,
+        private string $datatype,
         private array $allowedFilters
-    )
-    {
+    ) {
         self::$filterValidator = FilterValidator::getInstance();
         self::$filterValidator->isValid($this, $this->allowedFilters);
     }
@@ -51,12 +46,14 @@ class Filter
     public function getRelation(): string
     {
         $fieldArray = explode('.', $this->id);
+
         return count($fieldArray) > 1 ? $fieldArray[0] : '';
     }
 
     public function getColumn(): string
     {
         $fieldArray = explode('.', $this->id);
+
         return array_pop($fieldArray);
     }
 
@@ -69,5 +66,4 @@ class Filter
     {
         $this->value = $value;
     }
-
 }

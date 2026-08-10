@@ -7,25 +7,16 @@ use App\Services\DataTable\Sort\Sort;
 
 class DataTableInput
 {
-    /**
-     * @param int $start
-     * @param int $size
-     * @param array $filters
-     * @param array $sorting
-     * @param array $rels
-     */
     public function __construct(
-        private ?int   $start,
-        private ?int   $size,
+        private ?int $start,
+        private ?int $size,
         private array $filters,
         private ?array $sorting,
         private array $rels,
         private array $allowedFilters,
         private array $allowedSortings,
         private ?array $GroupBy,
-    )
-    {
-    }
+    ) {}
 
     public function getStart(): ?int
     {
@@ -42,7 +33,7 @@ class DataTableInput
      */
     public function getFilters(): array
     {
-        $filters = array();
+        $filters = [];
 
         foreach ($this->filters as $filter) {
             $filters[] = new Filter(
@@ -57,17 +48,15 @@ class DataTableInput
         return $filters;
     }
 
-    /**
-     * @return array
-     */
     public function getSorting(): ?array
     {
         $sorts = [];
-        if (!empty($this->sorting)){
+        if (! empty($this->sorting)) {
             foreach ($this->sorting as $sort) {
-                $sorts[] =  new Sort($sort->id, $sort->desc, $this->allowedSortings);
+                $sorts[] = new Sort($sort->id, $sort->desc, $this->allowedSortings);
             }
         }
+
         return $sorts;
     }
 

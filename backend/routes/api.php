@@ -2,7 +2,6 @@
 
 use App\Http\Controllers\CityController;
 use App\Http\Controllers\ProvinceController;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('provinces')

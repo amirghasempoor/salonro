@@ -8,66 +8,72 @@ use Illuminate\Contracts\Database\Query\Builder;
 
 class DataTableService
 {
-
     protected array $allowedFilters;
+
     protected array $allowedRelations;
+
     protected array $allowedSortings;
+
     protected array $allowedSelects;
+
     protected array $allowedGroupBy;
+
     private int $totalRowCount;
 
     public function __construct(
-        protected Builder      $query,
+        protected Builder $query,
         private DataTableInput $dataTableInput
-    )
-    {
-    }
+    ) {}
 
     public function setAllowedFilters(array $allowedFilters): DataTableService
     {
         $this->allowedFilters = $allowedFilters;
+
         return $this;
     }
 
     public function setAllowedRelations(array $allowedRelations): DataTableService
     {
         $this->allowedRelations = $allowedRelations;
+
         return $this;
     }
 
     public function setAllowedSortings(array $allowedSortings): DataTableService
     {
         $this->allowedSortings = $allowedSortings;
+
         return $this;
     }
 
     public function setAllowedSelects(array $allowedSelects): DataTableService
     {
         $this->allowedSelects = $allowedSelects;
+
         return $this;
     }
 
     public function setAllowedGroupBy(array $allowedGroupBy): DataTableService
     {
         $this->allowedGroupBy = $allowedGroupBy;
+
         return $this;
     }
 
     /**
      * Handle 'getData' operations
-     * @return array
      */
     public function getData(): array
     {
         $query = $this->buildQuery();
         $data = $query->get();
 
-        return array(
+        return [
             'data' => $data,
             'meta' => [
-                'totalRowCount' => $this->totalRowCount
-            ]
-        );
+                'totalRowCount' => $this->totalRowCount,
+            ],
+        ];
     }
 
     protected function buildQuery(): Builder
@@ -84,16 +90,16 @@ class DataTableService
 
         $this->totalRowCount = $query->count();
 
-        if (!is_null($this->dataTableInput->getStart())) {
+        if (! is_null($this->dataTableInput->getStart())) {
             $query->offset($this->dataTableInput->getStart());
         }
 
-        if(!is_null($this->dataTableInput->getSize())){
+        if (! is_null($this->dataTableInput->getSize())) {
             $query->limit($this->dataTableInput->getSize());
         }
 
         $sorting = $this->dataTableInput->getSorting();
-        foreach ($sorting as $sort){
+        foreach ($sorting as $sort) {
             $query = (new ApplySort($query, $sort))->apply();
         }
 
@@ -102,7 +108,7 @@ class DataTableService
 
     protected function applySelect(Builder $query, array $selectedFields): Builder
     {
-        if (!empty($selectedFields)) {
+        if (! empty($selectedFields)) {
             $query->select($selectedFields);
         }
 
@@ -116,7 +122,7 @@ class DataTableService
 
     protected function includeRelationsInQuery(Builder $query, array $rels): Builder
     {
-        if (!empty($rels)) {
+        if (! empty($rels)) {
             $query->with($rels);
         }
 

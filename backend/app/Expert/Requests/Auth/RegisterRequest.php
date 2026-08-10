@@ -31,7 +31,7 @@ class RegisterRequest extends FormRequest
             'province_id' => 'required|exists:provinces,id',
             'city_id' => 'required|exists:cities,id',
             'avatar' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-            'role' => 'required|in:1,2'
+            'role' => 'required|in:1,2',
         ];
     }
 }

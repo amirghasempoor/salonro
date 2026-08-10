@@ -24,7 +24,7 @@ class LoginWithPasswordRequest extends FormRequest
     {
         return [
             'phone_number' => 'required|string',
-            'password' => 'required|string'
+            'password' => 'required|string',
         ];
     }
 }

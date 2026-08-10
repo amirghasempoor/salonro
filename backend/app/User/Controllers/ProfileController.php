@@ -38,7 +38,7 @@ class ProfileController extends Controller
             'city_id' => $city->id,
             'province_name' => $province->name,
             'city_name' => $city->name,
-            'kyc_status' => 1
+            'kyc_status' => 1,
         ]);
 
         return $this->successResponse();
@@ -48,13 +48,12 @@ class ProfileController extends Controller
     {
         $expert = Auth::guard('web')->user();
 
-        if (! Hash::check($request->current_password, $expert->password))
-        {
+        if (! Hash::check($request->current_password, $expert->password)) {
             return $this->errorResponse(__('messages.incorrect_current_password'));
         }
 
         $expert->update([
-            'password' => Hash::make($request->new_password)
+            'password' => Hash::make($request->new_password),
         ]);
 
         return $this->successResponse();
