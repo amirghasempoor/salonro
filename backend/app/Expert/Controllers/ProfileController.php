@@ -48,13 +48,12 @@ class ProfileController extends Controller
     {
         $expert = Auth::guard('expert')->user();
 
-        if (! Hash::check($request->current_password, $expert->password))
-        {
+        if (! Hash::check($request->current_password, $expert->password)) {
             return $this->errorResponse(__('messages.incorrect_current_password'));
         }
 
         $expert->update([
-            'password' => Hash::make($request->new_password)
+            'password' => Hash::make($request->new_password),
         ]);
 
         return $this->successResponse();
@@ -64,13 +63,12 @@ class ProfileController extends Controller
     {
         $expert = Auth::guard('expert')->user();
 
-        if ($expert->avatar)
-        {
+        if ($expert->avatar) {
             File::delete($expert->avatar);
         }
 
         $expert->update([
-            'avatar' => File::save($request->avatar, '/avatars')
+            'avatar' => File::save($request->avatar, '/avatars'),
         ]);
 
         return $this->successResponse();
@@ -80,12 +78,12 @@ class ProfileController extends Controller
     {
         $expert = Auth::guard('expert')->user();
 
-        foreach ($request->portfolio as $portfolio)
-        {
+        foreach ($request->portfolio as $portfolio) {
             $path = File::save($portfolio['image'], "portfolios/{$expert->id}");
 
             $expert->images()->create(['url' => $path, 'title' => $portfolio['title']]);
         }
+
         return $this->successResponse();
     }
 
@@ -93,14 +91,14 @@ class ProfileController extends Controller
     {
         $expert = Auth::guard('expert')->user();
 
-        foreach ($request->workingHours as $workingHour)
-        {
+        foreach ($request->workingHours as $workingHour) {
             $expert->workingHours()->create([
                 'day' => $workingHour['day'],
                 'from' => $workingHour['from'],
                 'to' => $workingHour['to'],
             ]);
         }
+
         return $this->successResponse();
     }
 
@@ -108,6 +106,7 @@ class ProfileController extends Controller
     {
         $expert = Auth::guard('expert')->user();
         $expert->assignRole(Roles::labels($request->role));
+
         return $this->successResponse();
     }
 }

@@ -8,7 +8,6 @@ use App\Http\Controllers\Controller;
 use App\Models\Expert;
 use App\Models\Hall;
 use App\Models\Reservation;
-use App\Models\Service;
 use App\Traits\ApiResponse;
 use App\User\Requests\Reservation\StoreRequest;
 use App\User\Requests\Reservation\UpdateRequest;
@@ -32,7 +31,7 @@ class ReservationManagementController extends Controller
             allowedFilters: ['*'],
             allowedSortings: ['*'],
             allowedSelects: [
-                'id', 'user_name', 'state_name', 'from_date', 'to_date',
+                'id', 'user_name', 'state_name', 'start_time', 'finish_time',
             ]
         );
 
@@ -47,9 +46,9 @@ class ReservationManagementController extends Controller
 
                 $reservation = Reservation::query()->create([
                     'user_id' => $user->id,
-                    'user_name' => $user->first_name . ' ' . $user->last_name,
+                    'user_name' => $user->first_name.' '.$user->last_name,
                     'expert_id' => $request->expert_id,
-                    'expert_name' => Expert::query()->find($request->expert_id)->last_name,
+                    'expert_name' => Expert::query()->find($request->expert_id)->full_name,
                     'hall_id' => $request->hall_id,
                     'hall_name' => Hall::query()->find($request->hall_id)->name,
                     'state_id' => ReservationStates::Reserve->value,
@@ -69,8 +68,7 @@ class ReservationManagementController extends Controller
             });
 
             return $this->successResponse();
-        }
-        catch (\Throwable $e) {
+        } catch (\Throwable $e) {
             return $this->errorResponse($e->getMessage());
         }
     }
@@ -104,9 +102,7 @@ class ReservationManagementController extends Controller
             });
 
             return $this->successResponse();
-        }
-        catch (\Throwable $e)
-        {
+        } catch (\Throwable $e) {
             return $this->errorResponse($e->getMessage());
         }
     }
@@ -118,6 +114,7 @@ class ReservationManagementController extends Controller
                 $reservation->services()->detach();
                 $reservation->delete();
             });
+
             return $this->successResponse();
         } catch (\Throwable $e) {
             return $this->errorResponse($e->getMessage());

@@ -7,29 +7,30 @@ use App\Expert\Requests\Manager\HallService\UpdateRequest;
 use App\Facades\DataTable\DataTableFacade;
 use App\Http\Controllers\Controller;
 use App\Models\Hall;
-use App\Models\Service;
+use App\Models\HallService;
 use App\Traits\ApiResponse;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 
 class HallServicesManagementController extends Controller
 {
     use ApiResponse;
+
     /**
      * Display a listing of the resource.
      */
-    public function index(Request $request, int $hall): JsonResponse
+    public function index(Request $request, Hall $hall): JsonResponse
     {
-        $query = Service::query()->where('hall_id', '=', $hall);
+        $query = HallService::query()->where('hall_id', '=', $hall->id);
 
         $data = DataTableFacade::run(
             $query,
             $request,
             allowedFilters: ['*'],
+            allowedRelations: ['service'],
             allowedSortings: ['*'],
             allowedSelects: [
-                'id', 'name', 'duration', 'price'
+                'id', 'service_id', 'description', 'duration', 'price', 'is_active',
             ]
         );
 
@@ -41,67 +42,50 @@ class HallServicesManagementController extends Controller
      */
     public function store(StoreRequest $request, Hall $hall): JsonResponse
     {
-        try {
-            DB::transaction(function () use ($request, $hall) {
-                $hall->services()->create([
-                    'category_id' => $request->category_id,
-                    'description' => $request->description,
-                    'duration' => $request->duration,
-                    'price' => $request->price
-                ]);
-            });
+        $hallService = HallService::query()->create([
+            'hall_id' => $hall->id,
+            'service_id' => $request->service_id,
+            'description' => $request->description,
+            'duration' => $request->duration,
+            'price' => $request->price,
+        ]);
 
-            return $this->successResponse();
-        }
-        catch (\Throwable $e) {
-            return $this->errorResponse($e->getMessage());
-        }
+        return $this->successResponse([
+            'hall_service_id' => $hallService->id,
+        ]);
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(Service $service): JsonResponse
+    public function show(HallService $hallService): JsonResponse
     {
-        return $this->successResponse($service);
+        return $this->successResponse($hallService->load('service'));
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateRequest $request, Service $service): JsonResponse
+    public function update(UpdateRequest $request, HallService $hallService): JsonResponse
     {
-        try {
-            DB::transaction(function () use ($request, $service) {
-                $service->update([
-                    'category_id' => $request->category_id,
-                    'description' => $request->description,
-                    'duration' => $request->duration,
-                    'price' => $request->price,
-                    'is_active' => $request->is_active
-                ]);
-            });
+        $hallService->update([
+            'service_id' => $request->service_id,
+            'description' => $request->description,
+            'duration' => $request->duration,
+            'price' => $request->price,
+            'is_active' => $request->is_active,
+        ]);
 
-            return $this->successResponse();
-        }
-        catch (\Throwable $e)
-        {
-            return $this->errorResponse($e->getMessage());
-        }
+        return $this->successResponse();
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Service $service): JsonResponse
+    public function destroy(HallService $hallService): JsonResponse
     {
-        try {
-            DB::transaction(function () use ($service) {
-                $service->delete();
-            });
-            return $this->successResponse();
-        } catch (\Throwable $e) {
-            return $this->errorResponse($e->getMessage());
-        }
+        $hallService->delete();
+
+        return $this->successResponse();
     }
 }

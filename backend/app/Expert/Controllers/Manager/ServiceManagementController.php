@@ -7,8 +7,6 @@ use App\Expert\Requests\Manager\ServiceCategory\UpdateRequest;
 use App\Facades\DataTable\DataTableFacade;
 use App\Facades\File\File;
 use App\Http\Controllers\Controller;
-use App\Models\Expert;
-use App\Models\Hall;
 use App\Models\Service;
 use App\Traits\ApiResponse;
 use Illuminate\Http\JsonResponse;
@@ -18,6 +16,7 @@ use Illuminate\Support\Facades\DB;
 class ServiceManagementController extends Controller
 {
     use ApiResponse;
+
     /**
      * Display a listing of the resource.
      */
@@ -29,7 +28,7 @@ class ServiceManagementController extends Controller
             allowedFilters: ['*'],
             allowedSortings: ['*'],
             allowedSelects: [
-                'id', 'cat_id', 'cat_name', 'sub_cat_id', 'sub_cat_name', 'icon'
+                'id', 'cat_id', 'cat_name', 'sub_cat_id', 'sub_cat_name', 'icon',
             ]
         );
 
@@ -43,20 +42,21 @@ class ServiceManagementController extends Controller
             ->get();
 
         $categories = $rows->groupBy('cat_id')->map(function ($group) {
-                $first = $group->first();
-                return [
-                    'cat_id' => $first->cat_id,
-                    'title' => $first->cat_name,
-                    'icon'  => $first->icon,
-                    'templates' => $group->map(function ($row) {
-                        return [
-                            'id' => $row->id,
-                            'sub_cat_id'   => $row->sub_cat_id,
-                            'name' => $row->sub_cat_name,
-                        ];
-                    })->values(),
-                ];
-            })->values();
+            $first = $group->first();
+
+            return [
+                'cat_id' => $first->cat_id,
+                'title' => $first->cat_name,
+                'icon' => $first->icon,
+                'templates' => $group->map(function ($row) {
+                    return [
+                        'id' => $row->id,
+                        'sub_cat_id' => $row->sub_cat_id,
+                        'name' => $row->sub_cat_name,
+                    ];
+                })->values(),
+            ];
+        })->values();
 
         return response()->json($categories);
     }
@@ -73,13 +73,12 @@ class ServiceManagementController extends Controller
                     'cat_name' => $request->cat_name,
                     'sub_cat_id' => $request->sub_cat_id,
                     'sub_cat_name' => $request->sub_cat_name,
-                    'icon' => File::save($request->icon, '/categories')
+                    'icon' => File::save($request->icon, '/categories'),
                 ]);
             });
 
             return $this->successResponse();
-        }
-        catch (\Throwable $e) {
+        } catch (\Throwable $e) {
             return $this->errorResponse($e->getMessage());
         }
     }
@@ -104,14 +103,12 @@ class ServiceManagementController extends Controller
                     'cat_name' => $request->cat_name,
                     'sub_cat_id' => $request->sub_cat_id,
                     'sub_cat_name' => $request->sub_cat_name,
-                    'icon' => File::save($request->icon, '/categories')
+                    'icon' => File::save($request->icon, '/categories'),
                 ]);
             });
 
             return $this->successResponse();
-        }
-        catch (\Throwable $e)
-        {
+        } catch (\Throwable $e) {
             return $this->errorResponse($e->getMessage());
         }
     }
@@ -122,6 +119,7 @@ class ServiceManagementController extends Controller
     public function destroy(Service $category): JsonResponse
     {
         $category->delete();
+
         return $this->successResponse();
     }
 }

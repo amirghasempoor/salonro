@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\DB;
 class HallManagementController extends Controller
 {
     use ApiResponse;
+
     /**
      * Display a listing of the resource.
      */
@@ -73,8 +74,7 @@ class HallManagementController extends Controller
             return $this->successResponse([
                 'hall_id' => $hall->id,
             ]);
-        }
-        catch (\Throwable $e) {
+        } catch (\Throwable $e) {
             return $this->errorResponse($e->getMessage());
         }
     }
@@ -108,9 +108,7 @@ class HallManagementController extends Controller
             });
 
             return $this->successResponse();
-        }
-        catch (\Throwable $e)
-        {
+        } catch (\Throwable $e) {
             return $this->errorResponse($e->getMessage());
         }
     }
@@ -123,9 +121,10 @@ class HallManagementController extends Controller
         try {
             DB::transaction(function () use ($hall) {
                 $hall->experts()->detach();
-                $hall->services()->delete();
+                $hall->services()->detach();
                 $hall->delete();
             });
+
             return $this->successResponse();
         } catch (\Throwable $e) {
             return $this->errorResponse($e->getMessage());
