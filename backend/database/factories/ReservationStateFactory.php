@@ -18,7 +18,7 @@ class ReservationStateFactory extends Factory
     public function definition(): array
     {
         return [
-            //
+            'name' => fake()->unique()->randomElement(['reserve', 'cancel', 'done']),
         ];
     }
 }

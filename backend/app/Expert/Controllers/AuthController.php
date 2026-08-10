@@ -88,7 +88,7 @@ class AuthController extends Controller
     {
         $expert = Expert::query()->where('phone_number', '=', $request->phone_number)->first();
 
-        if (! Hash::check($request->password, $expert->password)) {
+        if (! $expert || ! Hash::check($request->password, $expert->password)) {
             return $this->errorResponse(__('messages.invalid_credential'));
         }
 

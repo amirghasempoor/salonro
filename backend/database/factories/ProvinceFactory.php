@@ -18,7 +18,9 @@ class ProvinceFactory extends Factory
     public function definition(): array
     {
         return [
-            //
+            'name' => fake()->unique()->city(),
+            'center_lat' => null,
+            'center_lng' => null,
         ];
     }
 }

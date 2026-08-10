@@ -18,7 +18,13 @@ class SmsHistoryFactory extends Factory
     public function definition(): array
     {
         return [
-            //
+            'phone_number' => '09'.fake()->unique()->numerify('#########'),
+            'status' => 1,
+            'message' => fake()->sentence(),
+            'pack_id' => fake()->uuid(),
+            'message_ids' => json_encode([fake()->uuid()]),
+            'cost' => '1000',
+            'delivery_state' => null,
         ];
     }
 }

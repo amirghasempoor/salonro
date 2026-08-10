@@ -58,7 +58,7 @@ class HallServicesManagementController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(HallService $hallService): JsonResponse
+    public function show(Hall $hall, HallService $hallService): JsonResponse
     {
         return $this->successResponse($hallService->load('service'));
     }
@@ -66,7 +66,7 @@ class HallServicesManagementController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateRequest $request, HallService $hallService): JsonResponse
+    public function update(UpdateRequest $request, Hall $hall, HallService $hallService): JsonResponse
     {
         $hallService->update([
             'service_id' => $request->service_id,
@@ -82,7 +82,7 @@ class HallServicesManagementController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(HallService $hallService): JsonResponse
+    public function destroy(Hall $hall, HallService $hallService): JsonResponse
     {
         $hallService->delete();
 
