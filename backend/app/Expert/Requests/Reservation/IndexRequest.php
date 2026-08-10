@@ -16,7 +16,7 @@ class IndexRequest extends FormRequest
         return Auth::guard('expert')
             ->user()
             ->halls()
-            ->where('id', '=', $this->hall_id)
+            ->where('halls.id', '=', $this->hall_id)
             ->exists();
     }
 

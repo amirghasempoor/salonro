@@ -53,6 +53,10 @@ class AuthController extends Controller
 
             $user = User::query()->firstWhere('phone_number', $request->phone_number);
 
+            if (! $user) {
+                return $this->errorResponse(__('messages.invalid_credential'));
+            }
+
             Auth::guard('web')->login($user);
 
             $request->session()->regenerateToken();

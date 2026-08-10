@@ -92,13 +92,15 @@ class ReservationManagementController extends Controller
                     'total_price' => $request->total_price,
                 ]);
 
-                foreach ($request->services as $service) {
-                    $reservation->services()->sync($service['id'], [
+                $services = collect($request->services)->mapWithKeys(function ($service) {
+                    return [$service['id'] => [
                         'service_name' => $service['name'],
                         'price' => $service['price'],
                         'duration' => $service['duration'],
-                    ]);
-                }
+                    ]];
+                });
+
+                $reservation->services()->sync($services);
             });
 
             return $this->successResponse();

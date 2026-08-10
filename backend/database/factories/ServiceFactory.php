@@ -17,8 +17,14 @@ class ServiceFactory extends Factory
      */
     public function definition(): array
     {
+        $catId = fake()->numberBetween(1, 10);
+
         return [
-            //
+            'cat_id' => $catId,
+            'cat_name' => fake()->unique()->word().' cat',
+            'sub_cat_id' => $catId * 100 + fake()->numberBetween(1, 50),
+            'sub_cat_name' => fake()->unique()->word(),
+            'icon' => null,
         ];
     }
 }

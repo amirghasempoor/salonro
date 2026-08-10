@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\Expert;
 use App\Models\Image;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -18,7 +19,10 @@ class ImageFactory extends Factory
     public function definition(): array
     {
         return [
-            //
+            'imageable_id' => Expert::factory(),
+            'imageable_type' => Expert::class,
+            'url' => '/storage/experts/portfolios/'.fake()->uuid().'.jpg',
+            'title' => null,
         ];
     }
 }

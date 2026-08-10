@@ -18,7 +18,10 @@ class OtpFactory extends Factory
     public function definition(): array
     {
         return [
-            //
+            'phone_number' => '09'.fake()->unique()->numerify('#########'),
+            'verification_code' => fake()->numberBetween(1000, 9999),
+            'used' => false,
+            'expired_at' => now()->addMinutes(2),
         ];
     }
 }

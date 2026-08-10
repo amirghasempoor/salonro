@@ -15,7 +15,7 @@ use Tests\TestCase;
 */
 
 pest()->extend(TestCase::class)
- // ->use(RefreshDatabase::class)
+    ->use(RefreshDatabase::class)
     ->in('Feature');
 
 /*
@@ -47,4 +47,19 @@ expect()->extend('toBeOne', function () {
 function something()
 {
     // ..
+}
+
+function validPassword(): string
+{
+    return 'password123';
+}
+
+function seedRoles(): void
+{
+    test()->seed(\Database\Seeders\RoleSeeder::class);
+}
+
+function seedReservationStates(): void
+{
+    test()->seed(\Database\Seeders\ReservationStateSeeder::class);
 }
