@@ -25,7 +25,7 @@ class StoreRequest extends FormRequest
         return [
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
-            'phone_number' => 'required|string|max:255|unique:experts,phone_number',
+            'phone_number' => 'required|string|max:255',
             'services' => 'required|array',
             'services.*' => 'integer|exists:services,id',
         ];

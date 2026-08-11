@@ -5,34 +5,38 @@ namespace App\Facades\Otp;
 use App\Facades\Sms\Sms;
 use App\Models\Otp as OtpModel;
 use Carbon\Carbon;
-use Exception;
+use Illuminate\Support\Facades\DB;
+use Throwable;
 
 class Otp
 {
     /**
-     * @throws Exception
+     * @throws Throwable
      */
     public function generate($phone_number, $message): true
     {
-        $otp = OtpModel::query()->where([
-            ['phone_number', $phone_number],
-            ['created_at', '>', Carbon::now()->tomorrow()->toDateTimeString()]])
-            ->orderBy('created_at', 'desc')
-            ->first();
+        DB::transaction(function () use ($phone_number, $message) {
+            $otp = OtpModel::query()->where([
+                ['phone_number', $phone_number],
+                ['created_at', '>', Carbon::now()->tomorrow()->toDateTimeString()]])
+                ->orderBy('created_at', 'desc')
+                ->first();
 
-        if ($otp) {
+            if ($otp) {
+                Sms::send($phone_number, $message.' '.$otp->verification_code);
+
+                return true;
+            }
+
+            $otp = OtpModel::query()->create([
+                'phone_number' => $phone_number,
+                'verification_code' => rand(1000, 9999),
+                'expired_at' => Carbon::now()->addMinute(2),
+            ]);
+
             Sms::send($phone_number, $message.' '.$otp->verification_code);
 
-            return true;
-        }
-
-        $otp = OtpModel::query()->create([
-            'phone_number' => $phone_number,
-            'verification_code' => rand(1000, 9999),
-            'expired_at' => Carbon::now()->addMinute(2),
-        ]);
-
-        Sms::send($phone_number, $message.' '.$otp->verification_code);
+        });
 
         return true;
     }

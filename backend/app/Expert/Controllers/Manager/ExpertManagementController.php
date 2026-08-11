@@ -34,6 +34,11 @@ class ExpertManagementController extends Controller
         return response()->json($data);
     }
 
+    public function list(Hall $hall): JsonResponse
+    {
+        return response()->json($hall->experts()->get(['avatar']));
+    }
+
     /**
      * Store a newly created resource in storage.
      */
@@ -41,13 +46,18 @@ class ExpertManagementController extends Controller
     {
         try {
             DB::transaction(function () use ($request, $hall) {
-                $expert = Expert::query()->create([
-                    'first_name' => $request->first_name,
-                    'last_name' => $request->last_name,
-                    'phone_number' => $request->phone_number,
-                    'province_id' => $hall->province_id,
-                    'city_id' => $hall->city_id,
-                ]);
+                $expert = Expert::query()->firstOrCreate(
+                    [
+                        'phone_number' => $request->phone_number,
+                    ],
+                    [
+                        'first_name' => $request->first_name,
+                        'last_name' => $request->last_name,
+                        'phone_number' => $request->phone_number,
+                        'province_id' => $hall->province_id,
+                        'city_id' => $hall->city_id,
+                    ]
+                );
 
                 $expert->assignRole(Roles::Expert->value);
                 $hall->experts()->attach($expert->id, ['joined_at' => now()]);
