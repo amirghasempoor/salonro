@@ -3,7 +3,6 @@
 namespace Database\Factories;
 
 use App\Models\Expert;
-use App\Models\Hall;
 use App\Models\Reservation;
 use App\Models\ReservationState;
 use App\Models\User;
@@ -26,7 +25,7 @@ class ReservationFactory extends Factory
             'user_name' => fake()->name(),
             'expert_id' => Expert::factory(),
             'expert_name' => fake()->name(),
-            'hall_id' => Hall::factory(),
+            'hall_id' => 8,
             'hall_name' => fake()->company(),
             'state_id' => ReservationState::factory(),
             'state_name' => 'reserve',

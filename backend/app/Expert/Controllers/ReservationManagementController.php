@@ -3,7 +3,6 @@
 namespace App\Expert\Controllers;
 
 use App\Enums\ReservationStates;
-use App\Expert\Requests\Reservation\IndexRequest;
 use App\Expert\Requests\Reservation\StoreRequest;
 use App\Expert\Requests\Reservation\UpdateRequest;
 use App\Facades\DataTable\DataTableFacade;
@@ -13,6 +12,7 @@ use App\Models\Reservation;
 use App\Models\User;
 use App\Traits\ApiResponse;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
@@ -23,13 +23,13 @@ class ReservationManagementController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(IndexRequest $request): JsonResponse
+    public function index(Request $request, int $hall): JsonResponse
     {
         $expert = Auth::guard('expert')->user();
 
         $query = Reservation::query()
             ->where('expert_id', '=', $expert->id)
-            ->where('hall_id', '=', $request->hall_id);
+            ->where('hall_id', '=', $hall);
 
         $data = DataTableFacade::run(
             $query,

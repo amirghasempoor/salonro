@@ -1,5 +1,7 @@
 <?php
 
+use Database\Seeders\ReservationStateSeeder;
+use Database\Seeders\RoleSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -56,10 +58,10 @@ function validPassword(): string
 
 function seedRoles(): void
 {
-    test()->seed(\Database\Seeders\RoleSeeder::class);
+    test()->seed(RoleSeeder::class);
 }
 
 function seedReservationStates(): void
 {
-    test()->seed(\Database\Seeders\ReservationStateSeeder::class);
+    test()->seed(ReservationStateSeeder::class);
 }

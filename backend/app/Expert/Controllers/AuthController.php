@@ -12,7 +12,6 @@ use App\Facades\Otp\OtpFacade;
 use App\Http\Controllers\Controller;
 use App\Models\Expert;
 use App\Traits\ApiResponse;
-use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -49,7 +48,7 @@ class AuthController extends Controller
     }
 
     /**
-     * @throws Exception
+     * @throws Throwable
      */
     public function sendOtp(SendOtpRequest $request): JsonResponse
     {
