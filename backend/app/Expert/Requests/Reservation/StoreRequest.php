@@ -27,13 +27,12 @@ class StoreRequest extends FormRequest
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
             'services' => 'required|array',
-            'services.*.id' => 'required|exists:services,id',
+            'services.*.service_id' => 'required|exists:services,id',
             'services.*.name' => 'required|string|max:255',
             'services.*.price' => 'required',
             'services.*.duration' => 'required',
             'start_time' => 'required|date',
             'finish_time' => 'required|date',
-            'hall_id' => 'required|exists:halls,id',
             'total_price' => 'required',
         ];
     }
