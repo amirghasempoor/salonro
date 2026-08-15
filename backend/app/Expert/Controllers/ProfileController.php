@@ -9,7 +9,7 @@ use App\Expert\Requests\Profile\DefineRoleRequest;
 use App\Expert\Requests\Profile\DefineWorkingHourRequest;
 use App\Expert\Requests\Profile\EditRequest;
 use App\Expert\Requests\Profile\UploadPortfolioRequest;
-use App\Expert\Resources\ExpertResource;
+use App\Expert\Resources\ExpertProfileResource;
 use App\Facades\File\File;
 use App\Http\Controllers\Controller;
 use App\Traits\ApiResponse;
@@ -23,7 +23,7 @@ class ProfileController extends Controller
 
     public function info(): JsonResponse
     {
-        return $this->successResponse(new ExpertResource(Auth::guard('expert')->user()));
+        return $this->successResponse(new ExpertProfileResource(Auth::guard('expert')->user()));
     }
 
     public function update(EditRequest $request): JsonResponse
@@ -87,12 +87,21 @@ class ProfileController extends Controller
         return $this->successResponse();
     }
 
-    public function defineWorkingHour(DefineWorkingHourRequest $request): JsonResponse
+    public function defineWorkingHour(DefineWorkingHourRequest $request, int $hall): JsonResponse
     {
         $expert = Auth::guard('expert')->user();
 
+        $expertHall = $expert->expertHalls()
+            ->where('hall_id', '=', $hall)
+            ->where('is_active', '=', true)
+            ->first();
+
+        if (! $expertHall) {
+            return $this->errorResponse(__('messages.expert_not_in_hall'));
+        }
+
         foreach ($request->workingHours as $workingHour) {
-            $expert->workingHours()->create([
+            $expertHall->workingHours()->create([
                 'day' => $workingHour['day'],
                 'from' => $workingHour['from'],
                 'to' => $workingHour['to'],

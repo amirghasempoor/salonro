@@ -6,7 +6,7 @@ use App\Enums\Roles;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class ExpertResource extends JsonResource
+class ExpertProfileResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -21,9 +21,7 @@ class ExpertResource extends JsonResource
             'avatar' => $this->resource->avatar,
             'phone_number' => $this->resource->phone_number,
             'role' => $this->resource->getRoleNames()->first(),
-            'halls' => $this->when($this->resource->getRoleNames()->first() == Roles::Manager->value,
-                $this->resource->halls->pluck('id')->values()
-            ),
+            'halls' => $this->resource->halls->pluck('id')->values(),
             'is_verified' => $this->resource->is_verified,
         ];
     }

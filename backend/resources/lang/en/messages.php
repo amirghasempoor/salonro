@@ -8,4 +8,5 @@ return [
     'file_upload_failed' => 'The file can not be uploaded.',
     'otp' => 'your otp token is : ',
     'incorrect_otp' => 'Incorrect OTP code.',
+    'expert_not_in_hall' => 'The expert does not work in this hall.',
 ];

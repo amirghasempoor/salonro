@@ -30,8 +30,8 @@ Route::prefix('profile')
         Route::post('change_password', 'changePassword')->name('changePassword');
         Route::post('change_avatar', 'changeAvatar')->name('changeAvatar');
         Route::post('upload_portfolio', 'uploadPortfolio')->name('uploadPortfolio');
-        Route::post('define_working_hour', 'defineWorkingHour')->name('defineWorkingHour');
         Route::post('define_role', 'defineRole')->name('defineRole');
+        Route::post('define_working_hour/{hall}', 'defineWorkingHour')->name('defineWorkingHour');
     });
 
 Route::prefix('halls')
@@ -49,12 +49,12 @@ Route::prefix('halls')
 
 Route::prefix('reservations')
     ->name('reservation.')
-//    ->middleware(['auth:expert'])
+    ->middleware(['auth:expert'])
     ->controller(ReservationManagementController::class)
     ->group(function () {
         Route::get('/{hall}', 'index')->name('index');
         Route::post('/{hall}', 'store')->name('store');
-        Route::get('/{hall}/{reservation}', 'show')->name('show');
+        Route::get('/details/{reservation}', 'show')->name('show');
         Route::post('/{hall}/{reservation}', 'update')->name('update');
         Route::delete('/{hall}/{reservation}', 'destroy')->name('destroy');
     });
@@ -80,7 +80,7 @@ Route::prefix('staff')
         Route::get('/list/{hall}', 'list')->name('list')->where('hall', '[0-9]+');
         Route::get('/{hall}', 'index')->name('index');
         Route::post('/{hall}', 'store')->name('store');
-        Route::get('/{hall}/{expert}', 'show')->name('show');
+        Route::get('/details/{expert}', 'show')->name('show');
         Route::post('/{hall}/{expert}', 'update')->name('update');
         Route::delete('/{hall}/{expert}', 'destroy')->name('destroy');
     });

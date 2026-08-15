@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\Expert;
+use App\Models\Hall;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
@@ -99,15 +100,30 @@ test('expert can upload portfolio images', function () {
     expect($this->expert->images()->count())->toBe(2);
 });
 
-test('expert can define working hours', function () {
+test('expert can define working hours for a hall', function () {
+    $hall = Hall::factory()->create();
+    $this->expert->halls()->attach($hall->id, ['joined_at' => now()]);
+
     $this->postJson('/expert/profile/define_working_hour', [
+        'hall_id' => $hall->id,
         'workingHours' => [
             ['day' => 'saturday', 'from' => '09:00', 'to' => '18:00'],
             ['day' => 'sunday', 'from' => '10:00', 'to' => '16:00'],
         ],
     ])->assertOk();
 
-    expect($this->expert->workingHours()->count())->toBe(2);
+    expect($this->expert->workingHoursAtHall($hall->id)->count())->toBe(2);
+});
+
+test('expert cannot define working hours for a hall they do not work in', function () {
+    $hall = Hall::factory()->create();
+
+    $this->postJson('/expert/profile/define_working_hour', [
+        'hall_id' => $hall->id,
+        'workingHours' => [
+            ['day' => 'saturday', 'from' => '09:00', 'to' => '18:00'],
+        ],
+    ])->assertStatus(422);
 });
 
 test('expert can define role', function () {

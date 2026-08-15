@@ -25,7 +25,7 @@ class ReservationFactory extends Factory
             'user_name' => fake()->name(),
             'expert_id' => Expert::factory(),
             'expert_name' => fake()->name(),
-            'hall_id' => 8,
+            'hall_id' => 1,
             'hall_name' => fake()->company(),
             'state_id' => ReservationState::factory(),
             'state_name' => 'reserve',

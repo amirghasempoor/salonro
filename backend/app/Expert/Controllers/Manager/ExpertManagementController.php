@@ -5,6 +5,7 @@ namespace App\Expert\Controllers\Manager;
 use App\Enums\Roles;
 use App\Expert\Requests\Manager\Expert\StoreRequest;
 use App\Expert\Requests\Manager\Expert\UpdateRequest;
+use App\Expert\Resources\ExpertDetailsResource;
 use App\Facades\DataTable\DataTableFacade;
 use App\Http\Controllers\Controller;
 use App\Models\Expert;
@@ -46,7 +47,7 @@ class ExpertManagementController extends Controller
     {
         try {
             DB::transaction(function () use ($request, $hall) {
-                $expert = Expert::query()->firstOrCreate(
+                $expert = $hall->experts()->firstOrCreate(
                     [
                         'phone_number' => $request->phone_number,
                     ],
@@ -56,8 +57,7 @@ class ExpertManagementController extends Controller
                         'phone_number' => $request->phone_number,
                         'province_id' => $hall->province_id,
                         'city_id' => $hall->city_id,
-                    ]
-                );
+                    ]);
 
                 $expert->assignRole(Roles::Expert->value);
                 $hall->experts()->attach($expert->id, ['joined_at' => now()]);
@@ -73,9 +73,9 @@ class ExpertManagementController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Hall $hall, Expert $expert): JsonResponse
+    public function show(Expert $expert): JsonResponse
     {
-        return $this->successResponse($expert->load('services'));
+        return $this->successResponse(new ExpertDetailsResource($expert));
     }
 
     /**
