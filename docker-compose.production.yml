@@ -1,0 +1,80 @@
+services:
+  nginx:
+    image: docker.arvancloud.ir/nginx:stable-alpine3.23-perl
+    container_name: salonro-nginx
+    restart: unless-stopped
+    ports:
+      - "8002:80"
+    volumes:
+      - ./nginx/salonro.conf:/etc/nginx/conf.d/default.conf
+      # Host git checkout — used to serve public/ static assets directly
+      # (index.php, built frontend assets, and the storage/ symlink target
+      # below). Read-only: nginx only ever needs to read these files.
+      - ${BACKEND_PATH}:/var/www/${PROJECT_NAME}:ro
+    depends_on:
+      - backend
+    networks:
+      - payment
+
+  redis:
+    image: docker.arvancloud.ir/redis:8.6.0-alpine3.23
+    container_name: salonro-redis
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - payment
+
+  postgres:
+    image: docker.arvancloud.ir/postgres:18.2-alpine3.23
+    container_name: salonro-db
+    restart: unless-stopped
+    ports:
+      - "8093:5432"
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    volumes:
+      - payment-db:/var/lib/postgresql
+    networks:
+      - payment
+
+  backend:
+    # Pulled from the registry — built by CI from Dockerfile.production.
+    # No `build:` here on purpose: the whole point of Option A is that
+    # the image running in production is exactly what CI built and tested,
+    # not something rebuilt fresh on the server.
+    image: ${CI_REGISTRY_IMAGE}/backend:${TAG}
+    container_name: salonro-laravel
+    restart: unless-stopped
+    volumes:
+      # Only the upload directory is shared with the host — NOT the whole
+      # app tree. This keeps the image's baked-in code intact while still
+      # letting nginx (which mounts the full host tree above) see uploads
+      # written by Laravel at runtime, via the public/storage symlink.
+      - ${BACKEND_PATH}/storage/app/public:/var/www/${PROJECT_NAME}/storage/app/public
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - payment
+
+volumes:
+  payment-db:
+    driver: local
+
+networks:
+  payment:
+    driver: bridge
