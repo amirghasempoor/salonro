@@ -1,16 +1,30 @@
 # GitLab CI for SalonRo
 #
 # Requires a runner with the Docker executor and network access to:
-#   - the image registry (ArvanCloud mirror by default, see `REGISTRY`)
-#   - the GitLab Container Registry ($CI_REGISTRY) for the build stage
+#   - the GitLab Container Registry ($CI_REGISTRY)
 #
 # Deploy stage needs these CI/CD variables:
 #   DEPLOY_HOST       - server host (IP or FQDN)
 #   DEPLOY_USER       - SSH user on the server
 #   DEPLOY_PATH       - absolute path to the repo clone on the server
-#   DEPLOY_SSH_KEY    - SSH private key (file type, ed25519 or rsa)
+#   DEPLOY_SSH_KEY    - SSH private key (File type, ed25519 or rsa)
 #
 # `$CI_REGISTRY*` variables are provided automatically by GitLab.
+#
+# IMPORTANT — server-side requirement for the deploy stage to work:
+#   docker-compose.yml on the server must reference the registry image
+#   instead of building locally, e.g.:
+#
+#     services:
+#       backend:
+#         image: ${CI_REGISTRY_IMAGE}/backend:${TAG}
+#         # no `build:` key here
+#
+#   The deploy job below exports TAG and CI_REGISTRY_IMAGE, then runs
+#   `docker compose pull && docker compose up -d`. If the server's
+#   compose file still has a `build:` key, it will be ignored by `pull`
+#   but `up -d` alone won't rebuild — so this compose file change is
+#   required, not optional, before enabling deploy.
 
 stages:
   - lint
@@ -19,13 +33,11 @@ stages:
 #  - deploy
 
 variables:
-  REGISTRY: docker.arvancloud.ir
   COMPOSER_CACHE_DIR: $CI_PROJECT_DIR/.composer-cache
   COMPOSER_ALLOW_SUPERUSER: "1"
-  PHP_IMAGE: $REGISTRY/php:8.5.3-cli-alpine3.23
-  COMPOSER_IMAGE: $REGISTRY/composer:2
-  DOCKER_IMAGE: $REGISTRY/docker:27
-  DIND_IMAGE: $REGISTRY/docker:27-dind
+  COMPOSER_IMAGE: composer:2
+  DOCKER_IMAGE: docker:27
+  DIND_IMAGE: docker:27-dind
 
 default:
   image: $COMPOSER_IMAGE
@@ -40,6 +52,9 @@ default:
 
 lint:
   stage: lint
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_COMMIT_BRANCH'
   script:
     - cd backend
     - composer install --prefer-dist --no-progress --no-interaction
@@ -47,6 +62,9 @@ lint:
 
 test:
   stage: test
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_COMMIT_BRANCH'
   script:
     - cd backend
     - composer install --prefer-dist --no-progress --no-interaction
@@ -69,24 +87,24 @@ test:
 #    - docker push "$CI_REGISTRY_IMAGE/backend:$CI_COMMIT_SHORT_SHA"
 #  rules:
 #    - if: '$CI_COMMIT_BRANCH == "main"'
-#    - if: '$CI_COMMIT_BRANCH == "develop"'
-#    - if: '$CI_COMMIT_TAG'
 #
 #deploy:
 #  stage: deploy
-#  image: $REGISTRY/alpine:3.23
+#  image: alpine:3.23
 #  cache: {}
 #  before_script:
 #    - apk add --no-cache openssh-client
 #    - mkdir -p ~/.ssh && chmod 700 ~/.ssh
-#    - echo "$DEPLOY_SSH_KEY" > ~/.ssh/id_ed25519 && chmod 600 ~/.ssh/id_ed25519
+#    - cp "$DEPLOY_SSH_KEY" ~/.ssh/id_ed25519 && chmod 600 ~/.ssh/id_ed25519
 #    - ssh-keyscan -H "$DEPLOY_HOST" >> ~/.ssh/known_hosts
 #  script:
 #    - ssh "$DEPLOY_USER@$DEPLOY_HOST"
-#        "cd $DEPLOY_PATH
-#        && git fetch origin main
-#        && git reset --hard origin/main
-#        && docker compose up -d --build"
+#      "cd $DEPLOY_PATH
+#      && export CI_REGISTRY_IMAGE=$CI_REGISTRY_IMAGE
+#      && export TAG=$CI_COMMIT_SHORT_SHA
+#      && docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+#      && docker compose pull
+#      && docker compose up -d"
 #  environment:
 #    name: production
 #    url: http://$DEPLOY_HOST
