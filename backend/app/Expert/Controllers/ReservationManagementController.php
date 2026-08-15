@@ -5,6 +5,7 @@ namespace App\Expert\Controllers;
 use App\Enums\ReservationStates;
 use App\Expert\Requests\Reservation\StoreRequest;
 use App\Expert\Requests\Reservation\UpdateRequest;
+use App\Expert\Resources\ReservationDetailsResource;
 use App\Facades\DataTable\DataTableFacade;
 use App\Http\Controllers\Controller;
 use App\Models\Hall;
@@ -27,9 +28,11 @@ class ReservationManagementController extends Controller
     {
         $expert = Auth::guard('expert')->user();
 
-        $query = Reservation::query()
-            ->where('expert_id', '=', $expert->id)
-            ->where('hall_id', '=', $hall);
+        $query = Reservation::query()->with('services')->where('hall_id', '=', $hall);
+
+        if ($expert->hasRole('expert')) {
+            $query->where('expert_id', '=', $expert->id);
+        }
 
         $data = DataTableFacade::run(
             $query,
@@ -47,10 +50,10 @@ class ReservationManagementController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreRequest $request): JsonResponse
+    public function store(StoreRequest $request, Hall $hall): JsonResponse
     {
         try {
-            DB::transaction(function () use ($request) {
+            DB::transaction(function () use ($request, $hall) {
                 $expert = Auth::guard('expert')->user();
 
                 $user = User::query()->firstOrCreate(
@@ -68,8 +71,8 @@ class ReservationManagementController extends Controller
                     'user_name' => $user->first_name.' '.$user->last_name,
                     'expert_id' => $expert->id,
                     'expert_name' => $expert->full_name,
-                    'hall_id' => $request->hall_id,
-                    'hall_name' => Hall::query()->find($request->hall_id)->name,
+                    'hall_id' => $hall->id,
+                    'hall_name' => $hall->name,
                     'state_id' => ReservationStates::Reserve->value,
                     'state_name' => ReservationStates::Reserve->label(),
                     'start_time' => $request->start_time,
@@ -78,7 +81,7 @@ class ReservationManagementController extends Controller
                 ]);
 
                 foreach ($request->services as $service) {
-                    $reservation->services()->attach($service['id'], [
+                    $reservation->services()->attach($service['service_id'], [
                         'service_name' => $service['name'],
                         'price' => $service['price'],
                         'duration' => $service['duration'],
@@ -97,7 +100,7 @@ class ReservationManagementController extends Controller
      */
     public function show(Reservation $reservation): JsonResponse
     {
-        return $this->successResponse($reservation);
+        return $this->successResponse(new ReservationDetailsResource($reservation));
     }
 
     /**

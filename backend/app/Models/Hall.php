@@ -22,6 +22,11 @@ class Hall extends Model
         return $this->belongsToMany(Expert::class);
     }
 
+    public function workingHours(): MorphMany
+    {
+        return $this->morphMany(WorkingHour::class, 'hourable');
+    }
+
     public function images(): MorphMany
     {
         return $this->morphMany(Image::class, 'imageable');

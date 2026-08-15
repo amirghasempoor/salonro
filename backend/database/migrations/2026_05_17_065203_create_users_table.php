@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('last_name');
             $table->string('phone_number');
             $table->string('email')->nullable();
-            $table->string('password');
+            $table->string('password')->nullable();
             $table->tinyInteger('gender')->nullable();
             $table->date('birth_date')->nullable();
             $table->string('avatar')->nullable();

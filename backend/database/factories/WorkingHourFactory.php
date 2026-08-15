@@ -2,7 +2,7 @@
 
 namespace Database\Factories;
 
-use App\Models\Expert;
+use App\Models\ExpertHall;
 use App\Models\WorkingHour;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -19,8 +19,8 @@ class WorkingHourFactory extends Factory
     public function definition(): array
     {
         return [
-            'hourable_id' => Expert::factory(),
-            'hourable_type' => Expert::class,
+            'hourable_id' => ExpertHall::factory(),
+            'hourable_type' => ExpertHall::class,
             'day' => fake()->unique()->randomElement(['saturday', 'sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday']),
             'from' => '09:00:00',
             'to' => '18:00:00',
