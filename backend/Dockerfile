@@ -1,6 +1,5 @@
 FROM php:8.5.3-fpm-alpine3.23
 
-# Install common PHP extension dependencies
 RUN apk update && apk add --no-cache \
     bash \
     curl \
@@ -14,20 +13,28 @@ RUN apk update && apk add --no-cache \
     libzip-dev \
     libpq-dev \
     && docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp \
-    && docker-php-ext-install pdo_pgsql gd zip
+    && docker-php-ext-install pdo_pgsql gd zip #\
+#    && docker-php-ext-install pcntl \
+#    && docker-php-ext-install opcache
 
-# Set the working directory
+COPY --from=docker.arvancloud.ir/composer:latest /usr/bin/composer /usr/bin/composer
+ENV COMPOSER_ALLOW_SUPERUSER=1
+
+#COPY docker/opcache-dev.ini /usr/local/etc/php/conf.d/zz-opcache.ini
+COPY docker/entrypoint-dev.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
+
 WORKDIR /var/www/salonro
 
 COPY . .
 
-RUN chmod -R 777 /var/www/salonro/storage /var/www/salonro/bootstrap/cache
+RUN chown -R www-data:www-data storage bootstrap/cache \
+    && chmod -R 775 storage bootstrap/cache
 
-# Install Composer
-COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
-ENV COMPOSER_ALLOW_SUPERUSER=1
+EXPOSE 9000
 
-# Default command
-CMD composer install ;\
-    composer dump-autoload --optimize --classmap-authoritative ;\
-    php-fpm
+HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
+    CMD php -r "exit(@fsockopen('127.0.0.1',9000,\$errno,\$errstr,1)?0:1);"
+
+ENTRYPOINT ["entrypoint.sh"]
+CMD ["php-fpm"]

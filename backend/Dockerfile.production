@@ -1,4 +1,7 @@
-FROM docker.arvancloud.ir/composer:latest AS builder
+# ---------------------------------------------------------------------------
+# Stage 1: Composer dependencies (no scripts - no .env needed at build time)
+# ---------------------------------------------------------------------------
+FROM docker.arvancloud.ir/composer:2 AS builder
 
 WORKDIR /app
 
@@ -8,34 +11,72 @@ RUN composer install \
     --no-dev \
     --no-scripts \
     --no-autoloader \
+    --no-interaction \
     --prefer-dist
 
 COPY . .
 
-RUN composer dump-autoload --optimize --classmap-authoritative
+RUN composer dump-autoload --optimize --classmap-authoritative --no-dev --no-scripts
 
-FROM php:8.5.3-fpm-alpine3.23 AS application
+# ---------------------------------------------------------------------------
+# Stage 2: Compile PHP extensions with build tooling, produce artifacts only
+# ---------------------------------------------------------------------------
+FROM php:8.5.3-fpm-alpine3.23 AS extensions
 
-RUN apk update && apk add --no-cache \
-    bash \
-    curl \
-    libpng \
+RUN apk add --no-cache \
     libpng-dev \
     libjpeg-turbo-dev \
     freetype-dev \
     libwebp-dev \
     libxml2-dev \
-    unzip \
     libzip-dev \
     libpq-dev \
     && docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp \
-    && docker-php-ext-install pdo_pgsql gd zip
+    && docker-php-ext-install pdo_pgsql gd zip \
+    && docker-php-ext-install pcntl \
+    && docker-php-ext-install opcache
 
-WORKDIR /var/www/payment
+# ---------------------------------------------------------------------------
+# Stage 3: Slim runtime image - runtime libs only, no build tools
+# ---------------------------------------------------------------------------
+FROM php:8.5.3-fpm-alpine3.23 AS application
 
-COPY --from=builder /app /var/www/payment
+RUN apk add --no-cache \
+    bash \
+    curl \
+    libpng \
+    libjpeg-turbo \
+    freetype \
+    libwebp \
+    libxml2 \
+    libzip \
+    libpq
 
-RUN chown -R www-data:www-data /var/www/payment \
-    && chmod -R 665 storage bootstrap/cache
+COPY --from=extensions /usr/local/lib/php/extensions/ /usr/local/lib/php/extensions/
+COPY --from=extensions /usr/local/etc/php/conf.d/docker-php-ext-gd.ini \
+     /usr/local/etc/php/conf.d/docker-php-ext-pdo_pgsql.ini \
+     /usr/local/etc/php/conf.d/docker-php-ext-zip.ini \
+     /usr/local/etc/php/conf.d/docker-php-ext-opcache.ini \
+     /usr/local/etc/php/conf.d/docker-php-ext-pcntl.ini \
+     /usr/local/etc/php/conf.d/
+COPY docker/opcache-production.ini /usr/local/etc/php/conf.d/zz-opcache.ini
 
+WORKDIR /var/www/salonro
+
+COPY --from=builder /app /var/www/salonro
+
+COPY docker/entrypoint-production.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh \
+    && chown -R www-data:www-data storage bootstrap/cache \
+    && find storage bootstrap/cache -type d -exec chmod 775 {} + \
+    && find storage bootstrap/cache -type f -exec chmod 664 {} +
+
+USER www-data
+
+EXPOSE 9000
+
+HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
+    CMD php -r "exit(@fsockopen('127.0.0.1',9000,\$errno,\$errstr,1)?0:1);"
+
+ENTRYPOINT ["entrypoint.sh"]
 CMD ["php-fpm"]

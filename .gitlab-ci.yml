@@ -35,7 +35,7 @@ stages:
 variables:
   COMPOSER_CACHE_DIR: $CI_PROJECT_DIR/.composer-cache
   COMPOSER_ALLOW_SUPERUSER: "1"
-  COMPOSER_IMAGE: composer:2
+  COMPOSER_IMAGE: composer:latest
   DOCKER_IMAGE: docker:27
   DIND_IMAGE: docker:27-dind
 
@@ -100,11 +100,13 @@ test:
 #  script:
 #    - ssh "$DEPLOY_USER@$DEPLOY_HOST"
 #      "cd $DEPLOY_PATH
+#      && git fetch origin main
+#      && git reset --hard origin/main
 #      && export CI_REGISTRY_IMAGE=$CI_REGISTRY_IMAGE
 #      && export TAG=$CI_COMMIT_SHORT_SHA
 #      && docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
-#      && docker compose pull
-#      && docker compose up -d"
+#      && docker compose -f docker-compose.production.yml pull
+#      && docker compose -f docker-compose.production.yml up -d"
 #  environment:
 #    name: production
 #    url: http://$DEPLOY_HOST

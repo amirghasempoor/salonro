@@ -21,7 +21,7 @@ class Expert extends Authenticatable
 
     protected $guarded = ['id'];
 
-    protected $hidden = ['pivot', 'password',];
+    protected $hidden = ['pivot', 'password'];
 
     public function getFullNameAttribute(): string
     {
@@ -71,7 +71,7 @@ class Expert extends Authenticatable
     protected function avatar(): Attribute
     {
         return Attribute::make(
-            get: fn($value) => $value == null ? null : Storage::disk('public')->url($value)
+            get: fn ($value) => $value == null ? null : Storage::disk('public')->url($value)
         );
     }
 }
