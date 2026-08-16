@@ -11,7 +11,7 @@ services:
     depends_on:
       - backend
     networks:
-      - payment
+      - salonro
 
   redis:
     image: docker.arvancloud.ir/redis:8.6.0-alpine3.23
@@ -23,7 +23,7 @@ services:
       timeout: 5s
       retries: 5
     networks:
-      - payment
+      - salonro
 
   postgres:
     image: docker.arvancloud.ir/postgres:18.2-alpine3.23
@@ -42,9 +42,9 @@ services:
       retries: 5
       start_period: 10s
     volumes:
-      - payment-db:/var/lib/postgresql
+      - salonro-db:/var/lib/postgresql
     networks:
-      - payment
+      - salonro
 
   backend:
     build:
@@ -60,12 +60,12 @@ services:
       redis:
         condition: service_healthy
     networks:
-      - payment
+      - salonro
 
 volumes:
-  payment-db:
+  salonro-db:
     driver: local
 
 networks:
-  payment:
+  salonro:
     driver: bridge

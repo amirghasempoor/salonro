@@ -13,14 +13,14 @@ RUN apk update && apk add --no-cache \
     libzip-dev \
     libpq-dev \
     && docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp \
-    && docker-php-ext-install pdo_pgsql gd zip \
-    && docker-php-ext-install pcntl \
-    && docker-php-ext-install opcache
+    && docker-php-ext-install pdo_pgsql gd zip #\
+#    && docker-php-ext-install pcntl \
+#    && docker-php-ext-install opcache
 
-COPY --from=docker.arvancloud.ir/composer:2 /usr/bin/composer /usr/bin/composer
+COPY --from=docker.arvancloud.ir/composer:latest /usr/bin/composer /usr/bin/composer
 ENV COMPOSER_ALLOW_SUPERUSER=1
 
-COPY docker/opcache-dev.ini /usr/local/etc/php/conf.d/zz-opcache.ini
+#COPY docker/opcache-dev.ini /usr/local/etc/php/conf.d/zz-opcache.ini
 COPY docker/entrypoint-dev.sh /usr/local/bin/entrypoint.sh
 RUN chmod +x /usr/local/bin/entrypoint.sh
 
