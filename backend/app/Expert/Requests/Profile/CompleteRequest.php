@@ -5,7 +5,7 @@ namespace App\Expert\Requests\Profile;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
-class EditRequest extends FormRequest
+class CompleteRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.

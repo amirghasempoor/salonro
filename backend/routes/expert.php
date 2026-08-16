@@ -26,9 +26,9 @@ Route::prefix('profile')
     ->controller(ProfileController::class)
     ->group(function () {
         Route::get('info', 'info')->name('info');
+        Route::post('complete', 'complete')->name('complete');
         Route::post('update', 'update')->name('update');
         Route::post('change_password', 'changePassword')->name('changePassword');
-        Route::post('change_avatar', 'changeAvatar')->name('changeAvatar');
         Route::post('upload_portfolio', 'uploadPortfolio')->name('uploadPortfolio');
         Route::post('define_role', 'defineRole')->name('defineRole');
         Route::post('define_working_hour/{hall}', 'defineWorkingHour')->name('defineWorkingHour');

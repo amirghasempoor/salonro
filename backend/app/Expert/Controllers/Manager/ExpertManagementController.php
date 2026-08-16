@@ -47,7 +47,7 @@ class ExpertManagementController extends Controller
     {
         try {
             DB::transaction(function () use ($request, $hall) {
-                $expert = $hall->experts()->firstOrCreate(
+                $expert = Expert::query()->firstOrCreate(
                     [
                         'phone_number' => $request->phone_number,
                     ],

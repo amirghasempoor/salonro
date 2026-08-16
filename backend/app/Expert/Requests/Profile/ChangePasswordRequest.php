@@ -24,7 +24,7 @@ class ChangePasswordRequest extends FormRequest
     {
         return [
             'current_password' => 'required|string|regex:/^(?=.*[a-zA-Z])(?=.*\d).+$/|min:8',
-            'new_password' => 'required|string|regex:/^(?=.*[a-zA-Z])(?=.*\d).+$/|min:8',
+            'new_password' => 'required|string|regex:/^(?=.*[a-zA-Z])(?=.*\d).+$/|min:8|confirmed',
         ];
     }
 }

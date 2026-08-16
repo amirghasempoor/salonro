@@ -22,6 +22,8 @@ class ExpertProfileResource extends JsonResource
             'role' => $this->resource->getRoleNames()->first(),
             'halls' => $this->resource->halls->pluck('id')->values(),
             'is_verified' => $this->resource->is_verified,
+            'bio' => $this->resource->bio,
+            'is_active' => $this->resource->is_active,
         ];
     }
 }

@@ -7,7 +7,8 @@ use App\Expert\Requests\Profile\ChangeAvatarRequest;
 use App\Expert\Requests\Profile\ChangePasswordRequest;
 use App\Expert\Requests\Profile\DefineRoleRequest;
 use App\Expert\Requests\Profile\DefineWorkingHourRequest;
-use App\Expert\Requests\Profile\EditRequest;
+use App\Expert\Requests\Profile\CompleteRequest;
+use App\Expert\Requests\Profile\UpdateRequest;
 use App\Expert\Requests\Profile\UploadPortfolioRequest;
 use App\Expert\Resources\ExpertProfileResource;
 use App\Facades\File\File;
@@ -26,19 +27,36 @@ class ProfileController extends Controller
         return $this->successResponse(new ExpertProfileResource(Auth::guard('expert')->user()));
     }
 
-    public function update(EditRequest $request): JsonResponse
+    public function complete(CompleteRequest $request): JsonResponse
     {
-        $avatar = $request->avatar ?
-            File::save($request->avatar, '/experts/avatars')
-            : null;
+        Auth::guard('expert')->user()->update([
+            'first_name' => $request->first_name,
+            'last_name' => $request->last_name,
+            'avatar' => $request->avatar ? File::save($request->avatar, '/experts/avatars') : null,
+            'bio' => $request->bio,
+            'is_verified' => true,
+            'password' => Hash::make($request->password),
+        ]);
+
+        return $this->successResponse();
+    }
+
+    public function update(UpdateRequest $request): JsonResponse
+    {
+        if ($request->avatar) {
+            if (Auth::guard('expert')->user()->avatar) {
+                File::delete(Auth::guard('expert')->user()->avatar, true);
+            }
+
+            $avatar = File::save($request->avatar, '/experts/avatars');
+        }
 
         Auth::guard('expert')->user()->update([
             'first_name' => $request->first_name,
             'last_name' => $request->last_name,
-            'avatar' => $avatar,
+            'avatar' => $avatar ?? null,
             'bio' => $request->bio,
-            'is_verified' => true,
-            'password' => Hash::make($request->password),
+            'is_active' => $request->is_active,
         ]);
 
         return $this->successResponse();
@@ -54,21 +72,6 @@ class ProfileController extends Controller
 
         $expert->update([
             'password' => Hash::make($request->new_password),
-        ]);
-
-        return $this->successResponse();
-    }
-
-    public function changeAvatar(ChangeAvatarRequest $request): JsonResponse
-    {
-        $expert = Auth::guard('expert')->user();
-
-        if ($expert->avatar) {
-            File::delete($expert->avatar);
-        }
-
-        $expert->update([
-            'avatar' => File::save($request->avatar, '/avatars'),
         ]);
 
         return $this->successResponse();
