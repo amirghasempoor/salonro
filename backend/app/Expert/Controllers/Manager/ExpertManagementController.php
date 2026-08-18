@@ -9,6 +9,8 @@ use App\Expert\Resources\ExpertDetailsResource;
 use App\Facades\DataTable\DataTableFacade;
 use App\Http\Controllers\Controller;
 use App\Models\Expert;
+use App\Models\ExpertHall;
+use App\Models\ExpertService;
 use App\Models\Hall;
 use App\Traits\ApiResponse;
 use Illuminate\Http\JsonResponse;
@@ -61,7 +63,8 @@ class ExpertManagementController extends Controller
 
                 $expert->assignRole(Roles::Expert->value);
                 $hall->experts()->attach($expert->id, ['joined_at' => now()]);
-                $expert->services()->sync($request->services);
+                $expertHall = ExpertHall::where('expert_id', $expert->id)->where('hall_id', $hall->id)->first();
+                $expertHall->services()->sync($request->services);
             });
 
             return $this->successResponse();
@@ -105,8 +108,13 @@ class ExpertManagementController extends Controller
     {
         try {
             DB::transaction(function () use ($expert) {
+                ExpertService::query()->where('serviceable_type', Expert::class)
+                    ->where('serviceable_id', $expert->id)
+                    ->delete();
+                ExpertService::query()->where('serviceable_type', ExpertHall::class)
+                    ->whereIn('serviceable_id', $expert->expertHalls()->pluck('id'))
+                    ->delete();
                 $expert->halls()->detach();
-                $expert->services()->detach();
                 $expert->delete();
             });
 
