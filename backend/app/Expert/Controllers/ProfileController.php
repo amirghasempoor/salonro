@@ -97,7 +97,7 @@ class ProfileController extends Controller
         $expertHall = $expert->expertHalls()
             ->where('hall_id', '=', $hall)
             ->where('is_active', '=', true)
-            ->first();
+            ->firstOrFail();
 
         if (! $expertHall) {
             return $this->errorResponse(__('messages.expert_not_in_hall'));
