@@ -23,7 +23,6 @@ class DefineWorkingHourRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'hall_id' => 'required|integer|exists:halls,id',
             'workingHours' => 'required|array',
             'workingHours.*' => 'required|array',
             'workingHours.*.day' => 'required|string',

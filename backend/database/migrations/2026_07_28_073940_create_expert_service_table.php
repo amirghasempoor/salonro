@@ -13,8 +13,9 @@ return new class extends Migration
     {
         Schema::create('expert_service', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('expert_id')->constrained('experts');
+            $table->morphs('serviceable');
             $table->foreignId('service_id')->constrained('services');
+            $table->unique(['serviceable_type', 'serviceable_id', 'service_id']);
             $table->timestamps();
         });
     }

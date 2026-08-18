@@ -1,9 +1,11 @@
 <?php
 
 use App\Expert\Controllers\AuthController;
+use App\Expert\Controllers\JobOfferController;
 use App\Expert\Controllers\Manager\ExpertManagementController;
 use App\Expert\Controllers\Manager\HallManagementController;
 use App\Expert\Controllers\Manager\HallServicesManagementController;
+use App\Expert\Controllers\Manager\JobOfferController as ManagerJobOfferController;
 use App\Expert\Controllers\Manager\ServiceManagementController;
 use App\Expert\Controllers\ProfileController;
 use App\Expert\Controllers\ReservationManagementController;
@@ -26,9 +28,9 @@ Route::prefix('profile')
     ->controller(ProfileController::class)
     ->group(function () {
         Route::get('info', 'info')->name('info');
+        Route::post('complete', 'complete')->name('complete');
         Route::post('update', 'update')->name('update');
         Route::post('change_password', 'changePassword')->name('changePassword');
-        Route::post('change_avatar', 'changeAvatar')->name('changeAvatar');
         Route::post('upload_portfolio', 'uploadPortfolio')->name('uploadPortfolio');
         Route::post('define_role', 'defineRole')->name('defineRole');
         Route::post('define_working_hour/{hall}', 'defineWorkingHour')->name('defineWorkingHour');
@@ -95,4 +97,30 @@ Route::prefix('services')
         Route::get('/{hall}/{hallService}', 'show')->name('show');
         Route::post('/{hall}/{hallService}', 'update')->name('update');
         Route::delete('/{hall}/{hallService}', 'destroy')->name('destroy');
+    });
+
+Route::prefix('job_offers')
+    ->name('job_offers.')
+    ->middleware(['auth:expert'])
+    ->controller(ManagerJobOfferController::class)
+    ->group(function () {
+        Route::get('/{hall}', 'index')->name('index');
+        Route::post('/{hall}', 'store')->name('store');
+        Route::get('/details/{jobOffer}', 'show')->name('show');
+        Route::post('/update/{jobOffer}', 'update')->name('update');
+        Route::delete('/delete/{jobOffer}', 'destroy')->name('destroy');
+        Route::get('/{jobOffer}/applications', 'applications')->name('applications');
+        Route::post('/{application}/accept', 'acceptApplication')->name('acceptApplication');
+        Route::post('/{application}/reject', 'rejectApplication')->name('rejectApplication');
+    });
+
+Route::prefix('job_offers')
+    ->name('job_offers.')
+    ->middleware(['auth:expert'])
+    ->controller(JobOfferController::class)
+    ->group(function () {
+        Route::get('/', 'index')->name('browse');
+        Route::get('/applications/mine', 'myApplications')->name('myApplications');
+        Route::get('/{jobOffer}', 'show')->name('details');
+        Route::post('/{jobOffer}/apply', 'apply')->name('apply');
     });

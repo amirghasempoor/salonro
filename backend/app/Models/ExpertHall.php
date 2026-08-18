@@ -31,4 +31,9 @@ class ExpertHall extends Model
     {
         return $this->morphMany(WorkingHour::class, 'hourable');
     }
+
+    public function services(): MorphMany
+    {
+        return $this->morphMany(ExpertService::class, 'serviceable');
+    }
 }

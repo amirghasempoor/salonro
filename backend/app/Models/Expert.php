@@ -50,9 +50,19 @@ class Expert extends Authenticatable
         return $this->morphMany(Image::class, 'imageable');
     }
 
-    public function services(): BelongsToMany
+    public function services(): MorphMany
     {
-        return $this->belongsToMany(Service::class);
+        return $this->morphMany(ExpertService::class, 'serviceable');
+    }
+
+    public function jobOffers(): HasMany
+    {
+        return $this->hasMany(JobOffer::class);
+    }
+
+    public function jobApplications(): HasMany
+    {
+        return $this->hasMany(JobOfferApplication::class);
     }
 
     protected function workingHours(): Attribute
