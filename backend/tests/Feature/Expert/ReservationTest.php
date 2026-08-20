@@ -2,6 +2,7 @@
 
 use App\Models\Expert;
 use App\Models\Hall;
+use App\Models\HallService;
 use App\Models\Reservation;
 use App\Models\Service;
 
@@ -15,20 +16,23 @@ beforeEach(function () {
     $this->hall->experts()->attach($this->expert->id);
 
     $this->service = Service::factory()->create();
+
+    HallService::factory()->create([
+        'hall_id' => $this->hall->id,
+        'service_id' => $this->service->id,
+        'price' => 150000,
+        'duration' => 60,
+    ]);
 });
 
-test('expert can create a reservation', function () {
-    $this->postJson('/expert/reservations', [
+test('expert can create a reservation with server-side pricing', function () {
+    $this->postJson("/expert/reservations/{$this->hall->id}", [
         'phone_number' => '09123456789',
         'first_name' => 'John',
         'last_name' => 'Doe',
-        'hall_id' => $this->hall->id,
-        'services' => [
-            ['id' => $this->service->id, 'name' => $this->service->sub_cat_name, 'price' => 150000, 'duration' => 60],
-        ],
+        'services' => [['service_id' => $this->service->id]],
         'start_time' => '2026-08-20 10:00:00',
         'finish_time' => '2026-08-20 11:00:00',
-        'total_price' => 150000,
     ])->assertOk();
 
     $this->assertDatabaseHas('reservations', [
@@ -36,6 +40,9 @@ test('expert can create a reservation', function () {
         'hall_id' => $this->hall->id,
         'state_id' => 1,
     ]);
+
+    $reservation = Reservation::query()->latest('id')->first();
+    expect((int) $reservation->total_price)->toBe(150000);
 });
 
 test('expert can list reservations of an owned hall', function () {
@@ -44,7 +51,7 @@ test('expert can list reservations of an owned hall', function () {
         'hall_id' => $this->hall->id,
     ]);
 
-    $this->getJson("/expert/reservations?hall_id={$this->hall->id}&filters=[]&sorting=[]")
+    $this->getJson("/expert/reservations/{$this->hall->id}?filters=[]&sorting=[]")
         ->assertOk()
         ->assertJsonCount(3, 'data');
 });
@@ -52,7 +59,7 @@ test('expert can list reservations of an owned hall', function () {
 test('expert cannot list reservations of a hall they do not own', function () {
     $otherHall = Hall::factory()->create();
 
-    $this->getJson("/expert/reservations?hall_id={$otherHall->id}&filters=[]&sorting=[]")
+    $this->getJson("/expert/reservations/{$otherHall->id}?filters=[]&sorting=[]")
         ->assertStatus(403);
 });
 
@@ -62,31 +69,42 @@ test('expert can view a reservation', function () {
         'hall_id' => $this->hall->id,
     ]);
 
-    $this->getJson("/expert/reservations/{$reservation->id}")
+    $this->getJson("/expert/reservations/details/{$reservation->id}")
         ->assertOk()
-        ->assertJsonPath('data.id', $reservation->id);
+        ->assertJsonStructure(['data' => ['expert_name', 'user_name', 'total_price', 'discount_amount', 'hall_name']]);
 });
 
-test('expert can update a reservation', function () {
+test('expert can update a reservation and price is recomputed server-side', function () {
     $reservation = Reservation::factory()->create([
         'expert_id' => $this->expert->id,
         'hall_id' => $this->hall->id,
     ]);
 
-    $this->postJson("/expert/reservations/{$reservation->id}", [
-        'services' => [
-            ['id' => $this->service->id, 'name' => $this->service->sub_cat_name, 'price' => 200000, 'duration' => 90],
-        ],
+    $this->postJson("/expert/reservations/{$this->hall->id}/{$reservation->id}", [
+        'services' => [['service_id' => $this->service->id]],
         'start_time' => '2026-08-21 09:00:00',
         'finish_time' => '2026-08-21 10:30:00',
-        'total_price' => 200000,
     ])->assertOk();
 
-    $this->assertDatabaseHas('reservations', ['id' => $reservation->id, 'total_price' => 200000]);
+    expect((int) $reservation->fresh()->total_price)->toBe(150000);
     $this->assertDatabaseHas('reservation_services', [
         'reservation_id' => $reservation->id,
         'service_id' => $this->service->id,
     ]);
+});
+
+test('expert cannot update a reservation that belongs to another hall', function () {
+    $otherHall = Hall::factory()->create(['owner_id' => $this->expert->id]);
+    $reservation = Reservation::factory()->create([
+        'expert_id' => $this->expert->id,
+        'hall_id' => $otherHall->id,
+    ]);
+
+    $this->postJson("/expert/reservations/{$this->hall->id}/{$reservation->id}", [
+        'services' => [['service_id' => $this->service->id]],
+        'start_time' => '2026-08-21 09:00:00',
+        'finish_time' => '2026-08-21 10:30:00',
+    ])->assertStatus(404);
 });
 
 test('expert can delete a reservation', function () {
@@ -95,7 +113,7 @@ test('expert can delete a reservation', function () {
         'hall_id' => $this->hall->id,
     ]);
 
-    $this->deleteJson("/expert/reservations/{$reservation->id}")->assertOk();
+    $this->deleteJson("/expert/reservations/{$this->hall->id}/{$reservation->id}")->assertOk();
 
     $this->assertDatabaseMissing('reservations', ['id' => $reservation->id]);
 });

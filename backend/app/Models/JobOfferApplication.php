@@ -13,7 +13,9 @@ class JobOfferApplication extends Model
     protected $guarded = ['id'];
 
     const int STATUS_PENDING = 0;
+
     const int STATUS_ACCEPTED = 1;
+
     const int STATUS_REJECTED = 2;
 
     public function jobOffer(): BelongsTo

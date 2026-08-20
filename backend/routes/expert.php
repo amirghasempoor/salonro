@@ -2,6 +2,7 @@
 
 use App\Expert\Controllers\AuthController;
 use App\Expert\Controllers\JobOfferController;
+use App\Expert\Controllers\Manager\DiscountManagementController;
 use App\Expert\Controllers\Manager\ExpertManagementController;
 use App\Expert\Controllers\Manager\HallManagementController;
 use App\Expert\Controllers\Manager\HallServicesManagementController;
@@ -97,6 +98,18 @@ Route::prefix('services')
         Route::get('/{hall}/{hallService}', 'show')->name('show');
         Route::post('/{hall}/{hallService}', 'update')->name('update');
         Route::delete('/{hall}/{hallService}', 'destroy')->name('destroy');
+    });
+
+Route::prefix('discounts')
+    ->name('discount.')
+    ->middleware(['auth:expert'])
+    ->controller(DiscountManagementController::class)
+    ->group(function () {
+        Route::get('/{hall}', 'index')->name('index');
+        Route::post('/{hall}', 'store')->name('store');
+        Route::get('/details/{hall}/{discount}', 'show')->name('show');
+        Route::post('/{hall}/{discount}', 'update')->name('update');
+        Route::delete('/{hall}/{discount}', 'destroy')->name('destroy');
     });
 
 Route::prefix('job_offers')

@@ -3,11 +3,10 @@
 namespace App\Expert\Controllers;
 
 use App\Enums\Roles;
-use App\Expert\Requests\Profile\ChangeAvatarRequest;
 use App\Expert\Requests\Profile\ChangePasswordRequest;
+use App\Expert\Requests\Profile\CompleteRequest;
 use App\Expert\Requests\Profile\DefineRoleRequest;
 use App\Expert\Requests\Profile\DefineWorkingHourRequest;
-use App\Expert\Requests\Profile\CompleteRequest;
 use App\Expert\Requests\Profile\UpdateRequest;
 use App\Expert\Requests\Profile\UploadPortfolioRequest;
 use App\Expert\Resources\ExpertProfileResource;

@@ -1,6 +1,7 @@
 <?php
 
 use App\User\Controllers\AuthController;
+use App\User\Controllers\DiscountController;
 use App\User\Controllers\ProfileController;
 use App\User\Controllers\ReservationManagementController;
 use Illuminate\Support\Facades\Route;
@@ -36,4 +37,14 @@ Route::prefix('reservations')
         Route::get('/{reservation}', 'show')->name('show');
         Route::post('/{reservation}', 'update')->name('update');
         Route::delete('/{reservation}', 'destroy')->name('destroy');
+    });
+
+Route::prefix('discounts')
+    ->name('discount.')
+    ->middleware('auth:web')
+    ->controller(DiscountController::class)
+    ->group(function () {
+        Route::get('/', 'index')->name('index');
+        Route::get('/available', 'available')->name('available');
+        Route::get('/{discount}', 'show')->name('show');
     });
