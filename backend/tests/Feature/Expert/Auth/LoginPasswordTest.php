@@ -59,7 +59,7 @@ test('expert can login with password', function () {
 
     $response = $this->postJson(route('expert.auth.loginWithPassword'), [
         'phone_number' => $expert->phone_number,
-        'password' => 'password',
+        'password' => 'pass123@',
     ]);
 
     $response->assertOk();

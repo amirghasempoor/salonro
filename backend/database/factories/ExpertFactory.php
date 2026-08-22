@@ -23,7 +23,7 @@ class ExpertFactory extends Factory
             'last_name' => fake()->lastName(),
             'phone_number' => '09'.fake()->unique()->numerify('#########'),
             'email' => fake()->unique()->safeEmail(),
-            'password' => Hash::make('password'),
+            'password' => Hash::make('pass123@'),
             'avatar' => null,
             'province_id' => null,
             'city_id' => null,
