@@ -84,4 +84,9 @@ class Expert extends Authenticatable
             get: fn ($value) => $value == null ? null : Storage::disk('public')->url($value)
         );
     }
+
+    public function ownedHalls(): HasMany
+    {
+        return $this->hasMany(Hall::class, 'owner_id');
+    }
 }
