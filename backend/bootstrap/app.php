@@ -13,6 +13,7 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
         then: function () {
             Route::prefix('expert')
+                ->name('expert.')
                 ->middleware(SubstituteBindings::class)
                 ->group(base_path('routes/expert.php'));
         },

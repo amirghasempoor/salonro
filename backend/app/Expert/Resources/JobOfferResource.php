@@ -11,7 +11,11 @@ class JobOfferResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'title' => $this->title,
+            'profession_id' => $this->profession_id,
+            'profession' => $this->whenLoaded('profession', fn () => [
+                'id' => $this->profession->id,
+                'name' => $this->profession->name,
+            ]),
             'description' => $this->description,
             'is_active' => $this->is_active,
             'created_at' => $this->created_at,

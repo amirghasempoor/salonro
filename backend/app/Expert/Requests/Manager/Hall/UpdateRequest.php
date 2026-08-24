@@ -32,6 +32,10 @@ class UpdateRequest extends FormRequest
             'province_id' => 'required|exists:provinces,id',
             'city_id' => 'required|exists:cities,id',
             'description' => 'string',
+            'services' => 'required|array',
+            'services.*.duration' => 'required',
+            'services.*.price' => 'required',
+            'services.*.service_id' => 'required|exists:services,id',
         ];
     }
 }

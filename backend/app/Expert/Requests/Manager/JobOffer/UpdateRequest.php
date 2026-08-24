@@ -14,7 +14,7 @@ class UpdateRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'title' => 'sometimes|required|string|max:255',
+            'profession_id' => 'sometimes|required|integer|exists:professions,id',
             'description' => 'nullable|string',
             'is_active' => 'sometimes|boolean',
         ];

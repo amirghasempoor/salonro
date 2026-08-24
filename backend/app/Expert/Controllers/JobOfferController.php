@@ -18,12 +18,12 @@ class JobOfferController extends Controller
     public function index(Request $request): JsonResponse
     {
         $data = DataTableFacade::run(
-            JobOffer::query()->where('is_active', true)->with('hall'),
+            JobOffer::query()->where('is_active', true)->with('hall', 'profession'),
             $request,
             allowedFilters: ['*'],
-            allowedRelations: ['hall'],
+            allowedRelations: ['hall', 'profession'],
             allowedSortings: ['*'],
-            allowedSelects: ['id', 'title', 'description', 'created_at'],
+            allowedSelects: ['id', 'profession_id', 'description', 'created_at'],
         );
 
         return response()->json($data);
@@ -31,7 +31,7 @@ class JobOfferController extends Controller
 
     public function show(JobOffer $jobOffer): JsonResponse
     {
-        return $this->successResponse($jobOffer->load('hall', 'expert'));
+        return $this->successResponse($jobOffer->load('hall', 'expert', 'profession'));
     }
 
     public function apply(JobOffer $jobOffer): JsonResponse
@@ -61,7 +61,7 @@ class JobOfferController extends Controller
     {
         $applications = Auth::guard('expert')->user()
             ->jobApplications()
-            ->with('jobOffer.hall')
+            ->with('jobOffer.hall', 'jobOffer.profession')
             ->get();
 
         return $this->successResponse($applications);

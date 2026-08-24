@@ -26,9 +26,9 @@ class JobOfferController extends Controller
             $hall->jobOffers(),
             $request,
             allowedFilters: ['*'],
-            allowedRelations: ['applications', 'applications.expert'],
+            allowedRelations: ['profession', 'applications', 'applications.expert'],
             allowedSortings: ['*'],
-            allowedSelects: ['id', 'title', 'description', 'is_active', 'created_at'],
+            allowedSelects: ['id', 'profession_id', 'description', 'is_active', 'created_at'],
         );
 
         return response()->json($data);
@@ -39,7 +39,7 @@ class JobOfferController extends Controller
         try {
             $hall->jobOffers()->create([
                 'expert_id' => Auth::guard('expert')->user()->id,
-                'title' => $request->title,
+                'profession_id' => $request->profession_id,
                 'description' => $request->description,
             ]);
 
@@ -51,7 +51,7 @@ class JobOfferController extends Controller
 
     public function show(JobOffer $jobOffer): JsonResponse
     {
-        return $this->successResponse(new JobOfferResource($jobOffer->load('applications.expert')));
+        return $this->successResponse(new JobOfferResource($jobOffer->load('profession', 'applications.expert')));
     }
 
     public function update(UpdateRequest $request, JobOffer $jobOffer): JsonResponse
