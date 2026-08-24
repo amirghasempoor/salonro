@@ -8,20 +8,24 @@ use App\Models\Province;
 use App\Models\Service;
 use Laravel\Sanctum\Sanctum;
 
-test('manager should be authenticated to store a hall', function () {
-    $this->postJson(route('expert.hall.store'))->assertUnauthorized();
+beforeEach(function () {
+    $this->expertHall = ExpertHall::factory()->create();
+});
+
+test('manager should be authenticated to update a hall', function () {
+    $this->postJson(route('expert.hall.update', [$this->expertHall->hall_id]))->assertUnauthorized();
 });
 
 test('manager should be authenticated with guard expert', function () {
     $expert = Expert::factory()->create();
     Sanctum::actingAs($expert, ['*'], 'user');
-    $this->getJson(route('expert.hall.store'))->assertUnauthorized();
+    $this->getJson(route('expert.hall.update', [$this->expertHall->hall_id]))->assertUnauthorized();
 });
 
 test('name is required', function () {
     $expert = Expert::factory()->create();
     Sanctum::actingAs($expert, ['*'], 'expert');
-    $response = $this->postJson(route('expert.hall.store'));
+    $response = $this->postJson(route('expert.hall.update', [$this->expertHall->hall_id]));
 
     $response->assertStatus(422);
     $response->assertJsonValidationErrorFor('name');
@@ -30,7 +34,7 @@ test('name is required', function () {
 test('name should be string', function () {
     $expert = Expert::factory()->create();
     Sanctum::actingAs($expert, ['*'], 'expert');
-    $response = $this->postJson(route('expert.hall.store'), [
+    $response = $this->postJson(route('expert.hall.update', [$this->expertHall->hall_id]), [
         'name' => fake()->numberBetween(1, 100),
     ]);
 
@@ -43,7 +47,7 @@ test('name should be string', function () {
 test('lat is required', function () {
     $expert = Expert::factory()->create();
     Sanctum::actingAs($expert, ['*'], 'expert');
-    $response = $this->postJson(route('expert.hall.store'));
+    $response = $this->postJson(route('expert.hall.update', [$this->expertHall->hall_id]));
 
     $response->assertStatus(422);
     $response->assertJsonValidationErrorFor('lat');
@@ -52,7 +56,7 @@ test('lat is required', function () {
 test('lat should be string', function () {
     $expert = Expert::factory()->create();
     Sanctum::actingAs($expert, ['*'], 'expert');
-    $response = $this->postJson(route('expert.hall.store'), [
+    $response = $this->postJson(route('expert.hall.update', [$this->expertHall->hall_id]), [
         'lat' => fake()->numberBetween(1, 100),
     ]);
 
@@ -65,7 +69,7 @@ test('lat should be string', function () {
 test('lng is required', function () {
     $expert = Expert::factory()->create();
     Sanctum::actingAs($expert, ['*'], 'expert');
-    $response = $this->postJson(route('expert.hall.store'));
+    $response = $this->postJson(route('expert.hall.update', [$this->expertHall->hall_id]));
 
     $response->assertStatus(422);
     $response->assertJsonValidationErrorFor('lng');
@@ -74,7 +78,7 @@ test('lng is required', function () {
 test('lng should be string', function () {
     $expert = Expert::factory()->create();
     Sanctum::actingAs($expert, ['*'], 'expert');
-    $response = $this->postJson(route('expert.hall.store'), [
+    $response = $this->postJson(route('expert.hall.update', [$this->expertHall->hall_id]), [
         'lng' => fake()->numberBetween(1, 100),
     ]);
 
@@ -87,7 +91,7 @@ test('lng should be string', function () {
 test('address is required', function () {
     $expert = Expert::factory()->create();
     Sanctum::actingAs($expert, ['*'], 'expert');
-    $response = $this->postJson(route('expert.hall.store'));
+    $response = $this->postJson(route('expert.hall.update', [$this->expertHall->hall_id]));
 
     $response->assertStatus(422);
     $response->assertJsonValidationErrorFor('address');
@@ -96,7 +100,7 @@ test('address is required', function () {
 test('address should be string', function () {
     $expert = Expert::factory()->create();
     Sanctum::actingAs($expert, ['*'], 'expert');
-    $response = $this->postJson(route('expert.hall.store'), [
+    $response = $this->postJson(route('expert.hall.update', [$this->expertHall->hall_id]), [
         'address' => fake()->numberBetween(1, 100),
     ]);
 
@@ -109,7 +113,7 @@ test('address should be string', function () {
 test('postal code is required', function () {
     $expert = Expert::factory()->create();
     Sanctum::actingAs($expert, ['*'], 'expert');
-    $response = $this->postJson(route('expert.hall.store'));
+    $response = $this->postJson(route('expert.hall.update', [$this->expertHall->hall_id]));
 
     $response->assertStatus(422);
     $response->assertJsonValidationErrorFor('postal_code');
@@ -118,7 +122,7 @@ test('postal code is required', function () {
 test('postal code should be string', function () {
     $expert = Expert::factory()->create();
     Sanctum::actingAs($expert, ['*'], 'expert');
-    $response = $this->postJson(route('expert.hall.store'), [
+    $response = $this->postJson(route('expert.hall.update', [$this->expertHall->hall_id]), [
         'postal_code' => fake()->numberBetween(1, 100),
     ]);
 
@@ -131,7 +135,7 @@ test('postal code should be string', function () {
 test('telephone is required', function () {
     $expert = Expert::factory()->create();
     Sanctum::actingAs($expert, ['*'], 'expert');
-    $response = $this->postJson(route('expert.hall.store'));
+    $response = $this->postJson(route('expert.hall.update', [$this->expertHall->hall_id]));
 
     $response->assertStatus(422);
     $response->assertJsonValidationErrorFor('telephone');
@@ -140,7 +144,7 @@ test('telephone is required', function () {
 test('telephone should be string', function () {
     $expert = Expert::factory()->create();
     Sanctum::actingAs($expert, ['*'], 'expert');
-    $response = $this->postJson(route('expert.hall.store'), [
+    $response = $this->postJson(route('expert.hall.update', [$this->expertHall->hall_id]), [
         'telephone' => fake()->numberBetween(1, 100),
     ]);
 
@@ -153,7 +157,7 @@ test('telephone should be string', function () {
 test('province id is required', function () {
     $expert = Expert::factory()->create();
     Sanctum::actingAs($expert, ['*'], 'expert');
-    $response = $this->postJson(route('expert.hall.store'));
+    $response = $this->postJson(route('expert.hall.update', [$this->expertHall->hall_id]));
 
     $response->assertStatus(422);
     $response->assertJsonValidationErrorFor('province_id');
@@ -162,7 +166,7 @@ test('province id is required', function () {
 test('province id should be existed', function () {
     $expert = Expert::factory()->create();
     Sanctum::actingAs($expert, ['*'], 'expert');
-    $response = $this->postJson(route('expert.hall.store'), [
+    $response = $this->postJson(route('expert.hall.update', [$this->expertHall->hall_id]), [
         'province_id' => fake()->numberBetween(1, 10),
     ]);
 
@@ -175,7 +179,7 @@ test('province id should be existed', function () {
 test('city id is required', function () {
     $expert = Expert::factory()->create();
     Sanctum::actingAs($expert, ['*'], 'expert');
-    $response = $this->postJson(route('expert.hall.store'));
+    $response = $this->postJson(route('expert.hall.update', [$this->expertHall->hall_id]));
 
     $response->assertStatus(422);
     $response->assertJsonValidationErrorFor('city_id');
@@ -184,7 +188,7 @@ test('city id is required', function () {
 test('city id should be existed', function () {
     $expert = Expert::factory()->create();
     Sanctum::actingAs($expert, ['*'], 'expert');
-    $response = $this->postJson(route('expert.hall.store'), [
+    $response = $this->postJson(route('expert.hall.update', [$this->expertHall->hall_id]), [
         'city_id' => fake()->numberBetween(1, 10),
     ]);
 
@@ -197,14 +201,14 @@ test('city id should be existed', function () {
 test('services is required', function () {
     $expert = Expert::factory()->create();
     Sanctum::actingAs($expert, ['*'], 'expert');
-    $response = $this->postJson(route('expert.hall.store'));
+    $response = $this->postJson(route('expert.hall.update', [$this->expertHall->hall_id]));
 
     $response->assertStatus(422);
     $response->assertJsonValidationErrorFor('services');
 });
 
-test('manager can store a hall', function () {
-    $expert = Expert::factory()->create();
+test('manager can update a hall', function () {
+    $expert = Expert::query()->find($this->expertHall->expert_id);
 
     Sanctum::actingAs($expert, ['*'], 'expert');
 
@@ -238,20 +242,16 @@ test('manager can store a hall', function () {
         ],
     ];
 
-    $response = $this->postJson(route('expert.hall.store'), $data);
+    $response = $this->postJson(route('expert.hall.update', [$this->expertHall->hall_id]), $data);
 
     $response->assertOk();
 
-    $response->assertJsonStructure([
-        'data' => [
-            'hall_id'
-        ],
+    $response->assertExactJson([
+        'message' => __('messages.successful')
     ]);
 
     $this->assertDatabaseHas('halls', [
         'name' => $data['name'],
-        'owner_id' => $expert->id,
-        'owner_name' => $expert->last_name,
         'lat' => $data['lat'],
         'lng' => $data['lng'],
         'address' => $data['address'],

@@ -25,6 +25,11 @@ class JobOffer extends Model
         return $this->belongsTo(Expert::class);
     }
 
+    public function profession(): BelongsTo
+    {
+        return $this->belongsTo(Profession::class);
+    }
+
     public function applications(): HasMany
     {
         return $this->hasMany(JobOfferApplication::class);

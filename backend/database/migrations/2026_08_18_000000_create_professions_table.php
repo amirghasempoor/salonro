@@ -8,12 +8,9 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('job_offers', function (Blueprint $table) {
+        Schema::create('professions', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('hall_id')->constrained('halls');
-            $table->foreignId('expert_id')->constrained('experts');
-            $table->foreignId('profession_id')->constrained('professions')->cascadeOnDelete();
-            $table->text('description')->nullable();
+            $table->string('name')->unique();
             $table->boolean('is_active')->default(true);
             $table->timestamps();
         });
@@ -21,6 +18,6 @@ return new class extends Migration
 
     public function down(): void
     {
-        Schema::dropIfExists('job_offers');
+        Schema::dropIfExists('professions');
     }
 };

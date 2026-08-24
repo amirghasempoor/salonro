@@ -18,6 +18,7 @@ class DatabaseSeeder extends Seeder
             ProvinceSeeder::class,
             CitySeeder::class,
             ServiceSeeder::class,
+            ProfessionSeeder::class,
             RoleSeeder::class,
         ]);
     }

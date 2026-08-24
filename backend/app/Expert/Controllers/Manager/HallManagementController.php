@@ -25,7 +25,7 @@ class HallManagementController extends Controller
     {
         $query = Expert::query()
             ->find(Auth::guard('expert')->user()->id)
-            ->halls()->select(['owner_name', 'name', 'lat', 'lng', 'address']);
+            ->halls()->select(['halls.id', 'owner_name', 'name', 'lat', 'lng', 'address']);
 
         $data = DataTableFacade::run(
             $query,
@@ -106,6 +106,15 @@ class HallManagementController extends Controller
                     'description' => $request->description,
                 ]);
             });
+
+            foreach ($request->services as $service) {
+                $services[$service['service_id']] = [
+                    'price' => $service['price'],
+                    'duration' => $service['duration'],
+                ];
+            }
+
+            $hall->services()->sync($services);
 
             return $this->successResponse();
         } catch (\Throwable $e) {
