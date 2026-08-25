@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Database\Eloquent\Relations\MorphToMany;
 
 class ExpertHall extends Model
 {
@@ -32,8 +33,8 @@ class ExpertHall extends Model
         return $this->morphMany(WorkingHour::class, 'hourable');
     }
 
-    public function services(): MorphMany
+    public function services(): MorphToMany
     {
-        return $this->morphMany(ExpertService::class, 'serviceable');
+        return $this->morphToMany(Service::class, 'serviceable', 'expert_service');
     }
 }

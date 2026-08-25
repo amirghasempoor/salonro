@@ -1,5 +1,10 @@
 <?php
 
+use App\Models\City;
+use App\Models\Expert;
+use App\Models\Province;
+use App\Models\Role;
+
 test('first name is required to register', function () {
     $response = $this->postJson(route('expert.auth.register'));
 
@@ -29,7 +34,7 @@ test('first name should should not exceed 255 characters', function () {
     ]);
 });
 
-#######################################################################################
+// ######################################################################################
 test('last name is required to register', function () {
     $response = $this->postJson(route('expert.auth.register'));
 
@@ -59,7 +64,7 @@ test('last name should should not exceed 255 characters', function () {
     ]);
 });
 
-###########################################################################################
+// ##########################################################################################
 test('password is required to register', function () {
     $response = $this->postJson(route('expert.auth.register'));
 
@@ -88,7 +93,7 @@ test('password should be at least 8 characters', function () {
         'password' => __('validation.min.string', ['attribute' => 'password', 'min' => 8]),
     ]);
 });
-######################################################################################################
+// #####################################################################################################
 test('phone number is required to register', function () {
     $response = $this->postJson(route('expert.auth.register'));
 
@@ -119,7 +124,7 @@ test('phone number should not exceed 11 character', function () {
 });
 
 test('phone number should be unique in experts table', function () {
-    \App\Models\Expert::factory()->create([
+    Expert::factory()->create([
         'phone_number' => '09134844955',
     ]);
     $response = $this->postJson(route('expert.auth.register'), [
@@ -131,7 +136,7 @@ test('phone number should be unique in experts table', function () {
         'phone_number' => __('validation.unique', ['attribute' => 'phone number']),
     ]);
 });
-#######################################################################################################
+// ######################################################################################################
 test('email should be string', function () {
     $response = $this->postJson(route('expert.auth.register'), [
         'email' => fake()->numberBetween(1, 100),
@@ -155,7 +160,7 @@ test('email should be in a valid form', function () {
 });
 
 test('email should be unique in experts table', function () {
-    \App\Models\Expert::factory()->create([
+    Expert::factory()->create([
         'email' => 'amir@amir.com',
     ]);
     $response = $this->postJson(route('expert.auth.register'), [
@@ -167,7 +172,7 @@ test('email should be unique in experts table', function () {
         'email' => __('validation.unique', ['attribute' => 'email']),
     ]);
 });
-###############################################################################################
+// ##############################################################################################
 test('province id is required to register', function () {
     $response = $this->postJson(route('expert.auth.register'));
 
@@ -185,7 +190,7 @@ test('province id should be existed in provinces table', function () {
         'province_id' => __('validation.exists', ['attribute' => 'province id']),
     ]);
 });
-#######################################################################################################
+// ######################################################################################################
 test('city id is required to register', function () {
     $response = $this->postJson(route('expert.auth.register'));
 
@@ -203,7 +208,7 @@ test('city id should be existed in citys table', function () {
         'city_id' => __('validation.exists', ['attribute' => 'city id']),
     ]);
 });
-###########################################################################################################
+// ##########################################################################################################
 test('avatar should be a valid image type', function () {
     $response = $this->postJson(route('expert.auth.register'), [
         'avatar' => fake()->numberBetween(1, 100),
@@ -214,7 +219,7 @@ test('avatar should be a valid image type', function () {
         'avatar' => __('validation.image', ['attribute' => 'avatar']),
     ]);
 });
-#############################################################################################################
+// ############################################################################################################
 test('role is required to register', function () {
     $response = $this->postJson(route('expert.auth.register'));
 
@@ -232,13 +237,13 @@ test('role should be 1 or 2', function () {
         'role' => __('validation.in', ['attribute' => 'role']),
     ]);
 });
-###############################################################################################################
+// ##############################################################################################################
 test('expert can be registered', function () {
-    \App\Models\Role::factory()->create([
+    Role::factory()->create([
         'name' => 'expert',
     ]);
-    $province = \App\Models\Province::factory()->create();
-    $city = \App\Models\City::factory()->create();
+    $province = Province::factory()->create();
+    $city = City::factory()->create();
     $response = $this->postJson(route('expert.auth.register'), [
         'first_name' => fake()->firstName,
         'last_name' => fake()->lastName,

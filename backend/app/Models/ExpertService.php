@@ -11,6 +11,8 @@ class ExpertService extends Model
 {
     use HasFactory;
 
+    protected $table = 'expert_service';
+
     protected $guarded = ['id'];
 
     protected $hidden = ['pivot', 'serviceable_type', 'serviceable_id'];

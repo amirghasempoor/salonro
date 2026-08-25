@@ -10,7 +10,6 @@ use App\Facades\DataTable\DataTableFacade;
 use App\Http\Controllers\Controller;
 use App\Models\Expert;
 use App\Models\ExpertHall;
-use App\Models\ExpertService;
 use App\Models\Hall;
 use App\Traits\ApiResponse;
 use Illuminate\Http\JsonResponse;
@@ -108,12 +107,10 @@ class ExpertManagementController extends Controller
     {
         try {
             DB::transaction(function () use ($expert) {
-                ExpertService::query()->where('serviceable_type', Expert::class)
-                    ->where('serviceable_id', $expert->id)
-                    ->delete();
-                ExpertService::query()->where('serviceable_type', ExpertHall::class)
-                    ->whereIn('serviceable_id', $expert->expertHalls()->pluck('id'))
-                    ->delete();
+                $expert->services()->detach();
+                $expert->expertHalls->each(
+                    fn (ExpertHall $expertHall) => $expertHall->services()->detach()
+                );
                 $expert->halls()->detach();
                 $expert->delete();
             });

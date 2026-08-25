@@ -22,7 +22,7 @@ test('manager can see the halls info', function () {
         'start' => 0,
         'size' => 5,
         'filters' => json_encode([]),
-        'sorting' => json_encode([])
+        'sorting' => json_encode([]),
     ]));
 
     $response->assertOk();
@@ -34,8 +34,8 @@ test('manager can see the halls info', function () {
                 'lat',
                 'lng',
                 'address',
-            ]
+            ],
         ],
-        'meta' => []
+        'meta' => [],
     ]);
 });

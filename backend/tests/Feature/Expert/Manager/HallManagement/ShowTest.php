@@ -31,6 +31,6 @@ test('manager can see the halls info', function () {
             'lat',
             'lng',
             'address',
-        ]
+        ],
     ]);
 });

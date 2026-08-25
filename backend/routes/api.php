@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\CityController;
+use App\Http\Controllers\ProfessionController;
 use App\Http\Controllers\ProvinceController;
 use Illuminate\Support\Facades\Route;
 
@@ -16,4 +17,11 @@ Route::prefix('cities')
     ->name('cities.')
     ->group(function () {
         Route::get('/{province_id}', 'list')->name('list');
+    });
+
+Route::prefix('professions')
+    ->controller(ProfessionController::class)
+    ->name('provinces.')
+    ->group(function () {
+        Route::get('/list', 'list')->name('list');
     });

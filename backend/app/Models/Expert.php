@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Support\Facades\Storage;
 use Laravel\Sanctum\HasApiTokens;
@@ -50,9 +51,9 @@ class Expert extends Authenticatable
         return $this->morphMany(Image::class, 'imageable');
     }
 
-    public function services(): MorphMany
+    public function services(): MorphToMany
     {
-        return $this->morphMany(ExpertService::class, 'serviceable');
+        return $this->morphToMany(Service::class, 'serviceable', 'expert_service');
     }
 
     public function jobOffers(): HasMany
