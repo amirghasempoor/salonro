@@ -11,10 +11,11 @@ use App\Http\Controllers\Controller;
 use App\Models\Hall;
 use App\Models\JobOffer;
 use App\Models\JobOfferApplication;
+use App\Models\Profession;
 use App\Traits\ApiResponse;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
+use Throwable;
 
 class JobOfferController extends Controller
 {
@@ -37,14 +38,23 @@ class JobOfferController extends Controller
     public function store(StoreRequest $request, Hall $hall): JsonResponse
     {
         try {
-            $hall->jobOffers()->create([
-                'expert_id' => Auth::guard('expert')->user()->id,
-                'profession_id' => $request->profession_id,
+            $profession = Profession::query()->find($request->profession_id);
+
+            JobOffer::query()->create([
+                'hall_id' => $hall->id,
+                'hall_name' => $hall->name,
+                'expert_id' => $hall->owner_id,
+                'profession_id' => $profession->id,
+                'profession_name' => $profession->name,
                 'description' => $request->description,
+                'province_id' => $hall->province_id,
+                'province_name' => $hall->province_name,
+                'city_id' => $hall->city_id,
+                'city_name' => $hall->city_name,
             ]);
 
             return $this->successResponse();
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             return $this->errorResponse($e->getMessage());
         }
     }
@@ -60,7 +70,7 @@ class JobOfferController extends Controller
             $jobOffer->update($request->validated());
 
             return $this->successResponse();
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             return $this->errorResponse($e->getMessage());
         }
     }
@@ -71,17 +81,20 @@ class JobOfferController extends Controller
             $jobOffer->delete();
 
             return $this->successResponse();
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             return $this->errorResponse($e->getMessage());
         }
     }
 
+    /**
+     * @throws Throwable
+     */
     public function applications(JobOffer $jobOffer): JsonResponse
     {
         $applications = $jobOffer->applications()
             ->with('expert')
             ->get()
-            ->map(fn (JobOfferApplication $app) => new JobOfferApplicationResource($app));
+            ->toResourceCollection(JobOfferApplicationResource::class);
 
         return $this->successResponse($applications);
     }
@@ -92,7 +105,7 @@ class JobOfferController extends Controller
             $application->update(['status' => JobOfferApplication::STATUS_ACCEPTED]);
 
             return $this->successResponse();
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             return $this->errorResponse($e->getMessage());
         }
     }
@@ -103,7 +116,7 @@ class JobOfferController extends Controller
             $application->update(['status' => JobOfferApplication::STATUS_REJECTED]);
 
             return $this->successResponse();
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             return $this->errorResponse($e->getMessage());
         }
     }

@@ -23,7 +23,10 @@ class JobOfferController extends Controller
             allowedFilters: ['*'],
             allowedRelations: ['hall', 'profession'],
             allowedSortings: ['*'],
-            allowedSelects: ['id', 'profession_id', 'description', 'created_at'],
+            allowedSelects: [
+                'id', 'hall_id', 'hall_name', 'profession_id', 'profession_name', 'description',
+                'created_at', 'province_id', 'province_name', 'city_id', 'city_name',
+            ],
         );
 
         return response()->json($data);

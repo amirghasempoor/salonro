@@ -127,8 +127,8 @@ Route::prefix('job_offers')
         Route::post('/{application}/reject', 'rejectApplication')->name('rejectApplication');
     });
 
-Route::prefix('job_offers')
-    ->name('job_offers.')
+Route::prefix('jobs')
+    ->name('jobs.')
     ->middleware(['auth:expert'])
     ->controller(JobOfferController::class)
     ->group(function () {

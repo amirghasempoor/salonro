@@ -62,7 +62,10 @@ class ExpertManagementController extends Controller
 
                 $expert->assignRole(Roles::Expert->value);
                 $hall->experts()->attach($expert->id, ['joined_at' => now()]);
-                $expertHall = ExpertHall::where('expert_id', $expert->id)->where('hall_id', $hall->id)->first();
+                $expertHall = ExpertHall::query()
+                    ->where('expert_id', '=', $expert->id)
+                    ->where('hall_id', '=', $hall->id)
+                    ->first();
                 $expertHall->services()->sync($request->services);
             });
 
