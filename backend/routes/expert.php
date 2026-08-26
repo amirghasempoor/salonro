@@ -122,9 +122,9 @@ Route::prefix('job_offers')
         Route::get('/details/{jobOffer}', 'show')->name('show');
         Route::post('/update/{jobOffer}', 'update')->name('update');
         Route::delete('/delete/{jobOffer}', 'destroy')->name('destroy');
-        Route::get('/{jobOffer}/applications', 'applications')->name('applications');
-        Route::post('/{application}/accept', 'acceptApplication')->name('acceptApplication');
-        Route::post('/{application}/reject', 'rejectApplication')->name('rejectApplication');
+        Route::get('/applications/{jobOffer}', 'applications')->name('applications');
+        Route::post('/accept/{application}', 'acceptApplication')->name('acceptApplication');
+        Route::post('/reject/{application}', 'rejectApplication')->name('rejectApplication');
     });
 
 Route::prefix('jobs')
@@ -132,8 +132,8 @@ Route::prefix('jobs')
     ->middleware(['auth:expert'])
     ->controller(JobOfferController::class)
     ->group(function () {
-        Route::get('/', 'index')->name('browse');
-        Route::get('/applications/mine', 'myApplications')->name('myApplications');
-        Route::get('/{jobOffer}', 'show')->name('details');
-        Route::post('/{jobOffer}/apply', 'apply')->name('apply');
+        Route::get('/', 'index')->name('index');
+        Route::get('/my_applications', 'myApplications')->name('myApplications');
+        Route::get('/{jobOffer}', 'show')->name('show');
+        Route::post('/apply/{jobOffer}', 'apply')->name('apply');
     });

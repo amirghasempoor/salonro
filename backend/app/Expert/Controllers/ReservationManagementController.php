@@ -50,7 +50,8 @@ class ReservationManagementController extends Controller
             allowedFilters: ['*'],
             allowedSortings: ['*'],
             allowedSelects: [
-                'id', 'user_name', 'state_name', 'start_time', 'finish_time',
+                'id', 'user_name', 'state_name', 'expert_name', 'start_time', 'finish_time',
+                'total_price', 'discount_id', 'discount_amount',
             ]
         );
 

@@ -27,9 +27,8 @@ class JobOfferController extends Controller
             $hall->jobOffers(),
             $request,
             allowedFilters: ['*'],
-            allowedRelations: ['profession', 'applications', 'applications.expert'],
             allowedSortings: ['*'],
-            allowedSelects: ['id', 'profession_id', 'description', 'is_active', 'created_at'],
+            allowedSelects: ['id', 'hall_id', 'hall_name', 'profession_id', 'description', 'is_active', 'created_at'],
         );
 
         return response()->json($data);
@@ -61,7 +60,7 @@ class JobOfferController extends Controller
 
     public function show(JobOffer $jobOffer): JsonResponse
     {
-        return $this->successResponse(new JobOfferResource($jobOffer->load('profession', 'applications.expert')));
+        return $this->successResponse(new JobOfferResource($jobOffer));
     }
 
     public function update(UpdateRequest $request, JobOffer $jobOffer): JsonResponse

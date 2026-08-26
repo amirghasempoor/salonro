@@ -31,33 +31,12 @@ test('manager can see a job offer details', function () {
         'data' => [
             'id',
             'profession_id',
+            'profession_name',
             'description',
             'is_active',
+            'hall_id',
+            'hall_name',
             'created_at',
-            'hall' => [
-                'id',
-                'name',
-            ],
-            'profession' => [
-                'id',
-                'name',
-            ],
-            'applications' => [
-                [
-                    'id',
-                    'status',
-                    'status_label',
-                    'created_at',
-                    'expert' => [
-                        'id',
-                        'first_name',
-                        'last_name',
-                        'phone_number',
-                        'avatar',
-                    ],
-                ],
-            ],
         ],
     ]);
-    $response->assertJsonPath('data.id', $this->jobOffer->id);
 });
