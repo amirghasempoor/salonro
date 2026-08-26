@@ -17,15 +17,15 @@ beforeEach(function () {
 });
 
 test('working hours is required', function () {
-    $response = $this->postJson(route("expert.profile.defineWorkingHour", 3));
+    $response = $this->postJson(route('expert.profile.defineWorkingHour', 3));
 
     $response->assertStatus(422);
     $response->assertJsonValidationErrorFor('workingHours');
 });
 
 test('working hours should be array', function () {
-    $response = $this->postJson(route("expert.profile.defineWorkingHour", 3), [
-        'workingHours' => fake()->lexify()
+    $response = $this->postJson(route('expert.profile.defineWorkingHour', 3), [
+        'workingHours' => fake()->lexify(),
     ]);
 
     $response->assertStatus(422);
@@ -35,18 +35,18 @@ test('working hours should be array', function () {
 });
 
 test('expert can upload the working hours', function () {
-    $response = $this->postJson(route("expert.profile.defineWorkingHour", 3), [
+    $response = $this->postJson(route('expert.profile.defineWorkingHour', 3), [
         'workingHours' => [
             [
                 'day' => 'sun',
                 'from' => '8:00',
-                'to' => '14:00'
+                'to' => '14:00',
             ],
             [
                 'day' => 'mon',
                 'from' => '9:00',
-                'to' => '13:00'
-            ]
+                'to' => '13:00',
+            ],
         ],
     ]);
 
@@ -61,12 +61,12 @@ test('expert can upload the working hours', function () {
     $this->assertDatabaseHas('working_hours', [
         'day' => 'sun',
         'from' => '8:00',
-        'to' => '14:00'
+        'to' => '14:00',
     ]);
 
     $this->assertDatabaseHas('working_hours', [
         'day' => 'mon',
         'from' => '9:00',
-        'to' => '13:00'
+        'to' => '13:00',
     ]);
 });

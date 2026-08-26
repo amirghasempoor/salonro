@@ -38,7 +38,6 @@ test('phone number should be string', function () {
     ]);
 });
 
-
 test('otp code and phone number should be valid and paired', function () {
     OtpFacade::expects('verify')->once()->andReturn(false);
 
@@ -69,7 +68,6 @@ test('expert can login with otp', function () {
             'token',
             'is_verified',
             'role',
-        ]
+        ],
     ]);
 });
-

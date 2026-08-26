@@ -11,21 +11,21 @@ class JobOfferApplicationResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'id' => $this->id,
-            'status' => $this->status,
-            'status_label' => match ($this->status) {
+            'id' => $this->resource->id,
+            'status' => $this->resource->status,
+            'status_label' => match ($this->resource->status) {
                 JobOfferApplication::STATUS_PENDING => 'pending',
                 JobOfferApplication::STATUS_ACCEPTED => 'accepted',
                 JobOfferApplication::STATUS_REJECTED => 'rejected',
             },
-            'created_at' => $this->created_at,
+            'created_at' => $this->resource->created_at,
             'expert' => [
-                'id' => $this->expert->id,
-                'first_name' => $this->expert->first_name,
-                'last_name' => $this->expert->last_name,
-                'phone_number' => $this->expert->phone_number,
-                'avatar' => $this->expert->avatar,
-                'portfolio' => $this->expert->images,
+                'id' => $this->resource->expert->id,
+                'first_name' => $this->resource->expert->first_name,
+                'last_name' => $this->resource->expert->last_name,
+                'phone_number' => $this->resource->expert->phone_number,
+                'avatar' => $this->resource->expert->avatar,
+                'portfolio' => $this->resource->expert->images,
             ],
         ];
     }

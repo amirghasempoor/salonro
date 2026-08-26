@@ -22,7 +22,9 @@ return new class extends Migration
             $table->string('postal_code');
             $table->string('telephone');
             $table->foreignId('province_id')->constrained('provinces');
+            $table->string('province_name');
             $table->foreignId('city_id')->constrained('cities');
+            $table->string('city_name');
             $table->boolean('is_active')->default(true);
             $table->string('description')->nullable();
             $table->timestamps();

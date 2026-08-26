@@ -12,19 +12,12 @@ class JobOfferResource extends JsonResource
         return [
             'id' => $this->id,
             'profession_id' => $this->profession_id,
-            'profession' => $this->whenLoaded('profession', fn () => [
-                'id' => $this->profession->id,
-                'name' => $this->profession->name,
-            ]),
+            'profession_name' => $this->profession_name,
             'description' => $this->description,
             'is_active' => $this->is_active,
             'created_at' => $this->created_at,
-            'hall' => [
-                'id' => $this->hall->id,
-                'name' => $this->hall->name,
-            ],
-            'applications_count' => $this->whenCounted('applications'),
-            'applications' => JobOfferApplicationResource::collection($this->whenLoaded('applications')),
+            'hall_id' => $this->hall_id,
+            'hall_name' => $this->hall_name,
         ];
     }
 }

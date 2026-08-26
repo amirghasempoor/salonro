@@ -11,6 +11,6 @@ test('phone number is required', function () {
 
     $response->assertOk();
     $response->assertExactJson([
-       'message' => __('messages.successful'),
+        'message' => __('messages.successful'),
     ]);
 });

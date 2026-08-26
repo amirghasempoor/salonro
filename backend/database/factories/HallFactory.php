@@ -30,7 +30,13 @@ class HallFactory extends Factory
             'postal_code' => fake()->postcode(),
             'telephone' => fake()->phoneNumber(),
             'province_id' => Province::factory(),
+            'province_name' => function (array $attributes) {
+                return Province::query()->find($attributes['province_id'])->name;
+            },
             'city_id' => City::factory(),
+            'city_name' => function (array $attributes) {
+                return City::query()->find($attributes['city_id'])->name;
+            },
             'is_active' => true,
             'description' => null,
         ];

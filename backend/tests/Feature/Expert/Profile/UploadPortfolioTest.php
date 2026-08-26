@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\Expert;
+use Illuminate\Http\UploadedFile;
 use Laravel\Sanctum\Sanctum;
 
 beforeEach(function () {
@@ -17,7 +18,7 @@ test('portfolio is required', function () {
 
 test('portfolio should be array', function () {
     $response = $this->postJson(route('expert.profile.uploadPortfolio'), [
-        'portfolio' => fake()->lexify()
+        'portfolio' => fake()->lexify(),
     ]);
 
     $response->assertStatus(422);
@@ -31,12 +32,12 @@ test('expert can upload the portfolio', function () {
         'portfolio' => [
             [
                 'title' => 'title1',
-                'image' => \Illuminate\Http\UploadedFile::fake()->image('portfolio1.jpg'),
+                'image' => UploadedFile::fake()->image('portfolio1.jpg'),
             ],
             [
                 'title' => 'title2',
-                'image' => \Illuminate\Http\UploadedFile::fake()->image('portfolio2.jpg'),
-            ]
+                'image' => UploadedFile::fake()->image('portfolio2.jpg'),
+            ],
         ],
     ]);
 

@@ -6,8 +6,10 @@ use App\Expert\Requests\Manager\Hall\StoreRequest;
 use App\Expert\Requests\Manager\Hall\UpdateRequest;
 use App\Facades\DataTable\DataTableFacade;
 use App\Http\Controllers\Controller;
+use App\Models\City;
 use App\Models\Expert;
 use App\Models\Hall;
+use App\Models\Province;
 use App\Traits\ApiResponse;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -45,6 +47,8 @@ class HallManagementController extends Controller
         try {
             $hall = DB::transaction(function () use ($request) {
                 $owner = Auth::guard('expert')->user();
+                $province = Province::query()->find($request->province_id);
+                $city = City::query()->find($request->city_id);
                 $hall = Hall::query()->create([
                     'name' => $request->name,
                     'owner_id' => $owner->id,
@@ -54,8 +58,10 @@ class HallManagementController extends Controller
                     'address' => $request->address,
                     'postal_code' => $request->postal_code,
                     'telephone' => $request->telephone,
-                    'province_id' => $request->province_id,
-                    'city_id' => $request->city_id,
+                    'province_id' => $province->id,
+                    'province_name' => $province->name,
+                    'city_id' => $city->id,
+                    'city_name' => $city->name,
                     'description' => $request->description,
                 ]);
 
@@ -94,6 +100,8 @@ class HallManagementController extends Controller
     {
         try {
             DB::transaction(function () use ($request, $hall) {
+                $province = Province::query()->find($request->province_id);
+                $city = City::query()->find($request->city_id);
                 $hall->update([
                     'name' => $request->name,
                     'lat' => $request->lat,
@@ -101,8 +109,10 @@ class HallManagementController extends Controller
                     'address' => $request->address,
                     'postal_code' => $request->postal_code,
                     'telephone' => $request->telephone,
-                    'province_id' => $request->province_id,
-                    'city_id' => $request->city_id,
+                    'province_id' => $province->id,
+                    'province_name' => $province->name,
+                    'city_id' => $city->id,
+                    'city_name' => $city->name,
                     'description' => $request->description,
                 ]);
             });

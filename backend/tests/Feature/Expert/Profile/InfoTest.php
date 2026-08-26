@@ -30,6 +30,6 @@ test('expert can see the profile info', function () {
             'is_verified',
             'bio',
             'is_active',
-        ]
+        ],
     ]);
 });

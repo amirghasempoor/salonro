@@ -2,7 +2,6 @@
 
 use App\Models\City;
 use App\Models\Expert;
-use App\Models\ExpertHall;
 use App\Models\Hall;
 use App\Models\Province;
 use App\Models\Service;
@@ -217,8 +216,8 @@ test('manager can store a hall', function () {
 
     $data = [
         'name' => fake()->name,
-        'lat' => (string)fake()->latitude,
-        'lng' => (string)fake()->longitude,
+        'lat' => (string) fake()->latitude,
+        'lng' => (string) fake()->longitude,
         'address' => fake()->address,
         'postal_code' => fake()->numerify(),
         'telephone' => fake()->phoneNumber,
@@ -234,7 +233,7 @@ test('manager can store a hall', function () {
                 'service_id' => $service2->id,
                 'duration' => fake()->numberBetween(1, 100),
                 'price' => fake()->numberBetween(1, 100),
-            ]
+            ],
         ],
     ];
 
@@ -244,7 +243,7 @@ test('manager can store a hall', function () {
 
     $response->assertJsonStructure([
         'data' => [
-            'hall_id'
+            'hall_id',
         ],
     ]);
 

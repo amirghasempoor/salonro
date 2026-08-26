@@ -221,8 +221,8 @@ test('manager can update a hall', function () {
 
     $data = [
         'name' => fake()->name,
-        'lat' => (string)fake()->latitude,
-        'lng' => (string)fake()->longitude,
+        'lat' => (string) fake()->latitude,
+        'lng' => (string) fake()->longitude,
         'address' => fake()->address,
         'postal_code' => fake()->numerify(),
         'telephone' => fake()->phoneNumber,
@@ -238,7 +238,7 @@ test('manager can update a hall', function () {
                 'service_id' => $service2->id,
                 'duration' => fake()->numberBetween(1, 100),
                 'price' => fake()->numberBetween(1, 100),
-            ]
+            ],
         ],
     ];
 
@@ -247,7 +247,7 @@ test('manager can update a hall', function () {
     $response->assertOk();
 
     $response->assertExactJson([
-        'message' => __('messages.successful')
+        'message' => __('messages.successful'),
     ]);
 
     $this->assertDatabaseHas('halls', [

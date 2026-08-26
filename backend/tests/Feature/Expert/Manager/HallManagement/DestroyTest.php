@@ -25,6 +25,6 @@ test('manager can delete a hall', function () {
 
     $response->assertOk();
     $response->assertExactJson([
-        'message' => __('messages.successful')
+        'message' => __('messages.successful'),
     ]);
 });

@@ -1,6 +1,5 @@
 <?php
 
-use App\Facades\Otp\OtpFacade;
 use App\Models\Expert;
 
 test('phone number is required', function () {
@@ -68,6 +67,6 @@ test('expert can login with password', function () {
             'token',
             'is_verified',
             'role',
-        ]
+        ],
     ]);
 });
