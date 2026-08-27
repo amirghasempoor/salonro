@@ -12,9 +12,9 @@ use App\User\Requests\Auth\LoginWithPasswordRequest;
 use App\User\Requests\Auth\RegisterRequest;
 use Exception;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Throwable;
 
 class AuthController extends Controller
 {
@@ -29,15 +29,13 @@ class AuthController extends Controller
             'password' => Hash::make($request->password),
         ]);
 
-        Auth::guard('web')->login($user);
-
-        $request->session()->regenerateToken();
-
-        return $this->successResponse();
+        return $this->successResponse([
+            'token' => $user->createToken('USER_TOKEN', ['*'], now()->addWeek())->plainTextToken,
+        ]);
     }
 
     /**
-     * @throws Exception
+     * @throws Exception|Throwable
      */
     public function sendOtp(SendOtpRequest $request): JsonResponse
     {
@@ -57,11 +55,9 @@ class AuthController extends Controller
                 return $this->errorResponse(__('messages.invalid_credential'));
             }
 
-            Auth::guard('web')->login($user);
-
-            $request->session()->regenerateToken();
-
-            return $this->successResponse();
+            return $this->successResponse([
+                'token' => $user->createToken('USER_TOKEN', ['*'], now()->addWeek())->plainTextToken,
+            ]);
         }
 
         return $this->errorResponse(__('messages.incorrect_otp'));
@@ -69,20 +65,20 @@ class AuthController extends Controller
 
     public function loginWithPassword(LoginWithPasswordRequest $request): JsonResponse
     {
-        if (Auth::guard('web')->attempt($request->only('phone_number', 'password'))) {
-            $request->session()->regenerate();
+        $user = User::query()->where('phone_number', '=', $request->phone_number)->first();
 
-            return $this->successResponse();
+        if (! $user || ! Hash::check($request->password, $user->password)) {
+            return $this->errorResponse(__('messages.invalid_credentials'));
         }
 
-        return $this->errorResponse(__('messages.invalid_credentials'));
+        return $this->successResponse([
+            'token' => $user->createToken('USER_TOKEN', ['*'], now()->addWeek())->plainTextToken,
+        ]);
     }
 
-    public function logout(Request $request): JsonResponse
+    public function logout(): JsonResponse
     {
-        Auth::guard('web')->logout();
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
+        Auth::guard('user')->user()->currentAccessToken()->delete();
 
         return $this->successResponse();
     }

@@ -16,6 +16,11 @@ return Application::configure(basePath: dirname(__DIR__))
                 ->name('expert.')
                 ->middleware(SubstituteBindings::class)
                 ->group(base_path('routes/expert.php'));
+
+            Route::prefix('user')
+                ->name('user.')
+                ->middleware(SubstituteBindings::class)
+                ->group(base_path('routes/user.php'));
         },
     )
     ->withMiddleware(function (Middleware $middleware): void {

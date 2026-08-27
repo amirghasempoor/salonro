@@ -2,7 +2,9 @@
 
 namespace App\Models;
 
+use App\Support\Geo;
 use Database\Factories\HallFactory;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -47,5 +49,19 @@ class Hall extends Model
     public function owner(): BelongsTo
     {
         return $this->belongsTo(Expert::class, 'owner_id');
+    }
+
+    public function scopeNearby(Builder $query, float $lat, float $lng, float $radiusKm): Builder
+    {
+        [$distanceSql, $bindings] = Geo::distanceInKmSql('lat', 'lng', $lat, $lng);
+
+        return $query
+            ->fromSub(
+                static::query()
+                    ->where('is_active', true)
+                    ->selectRaw("halls.*, $distanceSql as distance", $bindings),
+                $this->getTable(),
+            )
+            ->where('distance', '<=', $radiusKm);
     }
 }

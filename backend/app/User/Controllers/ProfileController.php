@@ -19,7 +19,7 @@ class ProfileController extends Controller
 
     public function info(): JsonResponse
     {
-        return $this->successResponse(new UserResource(Auth::guard('web')->user()));
+        return $this->successResponse(new UserResource(Auth::guard('user')->user()));
     }
 
     public function edit(EditRequest $request): JsonResponse
@@ -27,7 +27,7 @@ class ProfileController extends Controller
         $province = Province::query()->find($request->province_id);
         $city = City::query()->find($request->city_id);
 
-        Auth::guard('web')->user()->update([
+        Auth::guard('user')->user()->update([
             'first_name' => $request->first_name,
             'last_name' => $request->last_name,
             'phone_number' => $request->phone_number,
@@ -46,13 +46,13 @@ class ProfileController extends Controller
 
     public function changePassword(ChangePasswordRequest $request): JsonResponse
     {
-        $expert = Auth::guard('web')->user();
+        $user = Auth::guard('user')->user();
 
-        if (! Hash::check($request->current_password, $expert->password)) {
+        if (! Hash::check($request->current_password, $user->password)) {
             return $this->errorResponse(__('messages.incorrect_current_password'));
         }
 
-        $expert->update([
+        $user->update([
             'password' => Hash::make($request->new_password),
         ]);
 
