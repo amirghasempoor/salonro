@@ -2,10 +2,16 @@
 
 use App\Models\Expert;
 use App\Models\ExpertHall;
+use App\Models\Hall;
 use Laravel\Sanctum\Sanctum;
 
 beforeEach(function () {
-    $this->expertHall = ExpertHall::factory()->create();
+    $owner = Expert::factory()->create();
+    $hall = Hall::factory()->create(['owner_id' => $owner->id]);
+    $this->expertHall = ExpertHall::factory()->create([
+        'expert_id' => $owner->id,
+        'hall_id' => $hall->id,
+    ]);
 });
 
 test('manager should be authenticated to see the halls info', function () {
@@ -33,4 +39,12 @@ test('manager can see the halls info', function () {
             'address',
         ],
     ]);
+});
+
+test('manager cannot see a hall they do not own', function () {
+    $intruder = Expert::factory()->create();
+    Sanctum::actingAs($intruder, ['*'], 'expert');
+
+    $this->getJson(route('expert.hall.show', [$this->expertHall->hall_id]))
+        ->assertForbidden();
 });

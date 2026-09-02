@@ -2,11 +2,17 @@
 
 use App\Models\Expert;
 use App\Models\ExpertHall;
+use App\Models\Hall;
 use App\Models\Service;
 use Laravel\Sanctum\Sanctum;
 
 beforeEach(function () {
-    $this->expertHall = ExpertHall::factory()->create();
+    $owner = Expert::factory()->create();
+    $hall = Hall::factory()->create(['owner_id' => $owner->id]);
+    $this->expertHall = ExpertHall::factory()->create([
+        'expert_id' => $owner->id,
+        'hall_id' => $hall->id,
+    ]);
 });
 
 test('manager should be authenticated to store a hall service', function () {
@@ -127,4 +133,12 @@ test('manager can store a hall service', function () {
         'duration' => $data['duration'],
         'price' => $data['price'],
     ]);
+});
+
+test('manager cannot store a service on a hall they do not own', function () {
+    $intruder = Expert::factory()->create();
+    Sanctum::actingAs($intruder, ['*'], 'expert');
+
+    $this->postJson(route('expert.services.store', [$this->expertHall->hall_id]))
+        ->assertForbidden();
 });

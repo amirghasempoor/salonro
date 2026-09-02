@@ -12,6 +12,8 @@ Route::prefix('home')
     ->controller(HomePageController::class)
     ->group(function () {
         Route::get('halls', 'hallsInArea')->name('hallsInArea');
+        Route::get('halls/{hall}', 'hallDetails')->name('hallDetails');
+        Route::get('halls/services/{hall}', 'hallServices')->name('hallServices');
     });
 
 Route::prefix('auth')

@@ -38,7 +38,7 @@ class Hall extends Model
 
     public function services(): BelongsToMany
     {
-        return $this->belongsToMany(Service::class);
+        return $this->belongsToMany(Service::class)->withPivot('description', 'price', 'duration');
     }
 
     public function jobOffers(): HasMany
@@ -53,12 +53,15 @@ class Hall extends Model
 
     public function scopeNearby(Builder $query, float $lat, float $lng, float $radiusKm): Builder
     {
+        $box = Geo::boundingBox($lat, $lng, $radiusKm);
         [$distanceSql, $bindings] = Geo::distanceInKmSql('lat', 'lng', $lat, $lng);
 
         return $query
             ->fromSub(
                 static::query()
                     ->where('is_active', true)
+                    ->whereBetween('lat', [$box['latMin'], $box['latMax']])
+                    ->whereBetween('lng', [$box['lngMin'], $box['lngMax']])
                     ->selectRaw("halls.*, $distanceSql as distance", $bindings),
                 $this->getTable(),
             )
