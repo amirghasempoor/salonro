@@ -22,7 +22,6 @@ class HomePageController extends Controller
     public function hallsInArea(HallsInAreaRequest $request): JsonResponse
     {
         $query = Hall::query()
-            ->with('services')
             ->nearby((float) $request->query('lat'), (float) $request->query('lng'), self::SEARCH_RADIUS_KM)
             ->orderBy('distance');
 

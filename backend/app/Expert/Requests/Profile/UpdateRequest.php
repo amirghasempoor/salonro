@@ -25,7 +25,7 @@ class UpdateRequest extends FormRequest
         return [
             'first_name' => 'required|string',
             'last_name' => 'required|string',
-            'bio' => 'string|max:255',
+            'bio' => 'nullable|string|max:255',
             'is_active' => 'required|boolean',
             'avatar' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ];

@@ -33,8 +33,10 @@ Route::prefix('profile')
     ->controller(ProfileController::class)
     ->group(function () {
         Route::get('info', 'info')->name('info');
+        Route::post('complete', 'complete')->name('complete');
         Route::post('edit', 'edit')->name('edit');
         Route::post('change_password', 'changePassword')->name('changePassword');
+        Route::post('change_avatar', 'changeAvatar')->name('changeAvatar');
     });
 
 Route::prefix('reservations')

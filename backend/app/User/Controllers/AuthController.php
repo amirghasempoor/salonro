@@ -2,7 +2,6 @@
 
 namespace App\User\Controllers;
 
-use App\Expert\Requests\Auth\SendOtpRequest;
 use App\Facades\Otp\OtpFacade;
 use App\Http\Controllers\Controller;
 use App\Models\User;
@@ -10,9 +9,11 @@ use App\Traits\ApiResponse;
 use App\User\Requests\Auth\LoginWithOtpRequest;
 use App\User\Requests\Auth\LoginWithPasswordRequest;
 use App\User\Requests\Auth\RegisterRequest;
+use App\User\Requests\Auth\SendOtpRequest;
 use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Throwable;
 
@@ -44,16 +45,19 @@ class AuthController extends Controller
         return $this->successResponse();
     }
 
+    /**
+     * @throws Throwable
+     */
     public function loginWithOtp(LoginWithOtpRequest $request): JsonResponse
     {
         if (OtpFacade::verify($request->phone_number, $request->verification_code)) {
-            OtpFacade::deactivate($request->phone_number, $request->verification_code);
+            $user = DB::transaction(function () use ($request) {
+                OtpFacade::deactivate($request->phone_number, $request->verification_code);
 
-            $user = User::query()->firstWhere('phone_number', $request->phone_number);
-
-            if (! $user) {
-                return $this->errorResponse(__('messages.invalid_credential'));
-            }
+                return User::query()->firstOrCreate([
+                    'phone_number' => $request->phone_number,
+                ]);
+            });
 
             return $this->successResponse([
                 'token' => $user->createToken('USER_TOKEN', ['*'], now()->addWeek())->plainTextToken,
