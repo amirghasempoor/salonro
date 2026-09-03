@@ -2,13 +2,19 @@
 
 use App\Models\Expert;
 use App\Models\ExpertHall;
+use App\Models\Hall;
 use App\Models\HallService;
 use Laravel\Sanctum\Sanctum;
 
 beforeEach(function () {
-    $this->expertHall = ExpertHall::factory()->create();
+    $owner = Expert::factory()->create();
+    $hall = Hall::factory()->create(['owner_id' => $owner->id]);
+    $this->expertHall = ExpertHall::factory()->create([
+        'expert_id' => $owner->id,
+        'hall_id' => $hall->id,
+    ]);
     $this->hallService = HallService::factory()->create([
-        'hall_id' => $this->expertHall->hall_id,
+        'hall_id' => $hall->id,
     ]);
 });
 
@@ -37,4 +43,22 @@ test('manager can delete a hall service', function () {
     $this->assertDatabaseMissing('hall_service', [
         'id' => $this->hallService->id,
     ]);
+});
+
+test('manager cannot delete a service on a hall they do not own', function () {
+    $intruder = Expert::factory()->create();
+    Sanctum::actingAs($intruder, ['*'], 'expert');
+
+    $this->deleteJson(route('expert.services.destroy', [$this->expertHall->hall_id, $this->hallService->id]))
+        ->assertForbidden();
+});
+
+test('manager cannot delete a service that belongs to another hall', function () {
+    $expert = Expert::query()->find($this->expertHall->expert_id);
+    Sanctum::actingAs($expert, ['*'], 'expert');
+
+    $foreignService = HallService::factory()->create();
+
+    $this->deleteJson(route('expert.services.destroy', [$this->expertHall->hall_id, $foreignService->id]))
+        ->assertForbidden();
 });

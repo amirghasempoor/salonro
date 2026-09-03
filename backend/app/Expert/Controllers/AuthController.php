@@ -64,13 +64,11 @@ class AuthController extends Controller
     {
         if (OtpFacade::verify($request->phone_number, $request->verification_code)) {
             $expert = DB::transaction(function () use ($request) {
-                $expert = Expert::query()->firstOrCreate([
-                    'phone_number' => $request->phone_number,
-                ]);
-
                 OtpFacade::deactivate($request->phone_number, $request->verification_code);
 
-                return $expert;
+                return Expert::query()->firstOrCreate([
+                    'phone_number' => $request->phone_number,
+                ]);
             });
 
             return $this->successResponse([

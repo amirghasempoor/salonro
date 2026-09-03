@@ -31,7 +31,7 @@ class ReservationManagementController extends Controller
     public function index(Request $request): JsonResponse
     {
         $query = Reservation::query()
-            ->where('user_id', '=', Auth::guard('web')->id());
+            ->where('user_id', '=', Auth::guard('user')->id());
 
         $data = DataTableFacade::run(
             $query,
@@ -50,7 +50,7 @@ class ReservationManagementController extends Controller
     {
         try {
             DB::transaction(function () use ($request) {
-                $user = Auth::guard('web')->user();
+                $user = Auth::guard('user')->user();
 
                 $priced = $this->priceReservationServices((int) $request->hall_id, $request->services);
 

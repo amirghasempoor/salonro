@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Expert\Requests\Profile;
+namespace App\User\Requests\HomePage;
 
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
-class UpdateRequest extends FormRequest
+class HallsInAreaRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -23,11 +23,8 @@ class UpdateRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'first_name' => 'required|string',
-            'last_name' => 'required|string',
-            'bio' => 'nullable|string|max:255',
-            'is_active' => 'required|boolean',
-            'avatar' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'lat' => 'required|numeric|between:-90,90',
+            'lng' => 'required|numeric|between:-180,180',
         ];
     }
 }

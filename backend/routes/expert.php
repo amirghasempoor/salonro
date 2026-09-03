@@ -44,10 +44,10 @@ Route::prefix('halls')
     ->group(function () {
         Route::get('/', 'index')->name('index');
         Route::post('/', 'store')->name('store');
-        Route::get('/{hall}', 'show')->name('show');
-        Route::post('/{hall}', 'update')->name('update');
-        Route::delete('/{hall}', 'destroy')->name('destroy');
-        Route::get('/services/{hall}', 'services')->name('services');
+        Route::get('/{hall}', 'show')->name('show')->can('view', 'hall');
+        Route::post('/{hall}', 'update')->name('update')->can('update', 'hall');
+        Route::delete('/{hall}', 'destroy')->name('destroy')->can('delete', 'hall');
+        Route::get('/services/{hall}', 'services')->name('services')->can('view', 'hall');
     });
 
 Route::prefix('reservations')
@@ -93,11 +93,11 @@ Route::prefix('services')
     ->middleware(['auth:expert'])
     ->controller(HallServicesManagementController::class)
     ->group(function () {
-        Route::get('/{hall}', 'index')->name('index');
-        Route::post('/{hall}', 'store')->name('store');
-        Route::get('/{hall}/{hallService}', 'show')->name('show');
-        Route::post('/{hall}/{hallService}', 'update')->name('update');
-        Route::delete('/{hall}/{hallService}', 'destroy')->name('destroy');
+        Route::get('/{hall}', 'index')->name('index')->can('serviceView', 'hall');
+        Route::post('/{hall}', 'store')->name('store')->can('serviceStore', 'hall');
+        Route::get('/{hall}/{hallService}', 'show')->name('show')->can('serviceShow', ['hall', 'hallService']);
+        Route::post('/{hall}/{hallService}', 'update')->name('update')->can('serviceUpdate', ['hall', 'hallService']);
+        Route::delete('/{hall}/{hallService}', 'destroy')->name('destroy')->can('serviceDelete', ['hall', 'hallService']);
     });
 
 Route::prefix('discounts')

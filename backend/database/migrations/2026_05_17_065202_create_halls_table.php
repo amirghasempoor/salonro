@@ -16,8 +16,8 @@ return new class extends Migration
             $table->string('name');
             $table->foreignId('owner_id')->constrained('experts');
             $table->string('owner_name');
-            $table->string('lat');
-            $table->string('lng');
+            $table->decimal('lat', 10, 7);
+            $table->decimal('lng', 10, 7);
             $table->string('address');
             $table->string('postal_code');
             $table->string('telephone');
@@ -28,6 +28,7 @@ return new class extends Migration
             $table->boolean('is_active')->default(true);
             $table->string('description')->nullable();
             $table->timestamps();
+            $table->index(['lat', 'lng']);
         });
     }
 

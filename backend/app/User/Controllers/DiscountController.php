@@ -29,7 +29,7 @@ class DiscountController extends Controller
         $discounts = Discount::query()
             ->active()
             ->where('type', DiscountType::Manual)
-            ->where('user_id', Auth::guard('web')->id())
+            ->where('user_id', Auth::guard('user')->id())
             ->get();
 
         return $this->successResponse(DiscountResource::collection($discounts));
@@ -46,7 +46,7 @@ class DiscountController extends Controller
 
         $discounts = $this->discountService->applicable(
             (int) $request->hall_id,
-            Auth::guard('web')->id(),
+            Auth::guard('user')->id(),
             Carbon::now(),
         );
 
@@ -59,7 +59,7 @@ class DiscountController extends Controller
     public function show(Discount $discount): JsonResponse
     {
         $isOwnManual = $discount->type === DiscountType::Manual
-            && $discount->user_id === Auth::guard('web')->id();
+            && $discount->user_id === Auth::guard('user')->id();
 
         $isPublicHoliday = $discount->type === DiscountType::Holiday && $discount->is_active;
 

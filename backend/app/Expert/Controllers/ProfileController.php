@@ -42,19 +42,21 @@ class ProfileController extends Controller
 
     public function update(UpdateRequest $request): JsonResponse
     {
+        $expert = Auth::guard('expert')->user();
+
         if ($request->avatar) {
-            if (Auth::guard('expert')->user()->avatar) {
-                File::delete(Auth::guard('expert')->user()->avatar, true);
+            if ($expert->avatar) {
+                File::delete($expert->avatar, true);
             }
 
             $avatar = File::save($request->avatar, '/experts/avatars');
         }
 
-        Auth::guard('expert')->user()->update([
+        $expert->update([
             'first_name' => $request->first_name,
             'last_name' => $request->last_name,
-            'avatar' => $avatar ?? null,
-            'bio' => $request->bio,
+            'avatar' => $avatar ?? $expert->avatar,
+            'bio' => $request->bio ?? $expert->bio,
             'is_active' => $request->is_active,
         ]);
 
