@@ -7,6 +7,7 @@ use App\Models\Service;
 use Laravel\Sanctum\Sanctum;
 
 beforeEach(function () {
+    seedRoles();
     $owner = Expert::factory()->create();
     $hall = Hall::factory()->create(['owner_id' => $owner->id]);
     $this->expertHall = ExpertHall::factory()->create([
@@ -27,6 +28,7 @@ test('manager should be authenticated with guard expert', function () {
 
 test('service id is required', function () {
     $expert = Expert::query()->find($this->expertHall->expert_id);
+    $expert->assignRole('manager');
     Sanctum::actingAs($expert, ['*'], 'expert');
     $response = $this->postJson(route('expert.services.store', [$this->expertHall->hall_id]));
 
@@ -36,6 +38,7 @@ test('service id is required', function () {
 
 test('service id should be existed', function () {
     $expert = Expert::query()->find($this->expertHall->expert_id);
+    $expert->assignRole('manager');
     Sanctum::actingAs($expert, ['*'], 'expert');
     $response = $this->postJson(route('expert.services.store', [$this->expertHall->hall_id]), [
         'service_id' => 999999,
@@ -49,6 +52,7 @@ test('service id should be existed', function () {
 
 test('description should be string', function () {
     $expert = Expert::query()->find($this->expertHall->expert_id);
+    $expert->assignRole('manager');
     Sanctum::actingAs($expert, ['*'], 'expert');
     $response = $this->postJson(route('expert.services.store', [$this->expertHall->hall_id]), [
         'description' => fake()->numberBetween(1, 100),
@@ -62,6 +66,7 @@ test('description should be string', function () {
 
 test('duration is required', function () {
     $expert = Expert::query()->find($this->expertHall->expert_id);
+    $expert->assignRole('manager');
     Sanctum::actingAs($expert, ['*'], 'expert');
     $response = $this->postJson(route('expert.services.store', [$this->expertHall->hall_id]));
 
@@ -71,6 +76,7 @@ test('duration is required', function () {
 
 test('duration should be integer', function () {
     $expert = Expert::query()->find($this->expertHall->expert_id);
+    $expert->assignRole('manager');
     Sanctum::actingAs($expert, ['*'], 'expert');
     $response = $this->postJson(route('expert.services.store', [$this->expertHall->hall_id]), [
         'duration' => fake()->word(),
@@ -84,6 +90,7 @@ test('duration should be integer', function () {
 
 test('price is required', function () {
     $expert = Expert::query()->find($this->expertHall->expert_id);
+    $expert->assignRole('manager');
     Sanctum::actingAs($expert, ['*'], 'expert');
     $response = $this->postJson(route('expert.services.store', [$this->expertHall->hall_id]));
 
@@ -93,6 +100,7 @@ test('price is required', function () {
 
 test('price should be integer', function () {
     $expert = Expert::query()->find($this->expertHall->expert_id);
+    $expert->assignRole('manager');
     Sanctum::actingAs($expert, ['*'], 'expert');
     $response = $this->postJson(route('expert.services.store', [$this->expertHall->hall_id]), [
         'price' => fake()->word(),
@@ -106,6 +114,7 @@ test('price should be integer', function () {
 
 test('manager can store a hall service', function () {
     $expert = Expert::query()->find($this->expertHall->expert_id);
+    $expert->assignRole('manager');
     Sanctum::actingAs($expert, ['*'], 'expert');
 
     $service = Service::factory()->create();
@@ -137,6 +146,7 @@ test('manager can store a hall service', function () {
 
 test('manager cannot store a service on a hall they do not own', function () {
     $intruder = Expert::factory()->create();
+    $intruder->assignRole('manager');
     Sanctum::actingAs($intruder, ['*'], 'expert');
 
     $this->postJson(route('expert.services.store', [$this->expertHall->hall_id]))

@@ -6,6 +6,7 @@ use App\Models\Service;
 use Laravel\Sanctum\Sanctum;
 
 beforeEach(function () {
+    seedRoles();
     $this->expertHall = ExpertHall::factory()->create();
     $this->staff = Expert::query()->find($this->expertHall->expert_id);
 });
@@ -24,6 +25,7 @@ test('manager should be authenticated with guard expert', function () {
 
 test('manager can delete a staff', function () {
     $expert = Expert::factory()->create();
+    $expert->assignRole('manager');
     Sanctum::actingAs($expert, ['*'], 'expert');
 
     $service = Service::factory()->create();

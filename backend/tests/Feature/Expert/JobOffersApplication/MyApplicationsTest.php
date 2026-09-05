@@ -5,6 +5,7 @@ use App\Models\JobOfferApplication;
 use Laravel\Sanctum\Sanctum;
 
 beforeEach(function () {
+    seedRoles();
     $this->expert = Expert::factory()->create();
 });
 
@@ -22,6 +23,7 @@ test('expert sees only their own job applications', function () {
     JobOfferApplication::factory()->count(2)->create(['expert_id' => $this->expert->id]);
     JobOfferApplication::factory()->count(3)->create();
 
+    $this->expert->assignRole('expert');
     Sanctum::actingAs($this->expert, ['*'], 'expert');
 
     $response = $this->getJson(route('expert.jobs.myApplications'));

@@ -6,6 +6,7 @@ use App\Models\JobOffer;
 use Laravel\Sanctum\Sanctum;
 
 beforeEach(function () {
+    seedRoles();
     $this->hall = Hall::factory()->create();
     $this->manager = Expert::query()->find($this->hall->owner_id);
 });
@@ -23,6 +24,7 @@ test('manager should be authenticated with guard expert', function () {
 test('manager can see the hall job offers', function () {
     JobOffer::factory()->count(2)->create(['hall_id' => $this->hall->id]);
 
+    $this->manager->assignRole('manager');
     Sanctum::actingAs($this->manager, ['*'], 'expert');
     $response = $this->getJson(route('expert.job_offers.index', [
         'hall' => $this->hall->id,

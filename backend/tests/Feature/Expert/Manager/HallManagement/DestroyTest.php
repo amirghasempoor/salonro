@@ -6,6 +6,7 @@ use App\Models\Hall;
 use Laravel\Sanctum\Sanctum;
 
 beforeEach(function () {
+    seedRoles();
     $owner = Expert::factory()->create();
     $hall = Hall::factory()->create(['owner_id' => $owner->id]);
     $this->expertHall = ExpertHall::factory()->create([
@@ -26,6 +27,7 @@ test('manager should be authenticated with guard expert', function () {
 
 test('manager can delete a hall', function () {
     $expert = Expert::query()->find($this->expertHall->expert_id);
+    $expert->assignRole('manager');
     Sanctum::actingAs($expert, ['*'], 'expert');
     $response = $this->delete(route('expert.hall.destroy', [$this->expertHall->hall_id]));
 
@@ -37,6 +39,7 @@ test('manager can delete a hall', function () {
 
 test('manager cannot delete a hall they do not own', function () {
     $intruder = Expert::factory()->create();
+    $intruder->assignRole('manager');
     Sanctum::actingAs($intruder, ['*'], 'expert');
 
     $this->deleteJson(route('expert.hall.destroy', [$this->expertHall->hall_id]))

@@ -4,6 +4,10 @@ use App\Models\Expert;
 use App\Models\JobOffer;
 use Laravel\Sanctum\Sanctum;
 
+beforeEach(function () {
+    seedRoles();
+});
+
 test('expert should be authenticated to browse job offers', function () {
     $this->getJson(route('expert.jobs.index'))->assertUnauthorized();
 });
@@ -19,6 +23,7 @@ test('expert can browse only active job offers', function () {
     JobOffer::factory()->count(3)->create(['is_active' => true]);
     JobOffer::factory()->count(2)->create(['is_active' => false]);
 
+    $expert->assignRole('expert');
     Sanctum::actingAs($expert, ['*'], 'expert');
     $response = $this->getJson(route('expert.jobs.index', [
         'start' => 0,

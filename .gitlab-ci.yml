@@ -65,6 +65,10 @@ test:
   rules:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
     - if: '$CI_COMMIT_BRANCH'
+  before_script:
+    - apk add --no-cache freetype-dev libjpeg-turbo-dev libpng-dev
+    - docker-php-ext-configure gd --with-freetype --with-jpeg
+    - docker-php-ext-install -j"$(nproc)" gd
   script:
     - cd backend
     - composer install --prefer-dist --no-progress --no-interaction

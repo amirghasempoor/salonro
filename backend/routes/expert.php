@@ -39,7 +39,7 @@ Route::prefix('profile')
 
 Route::prefix('halls')
     ->name('hall.')
-    ->middleware(['auth:expert'])
+    ->middleware(['auth:expert', 'role:manager|admin'])
     ->controller(HallManagementController::class)
     ->group(function () {
         Route::get('/', 'index')->name('index');
@@ -77,7 +77,7 @@ Route::prefix('service_categories')
 
 Route::prefix('staff')
     ->name('staff.')
-    ->middleware(['auth:expert'])
+    ->middleware(['auth:expert', 'role:manager|admin'])
     ->controller(ExpertManagementController::class)
     ->group(function () {
         Route::get('/list/{hall}', 'list')->name('list')->where('hall', '[0-9]+');
@@ -90,7 +90,7 @@ Route::prefix('staff')
 
 Route::prefix('services')
     ->name('services.')
-    ->middleware(['auth:expert'])
+    ->middleware(['auth:expert', 'role:manager|admin'])
     ->controller(HallServicesManagementController::class)
     ->group(function () {
         Route::get('/{hall}', 'index')->name('index')->can('serviceView', 'hall');
@@ -114,7 +114,7 @@ Route::prefix('discounts')
 
 Route::prefix('job_offers')
     ->name('job_offers.')
-    ->middleware(['auth:expert'])
+    ->middleware(['auth:expert', 'role:manager|admin'])
     ->controller(ManagerJobOfferController::class)
     ->group(function () {
         Route::get('/{hall}', 'index')->name('index');
@@ -129,7 +129,7 @@ Route::prefix('job_offers')
 
 Route::prefix('jobs')
     ->name('jobs.')
-    ->middleware(['auth:expert'])
+    ->middleware(['auth:expert', 'role:expert|admin'])
     ->controller(JobOfferController::class)
     ->group(function () {
         Route::get('/', 'index')->name('index');

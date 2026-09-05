@@ -9,6 +9,7 @@ use App\Models\Service;
 use Laravel\Sanctum\Sanctum;
 
 beforeEach(function () {
+    seedRoles();
     $owner = Expert::factory()->create();
     $hall = Hall::factory()->create(['owner_id' => $owner->id]);
     $this->expertHall = ExpertHall::factory()->create([
@@ -29,6 +30,7 @@ test('manager should be authenticated with guard expert', function () {
 
 test('name is required', function () {
     $expert = Expert::query()->find($this->expertHall->expert_id);
+    $expert->assignRole('manager');
     Sanctum::actingAs($expert, ['*'], 'expert');
     $response = $this->postJson(route('expert.hall.update', [$this->expertHall->hall_id]));
 
@@ -38,6 +40,7 @@ test('name is required', function () {
 
 test('name should be string', function () {
     $expert = Expert::query()->find($this->expertHall->expert_id);
+    $expert->assignRole('manager');
     Sanctum::actingAs($expert, ['*'], 'expert');
     $response = $this->postJson(route('expert.hall.update', [$this->expertHall->hall_id]), [
         'name' => fake()->numberBetween(1, 100),
@@ -51,6 +54,7 @@ test('name should be string', function () {
 
 test('lat is required', function () {
     $expert = Expert::query()->find($this->expertHall->expert_id);
+    $expert->assignRole('manager');
     Sanctum::actingAs($expert, ['*'], 'expert');
     $response = $this->postJson(route('expert.hall.update', [$this->expertHall->hall_id]));
 
@@ -60,6 +64,7 @@ test('lat is required', function () {
 
 test('lat should be string', function () {
     $expert = Expert::query()->find($this->expertHall->expert_id);
+    $expert->assignRole('manager');
     Sanctum::actingAs($expert, ['*'], 'expert');
     $response = $this->postJson(route('expert.hall.update', [$this->expertHall->hall_id]), [
         'lat' => fake()->numberBetween(1, 100),
@@ -73,6 +78,7 @@ test('lat should be string', function () {
 
 test('lng is required', function () {
     $expert = Expert::query()->find($this->expertHall->expert_id);
+    $expert->assignRole('manager');
     Sanctum::actingAs($expert, ['*'], 'expert');
     $response = $this->postJson(route('expert.hall.update', [$this->expertHall->hall_id]));
 
@@ -82,6 +88,7 @@ test('lng is required', function () {
 
 test('lng should be string', function () {
     $expert = Expert::query()->find($this->expertHall->expert_id);
+    $expert->assignRole('manager');
     Sanctum::actingAs($expert, ['*'], 'expert');
     $response = $this->postJson(route('expert.hall.update', [$this->expertHall->hall_id]), [
         'lng' => fake()->numberBetween(1, 100),
@@ -95,6 +102,7 @@ test('lng should be string', function () {
 
 test('address is required', function () {
     $expert = Expert::query()->find($this->expertHall->expert_id);
+    $expert->assignRole('manager');
     Sanctum::actingAs($expert, ['*'], 'expert');
     $response = $this->postJson(route('expert.hall.update', [$this->expertHall->hall_id]));
 
@@ -104,6 +112,7 @@ test('address is required', function () {
 
 test('address should be string', function () {
     $expert = Expert::query()->find($this->expertHall->expert_id);
+    $expert->assignRole('manager');
     Sanctum::actingAs($expert, ['*'], 'expert');
     $response = $this->postJson(route('expert.hall.update', [$this->expertHall->hall_id]), [
         'address' => fake()->numberBetween(1, 100),
@@ -117,6 +126,7 @@ test('address should be string', function () {
 
 test('postal code is required', function () {
     $expert = Expert::query()->find($this->expertHall->expert_id);
+    $expert->assignRole('manager');
     Sanctum::actingAs($expert, ['*'], 'expert');
     $response = $this->postJson(route('expert.hall.update', [$this->expertHall->hall_id]));
 
@@ -126,6 +136,7 @@ test('postal code is required', function () {
 
 test('postal code should be string', function () {
     $expert = Expert::query()->find($this->expertHall->expert_id);
+    $expert->assignRole('manager');
     Sanctum::actingAs($expert, ['*'], 'expert');
     $response = $this->postJson(route('expert.hall.update', [$this->expertHall->hall_id]), [
         'postal_code' => fake()->numberBetween(1, 100),
@@ -139,6 +150,7 @@ test('postal code should be string', function () {
 
 test('telephone is required', function () {
     $expert = Expert::query()->find($this->expertHall->expert_id);
+    $expert->assignRole('manager');
     Sanctum::actingAs($expert, ['*'], 'expert');
     $response = $this->postJson(route('expert.hall.update', [$this->expertHall->hall_id]));
 
@@ -148,6 +160,7 @@ test('telephone is required', function () {
 
 test('telephone should be string', function () {
     $expert = Expert::query()->find($this->expertHall->expert_id);
+    $expert->assignRole('manager');
     Sanctum::actingAs($expert, ['*'], 'expert');
     $response = $this->postJson(route('expert.hall.update', [$this->expertHall->hall_id]), [
         'telephone' => fake()->numberBetween(1, 100),
@@ -161,6 +174,7 @@ test('telephone should be string', function () {
 
 test('province id is required', function () {
     $expert = Expert::query()->find($this->expertHall->expert_id);
+    $expert->assignRole('manager');
     Sanctum::actingAs($expert, ['*'], 'expert');
     $response = $this->postJson(route('expert.hall.update', [$this->expertHall->hall_id]));
 
@@ -170,6 +184,7 @@ test('province id is required', function () {
 
 test('province id should be existed', function () {
     $expert = Expert::query()->find($this->expertHall->expert_id);
+    $expert->assignRole('manager');
     Sanctum::actingAs($expert, ['*'], 'expert');
     $response = $this->postJson(route('expert.hall.update', [$this->expertHall->hall_id]), [
         'province_id' => Province::query()->max('id') + 1,
@@ -183,6 +198,7 @@ test('province id should be existed', function () {
 
 test('city id is required', function () {
     $expert = Expert::query()->find($this->expertHall->expert_id);
+    $expert->assignRole('manager');
     Sanctum::actingAs($expert, ['*'], 'expert');
     $response = $this->postJson(route('expert.hall.update', [$this->expertHall->hall_id]));
 
@@ -192,6 +208,7 @@ test('city id is required', function () {
 
 test('city id should be existed', function () {
     $expert = Expert::query()->find($this->expertHall->expert_id);
+    $expert->assignRole('manager');
     Sanctum::actingAs($expert, ['*'], 'expert');
     $response = $this->postJson(route('expert.hall.update', [$this->expertHall->hall_id]), [
         'city_id' => City::query()->max('id') + 1,
@@ -205,6 +222,7 @@ test('city id should be existed', function () {
 
 test('services is required', function () {
     $expert = Expert::query()->find($this->expertHall->expert_id);
+    $expert->assignRole('manager');
     Sanctum::actingAs($expert, ['*'], 'expert');
     $response = $this->postJson(route('expert.hall.update', [$this->expertHall->hall_id]));
 
@@ -215,6 +233,7 @@ test('services is required', function () {
 test('manager can update a hall', function () {
     $expert = Expert::query()->find($this->expertHall->expert_id);
 
+    $expert->assignRole('manager');
     Sanctum::actingAs($expert, ['*'], 'expert');
 
     $province = Province::factory()->create();
@@ -286,6 +305,7 @@ test('manager can update a hall', function () {
 
 test('manager cannot update a hall they do not own', function () {
     $intruder = Expert::factory()->create();
+    $intruder->assignRole('manager');
     Sanctum::actingAs($intruder, ['*'], 'expert');
 
     // Authorization runs before validation, so even an empty payload is 403, not 422.

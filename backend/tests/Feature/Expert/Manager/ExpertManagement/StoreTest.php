@@ -6,6 +6,7 @@ use App\Models\Service;
 use Laravel\Sanctum\Sanctum;
 
 beforeEach(function () {
+    seedRoles();
     $this->expertHall = ExpertHall::factory()->create();
 });
 
@@ -21,6 +22,7 @@ test('manager should be authenticated with guard expert', function () {
 
 test('first name is required', function () {
     $expert = Expert::query()->find($this->expertHall->expert_id);
+    $expert->assignRole('manager');
     Sanctum::actingAs($expert, ['*'], 'expert');
     $response = $this->postJson(route('expert.staff.store', [$this->expertHall->hall_id]));
 
@@ -30,6 +32,7 @@ test('first name is required', function () {
 
 test('first name should be string', function () {
     $expert = Expert::query()->find($this->expertHall->expert_id);
+    $expert->assignRole('manager');
     Sanctum::actingAs($expert, ['*'], 'expert');
     $response = $this->postJson(route('expert.staff.store', [$this->expertHall->hall_id]), [
         'first_name' => fake()->numberBetween(1, 100),
@@ -43,6 +46,7 @@ test('first name should be string', function () {
 
 test('last name is required', function () {
     $expert = Expert::query()->find($this->expertHall->expert_id);
+    $expert->assignRole('manager');
     Sanctum::actingAs($expert, ['*'], 'expert');
     $response = $this->postJson(route('expert.staff.store', [$this->expertHall->hall_id]));
 
@@ -52,6 +56,7 @@ test('last name is required', function () {
 
 test('last name should be string', function () {
     $expert = Expert::query()->find($this->expertHall->expert_id);
+    $expert->assignRole('manager');
     Sanctum::actingAs($expert, ['*'], 'expert');
     $response = $this->postJson(route('expert.staff.store', [$this->expertHall->hall_id]), [
         'last_name' => fake()->numberBetween(1, 100),
@@ -65,6 +70,7 @@ test('last name should be string', function () {
 
 test('phone number is required', function () {
     $expert = Expert::query()->find($this->expertHall->expert_id);
+    $expert->assignRole('manager');
     Sanctum::actingAs($expert, ['*'], 'expert');
     $response = $this->postJson(route('expert.staff.store', [$this->expertHall->hall_id]));
 
@@ -74,6 +80,7 @@ test('phone number is required', function () {
 
 test('phone number should be string', function () {
     $expert = Expert::query()->find($this->expertHall->expert_id);
+    $expert->assignRole('manager');
     Sanctum::actingAs($expert, ['*'], 'expert');
     $response = $this->postJson(route('expert.staff.store', [$this->expertHall->hall_id]), [
         'phone_number' => fake()->numberBetween(1, 100),
@@ -87,6 +94,7 @@ test('phone number should be string', function () {
 
 test('services is required', function () {
     $expert = Expert::query()->find($this->expertHall->expert_id);
+    $expert->assignRole('manager');
     Sanctum::actingAs($expert, ['*'], 'expert');
     $response = $this->postJson(route('expert.staff.store', [$this->expertHall->hall_id]));
 
@@ -96,6 +104,7 @@ test('services is required', function () {
 
 test('services should be array', function () {
     $expert = Expert::query()->find($this->expertHall->expert_id);
+    $expert->assignRole('manager');
     Sanctum::actingAs($expert, ['*'], 'expert');
     $response = $this->postJson(route('expert.staff.store', [$this->expertHall->hall_id]), [
         'services' => fake()->word(),
@@ -109,6 +118,7 @@ test('services should be array', function () {
 
 test('services should be existed', function () {
     $expert = Expert::query()->find($this->expertHall->expert_id);
+    $expert->assignRole('manager');
     Sanctum::actingAs($expert, ['*'], 'expert');
     $response = $this->postJson(route('expert.staff.store', [$this->expertHall->hall_id]), [
         'services' => [999999],
@@ -121,9 +131,8 @@ test('services should be existed', function () {
 });
 
 test('manager can store a staff', function () {
-    seedRoles();
-
     $expert = Expert::query()->find($this->expertHall->expert_id);
+    $expert->assignRole('manager');
     Sanctum::actingAs($expert, ['*'], 'expert');
 
     $service = Service::factory()->create();

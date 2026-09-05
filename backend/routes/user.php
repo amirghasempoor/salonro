@@ -14,6 +14,7 @@ Route::prefix('home')
         Route::get('halls', 'hallsInArea')->name('hallsInArea');
         Route::get('halls/{hall}', 'hallDetails')->name('hallDetails');
         Route::get('halls/services/{hall}', 'hallServices')->name('hallServices');
+        Route::get('halls/staff/{hall}', 'hallStaff')->name('hallStaff');
     });
 
 Route::prefix('auth')

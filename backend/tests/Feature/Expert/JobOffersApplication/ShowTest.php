@@ -5,6 +5,7 @@ use App\Models\JobOffer;
 use Laravel\Sanctum\Sanctum;
 
 beforeEach(function () {
+    seedRoles();
     $this->expert = Expert::factory()->create();
     $this->jobOffer = JobOffer::factory()->create();
 });
@@ -20,6 +21,7 @@ test('expert should be authenticated with guard expert', function () {
 });
 
 test('expert can see job offer details', function () {
+    $this->expert->assignRole('expert');
     Sanctum::actingAs($this->expert, ['*'], 'expert');
 
     $response = $this->getJson(route('expert.jobs.show', [$this->jobOffer->id]));

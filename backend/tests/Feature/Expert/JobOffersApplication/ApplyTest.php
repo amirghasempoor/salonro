@@ -6,6 +6,7 @@ use App\Models\JobOfferApplication;
 use Laravel\Sanctum\Sanctum;
 
 beforeEach(function () {
+    seedRoles();
     $this->expert = Expert::factory()->create();
     $this->jobOffer = JobOffer::factory()->create();
 });
@@ -21,6 +22,7 @@ test('expert should be authenticated with guard expert', function () {
 });
 
 test('expert can apply to a job offer', function () {
+    $this->expert->assignRole('expert');
     Sanctum::actingAs($this->expert, ['*'], 'expert');
 
     $response = $this->postJson(route('expert.jobs.apply', [$this->jobOffer->id]));
@@ -43,6 +45,7 @@ test('expert cannot apply twice to the same job offer', function () {
         'expert_id' => $this->expert->id,
     ]);
 
+    $this->expert->assignRole('expert');
     Sanctum::actingAs($this->expert, ['*'], 'expert');
 
     $response = $this->postJson(route('expert.jobs.apply', [$this->jobOffer->id]));

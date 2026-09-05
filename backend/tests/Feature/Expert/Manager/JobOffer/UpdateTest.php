@@ -6,6 +6,7 @@ use App\Models\Profession;
 use Laravel\Sanctum\Sanctum;
 
 beforeEach(function () {
+    seedRoles();
     $this->jobOffer = JobOffer::factory()->create();
     $this->manager = Expert::query()->find($this->jobOffer->hall->owner_id);
 });
@@ -21,6 +22,7 @@ test('manager should be authenticated with guard expert', function () {
 });
 
 test('profession should be existed', function () {
+    $this->manager->assignRole('manager');
     Sanctum::actingAs($this->manager, ['*'], 'expert');
     $response = $this->postJson(route('expert.job_offers.update', [$this->jobOffer->id]), [
         'profession_id' => 999999,
@@ -33,6 +35,7 @@ test('profession should be existed', function () {
 });
 
 test('description should be string', function () {
+    $this->manager->assignRole('manager');
     Sanctum::actingAs($this->manager, ['*'], 'expert');
     $response = $this->postJson(route('expert.job_offers.update', [$this->jobOffer->id]), [
         'description' => fake()->numberBetween(1, 100),
@@ -45,6 +48,7 @@ test('description should be string', function () {
 });
 
 test('is active should be boolean', function () {
+    $this->manager->assignRole('manager');
     Sanctum::actingAs($this->manager, ['*'], 'expert');
     $response = $this->postJson(route('expert.job_offers.update', [$this->jobOffer->id]), [
         'is_active' => fake()->word(),
@@ -57,6 +61,7 @@ test('is active should be boolean', function () {
 });
 
 test('manager can update a job offer', function () {
+    $this->manager->assignRole('manager');
     Sanctum::actingAs($this->manager, ['*'], 'expert');
 
     $profession = Profession::factory()->create();
