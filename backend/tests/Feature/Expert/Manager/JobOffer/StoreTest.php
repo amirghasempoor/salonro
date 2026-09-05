@@ -6,6 +6,7 @@ use App\Models\Profession;
 use Laravel\Sanctum\Sanctum;
 
 beforeEach(function () {
+    seedRoles();
     $this->hall = Hall::factory()->create();
     $this->manager = Expert::query()->find($this->hall->owner_id);
 });
@@ -21,6 +22,7 @@ test('manager should be authenticated with guard expert', function () {
 });
 
 test('profession is required', function () {
+    $this->manager->assignRole('manager');
     Sanctum::actingAs($this->manager, ['*'], 'expert');
     $response = $this->postJson(route('expert.job_offers.store', [$this->hall->id]));
 
@@ -29,6 +31,7 @@ test('profession is required', function () {
 });
 
 test('profession should be integer', function () {
+    $this->manager->assignRole('manager');
     Sanctum::actingAs($this->manager, ['*'], 'expert');
     $response = $this->postJson(route('expert.job_offers.store', [$this->hall->id]), [
         'profession_id' => fake()->word(),
@@ -41,6 +44,7 @@ test('profession should be integer', function () {
 });
 
 test('profession should be existed', function () {
+    $this->manager->assignRole('manager');
     Sanctum::actingAs($this->manager, ['*'], 'expert');
     $response = $this->postJson(route('expert.job_offers.store', [$this->hall->id]), [
         'profession_id' => 999999,
@@ -53,6 +57,7 @@ test('profession should be existed', function () {
 });
 
 test('description should be string', function () {
+    $this->manager->assignRole('manager');
     Sanctum::actingAs($this->manager, ['*'], 'expert');
     $response = $this->postJson(route('expert.job_offers.store', [$this->hall->id]), [
         'description' => fake()->numberBetween(1, 100),
@@ -65,6 +70,7 @@ test('description should be string', function () {
 });
 
 test('manager can store a job offer', function () {
+    $this->manager->assignRole('manager');
     Sanctum::actingAs($this->manager, ['*'], 'expert');
 
     $profession = Profession::factory()->create();

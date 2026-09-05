@@ -8,6 +8,7 @@ use App\Models\Service;
 use Laravel\Sanctum\Sanctum;
 
 beforeEach(function () {
+    seedRoles();
     $owner = Expert::factory()->create();
     $hall = Hall::factory()->create(['owner_id' => $owner->id]);
     $this->expertHall = ExpertHall::factory()->create([
@@ -33,6 +34,7 @@ test('manager should be authenticated with guard expert', function () {
 
 test('service id is required', function () {
     $expert = Expert::query()->find($this->expertHall->expert_id);
+    $expert->assignRole('manager');
     Sanctum::actingAs($expert, ['*'], 'expert');
     $response = $this->postJson(route('expert.services.update', [$this->expertHall->hall_id, $this->hallService->id]));
 
@@ -42,6 +44,7 @@ test('service id is required', function () {
 
 test('service id should be existed', function () {
     $expert = Expert::query()->find($this->expertHall->expert_id);
+    $expert->assignRole('manager');
     Sanctum::actingAs($expert, ['*'], 'expert');
     $response = $this->postJson(route('expert.services.update', [$this->expertHall->hall_id, $this->hallService->id]), [
         'service_id' => 999999,
@@ -55,6 +58,7 @@ test('service id should be existed', function () {
 
 test('duration is required', function () {
     $expert = Expert::query()->find($this->expertHall->expert_id);
+    $expert->assignRole('manager');
     Sanctum::actingAs($expert, ['*'], 'expert');
     $response = $this->postJson(route('expert.services.update', [$this->expertHall->hall_id, $this->hallService->id]));
 
@@ -64,6 +68,7 @@ test('duration is required', function () {
 
 test('duration should be integer', function () {
     $expert = Expert::query()->find($this->expertHall->expert_id);
+    $expert->assignRole('manager');
     Sanctum::actingAs($expert, ['*'], 'expert');
     $response = $this->postJson(route('expert.services.update', [$this->expertHall->hall_id, $this->hallService->id]), [
         'duration' => fake()->word(),
@@ -77,6 +82,7 @@ test('duration should be integer', function () {
 
 test('price is required', function () {
     $expert = Expert::query()->find($this->expertHall->expert_id);
+    $expert->assignRole('manager');
     Sanctum::actingAs($expert, ['*'], 'expert');
     $response = $this->postJson(route('expert.services.update', [$this->expertHall->hall_id, $this->hallService->id]));
 
@@ -86,6 +92,7 @@ test('price is required', function () {
 
 test('price should be integer', function () {
     $expert = Expert::query()->find($this->expertHall->expert_id);
+    $expert->assignRole('manager');
     Sanctum::actingAs($expert, ['*'], 'expert');
     $response = $this->postJson(route('expert.services.update', [$this->expertHall->hall_id, $this->hallService->id]), [
         'price' => fake()->word(),
@@ -99,6 +106,7 @@ test('price should be integer', function () {
 
 test('is active is required', function () {
     $expert = Expert::query()->find($this->expertHall->expert_id);
+    $expert->assignRole('manager');
     Sanctum::actingAs($expert, ['*'], 'expert');
     $response = $this->postJson(route('expert.services.update', [$this->expertHall->hall_id, $this->hallService->id]));
 
@@ -108,6 +116,7 @@ test('is active is required', function () {
 
 test('is active should be boolean', function () {
     $expert = Expert::query()->find($this->expertHall->expert_id);
+    $expert->assignRole('manager');
     Sanctum::actingAs($expert, ['*'], 'expert');
     $response = $this->postJson(route('expert.services.update', [$this->expertHall->hall_id, $this->hallService->id]), [
         'is_active' => 'not-a-boolean',
@@ -121,6 +130,7 @@ test('is active should be boolean', function () {
 
 test('manager can update a hall service', function () {
     $expert = Expert::query()->find($this->expertHall->expert_id);
+    $expert->assignRole('manager');
     Sanctum::actingAs($expert, ['*'], 'expert');
 
     $service = Service::factory()->create();
@@ -155,6 +165,7 @@ test('manager can update a hall service', function () {
 
 test('manager cannot update a service on a hall they do not own', function () {
     $intruder = Expert::factory()->create();
+    $intruder->assignRole('manager');
     Sanctum::actingAs($intruder, ['*'], 'expert');
 
     $this->postJson(route('expert.services.update', [$this->expertHall->hall_id, $this->hallService->id]))
@@ -163,6 +174,7 @@ test('manager cannot update a service on a hall they do not own', function () {
 
 test('manager cannot update a service that belongs to another hall', function () {
     $expert = Expert::query()->find($this->expertHall->expert_id);
+    $expert->assignRole('manager');
     Sanctum::actingAs($expert, ['*'], 'expert');
 
     $foreignService = HallService::factory()->create();

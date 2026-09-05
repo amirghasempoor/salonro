@@ -5,6 +5,7 @@ use App\Models\ExpertHall;
 use Laravel\Sanctum\Sanctum;
 
 beforeEach(function () {
+    seedRoles();
     $this->expertHall = ExpertHall::factory()->create();
 });
 
@@ -24,6 +25,7 @@ test('manager can see the hall staff', function () {
     $staff = Expert::factory()->count(2)->create();
     $this->expertHall->hall->experts()->attach($staff->pluck('id')->all(), ['joined_at' => now()]);
 
+    $expert->assignRole('manager');
     Sanctum::actingAs($expert, ['*'], 'expert');
     $response = $this->getJson(route('expert.staff.index', [
         'hall' => $this->expertHall->hall_id,

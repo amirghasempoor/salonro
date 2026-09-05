@@ -7,6 +7,7 @@ use App\Models\HallService;
 use Laravel\Sanctum\Sanctum;
 
 beforeEach(function () {
+    seedRoles();
     $owner = Expert::factory()->create();
     $hall = Hall::factory()->create(['owner_id' => $owner->id]);
     $this->expertHall = ExpertHall::factory()->create([
@@ -28,6 +29,7 @@ test('manager should be authenticated with guard expert', function () {
 test('manager can see the halls services', function () {
     $expert = Expert::query()->find($this->expertHall->expert_id);
     HallService::factory()->count(2)->create(['hall_id' => $this->expertHall->hall_id]);
+    $expert->assignRole('manager');
     Sanctum::actingAs($expert, ['*'], 'expert');
     $response = $this->getJson(route('expert.services.index', [
         'hall' => $this->expertHall->hall_id,
@@ -57,6 +59,7 @@ test('manager can see the halls services', function () {
 
 test('manager cannot see the services of a hall they do not own', function () {
     $intruder = Expert::factory()->create();
+    $intruder->assignRole('manager');
     Sanctum::actingAs($intruder, ['*'], 'expert');
 
     $this->getJson(route('expert.services.index', [$this->expertHall->hall_id]))

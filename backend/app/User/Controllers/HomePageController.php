@@ -49,4 +49,9 @@ class HomePageController extends Controller
 
         return $this->successResponse($services);
     }
+
+    public function hallStaff(Hall $hall): JsonResponse
+    {
+        return $this->successResponse($hall->experts()->get(['first_name', 'last_name', 'avatar', 'experts.id']));
+    }
 }

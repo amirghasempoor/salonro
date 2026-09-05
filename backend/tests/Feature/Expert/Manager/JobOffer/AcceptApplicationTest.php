@@ -5,6 +5,7 @@ use App\Models\JobOfferApplication;
 use Laravel\Sanctum\Sanctum;
 
 beforeEach(function () {
+    seedRoles();
     $this->application = JobOfferApplication::factory()->create();
     $this->manager = Expert::query()->find($this->application->jobOffer->hall->owner_id);
 });
@@ -20,6 +21,7 @@ test('manager should be authenticated with guard expert', function () {
 });
 
 test('manager can accept an application', function () {
+    $this->manager->assignRole('manager');
     Sanctum::actingAs($this->manager, ['*'], 'expert');
 
     $response = $this->postJson(route('expert.job_offers.acceptApplication', [$this->application->id]));

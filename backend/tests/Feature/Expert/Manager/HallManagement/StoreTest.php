@@ -7,6 +7,10 @@ use App\Models\Province;
 use App\Models\Service;
 use Laravel\Sanctum\Sanctum;
 
+beforeEach(function () {
+    seedRoles();
+});
+
 test('manager should be authenticated to store a hall', function () {
     $this->postJson(route('expert.hall.store'))->assertUnauthorized();
 });
@@ -19,6 +23,7 @@ test('manager should be authenticated with guard expert', function () {
 
 test('name is required', function () {
     $expert = Expert::factory()->create();
+    $expert->assignRole('manager');
     Sanctum::actingAs($expert, ['*'], 'expert');
     $response = $this->postJson(route('expert.hall.store'));
 
@@ -28,6 +33,7 @@ test('name is required', function () {
 
 test('name should be string', function () {
     $expert = Expert::factory()->create();
+    $expert->assignRole('manager');
     Sanctum::actingAs($expert, ['*'], 'expert');
     $response = $this->postJson(route('expert.hall.store'), [
         'name' => fake()->numberBetween(1, 100),
@@ -41,6 +47,7 @@ test('name should be string', function () {
 
 test('lat is required', function () {
     $expert = Expert::factory()->create();
+    $expert->assignRole('manager');
     Sanctum::actingAs($expert, ['*'], 'expert');
     $response = $this->postJson(route('expert.hall.store'));
 
@@ -50,6 +57,7 @@ test('lat is required', function () {
 
 test('lat should be string', function () {
     $expert = Expert::factory()->create();
+    $expert->assignRole('manager');
     Sanctum::actingAs($expert, ['*'], 'expert');
     $response = $this->postJson(route('expert.hall.store'), [
         'lat' => fake()->numberBetween(1, 100),
@@ -63,6 +71,7 @@ test('lat should be string', function () {
 
 test('lng is required', function () {
     $expert = Expert::factory()->create();
+    $expert->assignRole('manager');
     Sanctum::actingAs($expert, ['*'], 'expert');
     $response = $this->postJson(route('expert.hall.store'));
 
@@ -72,6 +81,7 @@ test('lng is required', function () {
 
 test('lng should be string', function () {
     $expert = Expert::factory()->create();
+    $expert->assignRole('manager');
     Sanctum::actingAs($expert, ['*'], 'expert');
     $response = $this->postJson(route('expert.hall.store'), [
         'lng' => fake()->numberBetween(1, 100),
@@ -85,6 +95,7 @@ test('lng should be string', function () {
 
 test('address is required', function () {
     $expert = Expert::factory()->create();
+    $expert->assignRole('manager');
     Sanctum::actingAs($expert, ['*'], 'expert');
     $response = $this->postJson(route('expert.hall.store'));
 
@@ -94,6 +105,7 @@ test('address is required', function () {
 
 test('address should be string', function () {
     $expert = Expert::factory()->create();
+    $expert->assignRole('manager');
     Sanctum::actingAs($expert, ['*'], 'expert');
     $response = $this->postJson(route('expert.hall.store'), [
         'address' => fake()->numberBetween(1, 100),
@@ -107,6 +119,7 @@ test('address should be string', function () {
 
 test('postal code is required', function () {
     $expert = Expert::factory()->create();
+    $expert->assignRole('manager');
     Sanctum::actingAs($expert, ['*'], 'expert');
     $response = $this->postJson(route('expert.hall.store'));
 
@@ -116,6 +129,7 @@ test('postal code is required', function () {
 
 test('postal code should be string', function () {
     $expert = Expert::factory()->create();
+    $expert->assignRole('manager');
     Sanctum::actingAs($expert, ['*'], 'expert');
     $response = $this->postJson(route('expert.hall.store'), [
         'postal_code' => fake()->numberBetween(1, 100),
@@ -129,6 +143,7 @@ test('postal code should be string', function () {
 
 test('telephone is required', function () {
     $expert = Expert::factory()->create();
+    $expert->assignRole('manager');
     Sanctum::actingAs($expert, ['*'], 'expert');
     $response = $this->postJson(route('expert.hall.store'));
 
@@ -138,6 +153,7 @@ test('telephone is required', function () {
 
 test('telephone should be string', function () {
     $expert = Expert::factory()->create();
+    $expert->assignRole('manager');
     Sanctum::actingAs($expert, ['*'], 'expert');
     $response = $this->postJson(route('expert.hall.store'), [
         'telephone' => fake()->numberBetween(1, 100),
@@ -151,6 +167,7 @@ test('telephone should be string', function () {
 
 test('province id is required', function () {
     $expert = Expert::factory()->create();
+    $expert->assignRole('manager');
     Sanctum::actingAs($expert, ['*'], 'expert');
     $response = $this->postJson(route('expert.hall.store'));
 
@@ -160,6 +177,7 @@ test('province id is required', function () {
 
 test('province id should be existed', function () {
     $expert = Expert::factory()->create();
+    $expert->assignRole('manager');
     Sanctum::actingAs($expert, ['*'], 'expert');
     $response = $this->postJson(route('expert.hall.store'), [
         'province_id' => fake()->numberBetween(1, 10),
@@ -173,6 +191,7 @@ test('province id should be existed', function () {
 
 test('city id is required', function () {
     $expert = Expert::factory()->create();
+    $expert->assignRole('manager');
     Sanctum::actingAs($expert, ['*'], 'expert');
     $response = $this->postJson(route('expert.hall.store'));
 
@@ -182,6 +201,7 @@ test('city id is required', function () {
 
 test('city id should be existed', function () {
     $expert = Expert::factory()->create();
+    $expert->assignRole('manager');
     Sanctum::actingAs($expert, ['*'], 'expert');
     $response = $this->postJson(route('expert.hall.store'), [
         'city_id' => fake()->numberBetween(1, 10),
@@ -195,6 +215,7 @@ test('city id should be existed', function () {
 
 test('services is required', function () {
     $expert = Expert::factory()->create();
+    $expert->assignRole('manager');
     Sanctum::actingAs($expert, ['*'], 'expert');
     $response = $this->postJson(route('expert.hall.store'));
 
@@ -205,6 +226,7 @@ test('services is required', function () {
 test('manager can store a hall', function () {
     $expert = Expert::factory()->create();
 
+    $expert->assignRole('manager');
     Sanctum::actingAs($expert, ['*'], 'expert');
 
     $province = Province::factory()->create();

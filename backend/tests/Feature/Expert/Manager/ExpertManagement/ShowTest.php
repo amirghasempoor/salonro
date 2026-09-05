@@ -5,6 +5,7 @@ use App\Models\ExpertHall;
 use Laravel\Sanctum\Sanctum;
 
 beforeEach(function () {
+    seedRoles();
     $this->expertHall = ExpertHall::factory()->create();
     $this->staff = Expert::query()->find($this->expertHall->expert_id);
 });
@@ -21,6 +22,7 @@ test('manager should be authenticated with guard expert', function () {
 
 test('manager can see a staff details', function () {
     $expert = Expert::factory()->create();
+    $expert->assignRole('manager');
     Sanctum::actingAs($expert, ['*'], 'expert');
 
     $response = $this->getJson(route('expert.staff.show', [
