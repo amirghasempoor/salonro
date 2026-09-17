@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Expert\Policies;
+namespace Expert\Manager\Hall\Application\Policies;
 
 use App\Models\Expert;
 use App\Models\Hall;

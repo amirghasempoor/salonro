@@ -5,6 +5,7 @@ use App\Providers\DataTableServiceProvider;
 use App\Providers\FileServiceProvider;
 use App\Providers\OtpServiceProvider;
 use App\Providers\SmsServiceProvider;
+use Expert\Manager\Hall\HallManagementServiceProvider;
 use Expert\Manager\HallService\HallServiceServiceProvider;
 use Expert\Profile\ProfileServiceProvider;
 
@@ -16,4 +17,5 @@ return [
     SmsServiceProvider::class,
     ProfileServiceProvider::class,
     HallServiceServiceProvider::class,
+    HallManagementServiceProvider::class,
 ];
