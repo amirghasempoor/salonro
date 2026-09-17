@@ -20,7 +20,9 @@ class ExpertProfileResource extends JsonResource
             'avatar' => $this->resource->avatar,
             'phone_number' => $this->resource->phone_number,
             'role' => $this->resource->getRoleNames()->first(),
-            'halls' => HallResource::collection($this->resource->halls),
+            'halls' => $this->resource->halls->map(
+                fn ($hall) => new HallResource($hall, $this->resource)
+            ),
             'is_verified' => $this->resource->is_verified,
             'bio' => $this->resource->bio,
             'is_active' => $this->resource->is_active,
