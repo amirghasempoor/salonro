@@ -42,3 +42,20 @@ test('manager can see a staff details', function () {
         ],
     ]);
 });
+
+test('staff details include the expert portfolio images', function () {
+    $expert = Expert::factory()->create();
+    $expert->assignRole('manager');
+    Sanctum::actingAs($expert, ['*'], 'expert');
+
+    $this->staff->images()->create(['url' => 'portfolios/1/photo.jpg', 'title' => 'Haircut']);
+
+    $response = $this->getJson(route('expert.staff.show', [
+        'expert' => $this->staff->id,
+        'hall_id' => $this->expertHall->hall_id,
+    ]));
+
+    $response->assertOk();
+    $response->assertJsonPath('data.portfolio.0.title', 'Haircut');
+    $response->assertJsonPath('data.portfolio.0.url', 'portfolios/1/photo.jpg');
+});

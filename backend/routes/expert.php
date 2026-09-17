@@ -2,13 +2,13 @@
 
 use App\Expert\Controllers\JobOfferController;
 use App\Expert\Controllers\Manager\DiscountManagementController;
-use App\Expert\Controllers\Manager\ExpertManagementController;
 use App\Expert\Controllers\Manager\JobOfferController as ManagerJobOfferController;
 use App\Expert\Controllers\Manager\ServiceManagementController;
 use App\Expert\Controllers\ReservationManagementController;
 use Expert\Auth\Application\Http\Controllers\AuthController;
 use Expert\Manager\Hall\Application\Http\Controllers\HallManagementController;
 use Expert\Manager\HallService\Application\Http\Controllers\HallServicesManagementController;
+use Expert\Manager\Staff\Application\Http\Controllers\ExpertManagementController;
 use Expert\Profile\Application\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
@@ -80,12 +80,12 @@ Route::prefix('staff')
     ->middleware(['auth:expert', 'role:manager|admin'])
     ->controller(ExpertManagementController::class)
     ->group(function () {
-        Route::get('/list/{hall}', 'list')->name('list')->where('hall', '[0-9]+');
-        Route::get('/{hall}', 'index')->name('index');
-        Route::post('/{hall}', 'store')->name('store');
+        Route::get('/list/{hall}', 'staffList')->name('list')->where('hall', '[0-9]+')->can('staff.view', 'hall');
+        Route::get('/{hall}', 'index')->name('index')->can('staff.view', 'hall');
+        Route::post('/{hall}', 'store')->name('store')->can('staff.store', 'hall');
         Route::get('/details/{expert}', 'show')->name('show');
-        Route::post('/{hall}/{expert}', 'update')->name('update');
-        Route::delete('/{hall}/{expert}', 'destroy')->name('destroy');
+        Route::post('/{hall}/{expert}', 'update')->name('update')->can('staff.update', ['hall', 'expert']);
+        Route::delete('/{hall}/{expert}', 'destroy')->name('destroy')->can('staff.delete', ['hall', 'expert']);
     });
 
 Route::prefix('services')

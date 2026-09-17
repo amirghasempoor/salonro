@@ -28,6 +28,7 @@ class HallManagementController extends Controller
 
     /**
      * Store a newly created resource in storage.
+     *
      * @throws Throwable
      */
     public function store(StoreRequest $request): JsonResponse
@@ -49,6 +50,7 @@ class HallManagementController extends Controller
 
     /**
      * Update the specified resource in storage.
+     *
      * @throws Throwable
      */
     public function update(UpdateRequest $request, Hall $hall): JsonResponse
@@ -60,6 +62,7 @@ class HallManagementController extends Controller
 
     /**
      * Remove the specified resource from storage.
+     *
      * @throws Throwable
      */
     public function destroy(Hall $hall): JsonResponse

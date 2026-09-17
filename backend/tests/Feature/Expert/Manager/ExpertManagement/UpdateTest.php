@@ -1,43 +1,42 @@
 <?php
 
 use App\Models\Expert;
-use App\Models\ExpertHall;
+use App\Models\Hall;
 use App\Models\User;
 use Laravel\Sanctum\Sanctum;
 
 beforeEach(function () {
     seedRoles();
-    $this->expertHall = ExpertHall::factory()->create();
-    $this->staff = Expert::query()->find($this->expertHall->expert_id);
+    $this->owner = Expert::factory()->create();
+    $this->hall = Hall::factory()->create(['owner_id' => $this->owner->id]);
+    $this->staff = Expert::factory()->create();
+    $this->hall->experts()->attach($this->staff->id, ['joined_at' => now()]);
 });
 
 test('manager should be authenticated to update a staff', function () {
-    $this->postJson(route('expert.staff.update', [$this->expertHall->hall_id, $this->staff->id]))
+    $this->postJson(route('expert.staff.update', [$this->hall->id, $this->staff->id]))
         ->assertUnauthorized();
 });
 
 test('manager should be authenticated with guard expert', function () {
-    $expert = Expert::factory()->create();
-    Sanctum::actingAs($expert, ['*'], 'user');
-    $this->postJson(route('expert.staff.update', [$this->expertHall->hall_id, $this->staff->id]))
+    Sanctum::actingAs($this->owner, ['*'], 'user');
+    $this->postJson(route('expert.staff.update', [$this->hall->id, $this->staff->id]))
         ->assertUnauthorized();
 });
 
 test('first name is required', function () {
-    $expert = Expert::factory()->create();
-    $expert->assignRole('manager');
-    Sanctum::actingAs($expert, ['*'], 'expert');
-    $response = $this->postJson(route('expert.staff.update', [$this->expertHall->hall_id, $this->staff->id]));
+    $this->owner->assignRole('manager');
+    Sanctum::actingAs($this->owner, ['*'], 'expert');
+    $response = $this->postJson(route('expert.staff.update', [$this->hall->id, $this->staff->id]));
 
     $response->assertStatus(422);
     $response->assertJsonValidationErrorFor('first_name');
 });
 
 test('first name should be string', function () {
-    $expert = Expert::factory()->create();
-    $expert->assignRole('manager');
-    Sanctum::actingAs($expert, ['*'], 'expert');
-    $response = $this->postJson(route('expert.staff.update', [$this->expertHall->hall_id, $this->staff->id]), [
+    $this->owner->assignRole('manager');
+    Sanctum::actingAs($this->owner, ['*'], 'expert');
+    $response = $this->postJson(route('expert.staff.update', [$this->hall->id, $this->staff->id]), [
         'first_name' => fake()->numberBetween(1, 100),
     ]);
 
@@ -48,20 +47,18 @@ test('first name should be string', function () {
 });
 
 test('last name is required', function () {
-    $expert = Expert::factory()->create();
-    $expert->assignRole('manager');
-    Sanctum::actingAs($expert, ['*'], 'expert');
-    $response = $this->postJson(route('expert.staff.update', [$this->expertHall->hall_id, $this->staff->id]));
+    $this->owner->assignRole('manager');
+    Sanctum::actingAs($this->owner, ['*'], 'expert');
+    $response = $this->postJson(route('expert.staff.update', [$this->hall->id, $this->staff->id]));
 
     $response->assertStatus(422);
     $response->assertJsonValidationErrorFor('last_name');
 });
 
 test('last name should be string', function () {
-    $expert = Expert::factory()->create();
-    $expert->assignRole('manager');
-    Sanctum::actingAs($expert, ['*'], 'expert');
-    $response = $this->postJson(route('expert.staff.update', [$this->expertHall->hall_id, $this->staff->id]), [
+    $this->owner->assignRole('manager');
+    Sanctum::actingAs($this->owner, ['*'], 'expert');
+    $response = $this->postJson(route('expert.staff.update', [$this->hall->id, $this->staff->id]), [
         'last_name' => fake()->numberBetween(1, 100),
     ]);
 
@@ -72,20 +69,18 @@ test('last name should be string', function () {
 });
 
 test('phone number is required', function () {
-    $expert = Expert::factory()->create();
-    $expert->assignRole('manager');
-    Sanctum::actingAs($expert, ['*'], 'expert');
-    $response = $this->postJson(route('expert.staff.update', [$this->expertHall->hall_id, $this->staff->id]));
+    $this->owner->assignRole('manager');
+    Sanctum::actingAs($this->owner, ['*'], 'expert');
+    $response = $this->postJson(route('expert.staff.update', [$this->hall->id, $this->staff->id]));
 
     $response->assertStatus(422);
     $response->assertJsonValidationErrorFor('phone_number');
 });
 
 test('phone number should be string', function () {
-    $expert = Expert::factory()->create();
-    $expert->assignRole('manager');
-    Sanctum::actingAs($expert, ['*'], 'expert');
-    $response = $this->postJson(route('expert.staff.update', [$this->expertHall->hall_id, $this->staff->id]), [
+    $this->owner->assignRole('manager');
+    Sanctum::actingAs($this->owner, ['*'], 'expert');
+    $response = $this->postJson(route('expert.staff.update', [$this->hall->id, $this->staff->id]), [
         'phone_number' => fake()->numberBetween(1, 100),
     ]);
 
@@ -96,13 +91,12 @@ test('phone number should be string', function () {
 });
 
 test('phone number should be unique', function () {
-    $expert = Expert::factory()->create();
-    $expert->assignRole('manager');
-    Sanctum::actingAs($expert, ['*'], 'expert');
+    $this->owner->assignRole('manager');
+    Sanctum::actingAs($this->owner, ['*'], 'expert');
 
     $user = User::factory()->create();
 
-    $response = $this->postJson(route('expert.staff.update', [$this->expertHall->hall_id, $this->staff->id]), [
+    $response = $this->postJson(route('expert.staff.update', [$this->hall->id, $this->staff->id]), [
         'first_name' => fake()->firstName(),
         'last_name' => fake()->lastName(),
         'phone_number' => $user->phone_number,
@@ -115,9 +109,8 @@ test('phone number should be unique', function () {
 });
 
 test('manager can update a staff', function () {
-    $expert = Expert::factory()->create();
-    $expert->assignRole('manager');
-    Sanctum::actingAs($expert, ['*'], 'expert');
+    $this->owner->assignRole('manager');
+    Sanctum::actingAs($this->owner, ['*'], 'expert');
 
     $data = [
         'first_name' => 'Updated',
@@ -126,7 +119,7 @@ test('manager can update a staff', function () {
     ];
 
     $response = $this->postJson(
-        route('expert.staff.update', [$this->expertHall->hall_id, $this->staff->id]),
+        route('expert.staff.update', [$this->hall->id, $this->staff->id]),
         $data
     );
 
@@ -141,4 +134,23 @@ test('manager can update a staff', function () {
         'last_name' => 'Staff',
         'phone_number' => $data['phone_number'],
     ]);
+});
+
+test('manager cannot update a staff on a hall they do not own', function () {
+    $intruder = Expert::factory()->create();
+    $intruder->assignRole('manager');
+    Sanctum::actingAs($intruder, ['*'], 'expert');
+
+    $this->postJson(route('expert.staff.update', [$this->hall->id, $this->staff->id]))
+        ->assertForbidden();
+});
+
+test('manager cannot update a staff that does not belong to their hall', function () {
+    $this->owner->assignRole('manager');
+    Sanctum::actingAs($this->owner, ['*'], 'expert');
+
+    $foreignStaff = Expert::factory()->create();
+
+    $this->postJson(route('expert.staff.update', [$this->hall->id, $foreignStaff->id]))
+        ->assertForbidden();
 });

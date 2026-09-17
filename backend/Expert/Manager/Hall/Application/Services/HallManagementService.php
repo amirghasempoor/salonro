@@ -9,7 +9,6 @@ use App\Models\Hall;
 use App\Models\Province;
 use Expert\Manager\Hall\Application\Http\Requests\StoreRequest;
 use Expert\Manager\Hall\Application\Http\Requests\UpdateRequest;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;

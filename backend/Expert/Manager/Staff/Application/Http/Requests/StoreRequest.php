@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Expert\Requests\Manager\Expert;
+namespace Expert\Manager\Staff\Application\Http\Requests;
 
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;

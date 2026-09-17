@@ -7,6 +7,7 @@ use App\Providers\OtpServiceProvider;
 use App\Providers\SmsServiceProvider;
 use Expert\Manager\Hall\HallManagementServiceProvider;
 use Expert\Manager\HallService\HallServiceServiceProvider;
+use Expert\Manager\Staff\StaffServiceProvider;
 use Expert\Profile\ProfileServiceProvider;
 
 return [
@@ -18,4 +19,5 @@ return [
     ProfileServiceProvider::class,
     HallServiceServiceProvider::class,
     HallManagementServiceProvider::class,
+    StaffServiceProvider::class,
 ];

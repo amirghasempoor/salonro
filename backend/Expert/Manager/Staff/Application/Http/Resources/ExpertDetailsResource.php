@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Expert\Resources;
+namespace Expert\Manager\Staff\Application\Http\Resources;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -20,7 +20,7 @@ class ExpertDetailsResource extends JsonResource
             'avatar' => $this->resource->avatar,
             'phone_number' => $this->resource->phone_number,
             'working_hours' => $this->resource->workingHoursAtHall($request->query('hall_id')),
-            'portfolio' => $this->resource->portfolio,
+            'portfolio' => $this->resource->images,
         ];
     }
 }
