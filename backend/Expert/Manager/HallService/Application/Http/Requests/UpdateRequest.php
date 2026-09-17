@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Expert\Requests\Manager\HallService;
+namespace Expert\Manager\HallService\Application\Http\Requests;
 
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
-class StoreRequest extends FormRequest
+class UpdateRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -27,6 +27,7 @@ class StoreRequest extends FormRequest
             'description' => 'nullable|string|max:255',
             'duration' => 'required|integer|between:1,1000000',
             'price' => 'required|integer|between:1,1000000',
+            'is_active' => 'required|boolean',
         ];
     }
 }

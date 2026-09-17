@@ -4,11 +4,11 @@ use App\Expert\Controllers\JobOfferController;
 use App\Expert\Controllers\Manager\DiscountManagementController;
 use App\Expert\Controllers\Manager\ExpertManagementController;
 use App\Expert\Controllers\Manager\HallManagementController;
-use App\Expert\Controllers\Manager\HallServicesManagementController;
 use App\Expert\Controllers\Manager\JobOfferController as ManagerJobOfferController;
 use App\Expert\Controllers\Manager\ServiceManagementController;
 use App\Expert\Controllers\ReservationManagementController;
 use Expert\Auth\Application\Http\Controllers\AuthController;
+use Expert\Manager\HallService\Application\Http\Controllers\HallServicesManagementController;
 use Expert\Profile\Application\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
@@ -93,11 +93,11 @@ Route::prefix('services')
     ->middleware(['auth:expert', 'role:manager|admin'])
     ->controller(HallServicesManagementController::class)
     ->group(function () {
-        Route::get('/{hall}', 'index')->name('index')->can('serviceView', 'hall');
-        Route::post('/{hall}', 'store')->name('store')->can('serviceStore', 'hall');
-        Route::get('/{hall}/{hallService}', 'show')->name('show')->can('serviceShow', ['hall', 'hallService']);
-        Route::post('/{hall}/{hallService}', 'update')->name('update')->can('serviceUpdate', ['hall', 'hallService']);
-        Route::delete('/{hall}/{hallService}', 'destroy')->name('destroy')->can('serviceDelete', ['hall', 'hallService']);
+        Route::get('/{hall}', 'index')->name('index')->can('hallService.view', 'hall');
+        Route::post('/{hall}', 'store')->name('store')->can('hallService.store', 'hall');
+        Route::get('/show/{hallService}', 'show')->name('show')->can('hallService.show', 'hallService');
+        Route::post('/update/{hallService}', 'update')->name('update')->can('hallService.update', 'hallService');
+        Route::delete('/delete/{hallService}', 'destroy')->name('destroy')->can('hallService.delete', 'hallService');
     });
 
 Route::prefix('discounts')

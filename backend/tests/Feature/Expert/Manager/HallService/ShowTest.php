@@ -20,14 +20,14 @@ beforeEach(function () {
 });
 
 test('manager should be authenticated to see a hall service', function () {
-    $this->getJson(route('expert.services.show', [$this->expertHall->hall_id, $this->hallService->id]))
+    $this->getJson(route('expert.services.show', $this->hallService->id))
         ->assertUnauthorized();
 });
 
 test('manager should be authenticated with guard expert', function () {
     $expert = Expert::factory()->create();
     Sanctum::actingAs($expert, ['*'], 'user');
-    $this->getJson(route('expert.services.show', [$this->expertHall->hall_id, $this->hallService->id]))
+    $this->getJson(route('expert.services.show', $this->hallService->id))
         ->assertUnauthorized();
 });
 
@@ -35,7 +35,7 @@ test('manager can see a hall service info', function () {
     $expert = Expert::query()->find($this->expertHall->expert_id);
     $expert->assignRole('manager');
     Sanctum::actingAs($expert, ['*'], 'expert');
-    $response = $this->getJson(route('expert.services.show', [$this->expertHall->hall_id, $this->hallService->id]));
+    $response = $this->getJson(route('expert.services.show', $this->hallService->id));
 
     $response->assertOk();
     $response->assertJsonStructure([
@@ -58,7 +58,7 @@ test('manager cannot see a service of a hall they do not own', function () {
     $intruder->assignRole('manager');
     Sanctum::actingAs($intruder, ['*'], 'expert');
 
-    $this->getJson(route('expert.services.show', [$this->expertHall->hall_id, $this->hallService->id]))
+    $this->getJson(route('expert.services.show', $this->hallService->id))
         ->assertForbidden();
 });
 
@@ -69,6 +69,6 @@ test('manager cannot see a service that belongs to another hall', function () {
 
     $foreignService = HallService::factory()->create();
 
-    $this->getJson(route('expert.services.show', [$this->expertHall->hall_id, $foreignService->id]))
+    $this->getJson(route('expert.services.show', $foreignService->id))
         ->assertForbidden();
 });

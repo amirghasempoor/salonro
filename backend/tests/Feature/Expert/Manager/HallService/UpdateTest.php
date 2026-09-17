@@ -21,14 +21,14 @@ beforeEach(function () {
 });
 
 test('manager should be authenticated to update a hall service', function () {
-    $this->postJson(route('expert.services.update', [$this->expertHall->hall_id, $this->hallService->id]))
+    $this->postJson(route('expert.services.update', $this->hallService->id))
         ->assertUnauthorized();
 });
 
 test('manager should be authenticated with guard expert', function () {
     $expert = Expert::factory()->create();
     Sanctum::actingAs($expert, ['*'], 'user');
-    $this->postJson(route('expert.services.update', [$this->expertHall->hall_id, $this->hallService->id]))
+    $this->postJson(route('expert.services.update', $this->hallService->id))
         ->assertUnauthorized();
 });
 
@@ -36,7 +36,7 @@ test('service id is required', function () {
     $expert = Expert::query()->find($this->expertHall->expert_id);
     $expert->assignRole('manager');
     Sanctum::actingAs($expert, ['*'], 'expert');
-    $response = $this->postJson(route('expert.services.update', [$this->expertHall->hall_id, $this->hallService->id]));
+    $response = $this->postJson(route('expert.services.update', $this->hallService->id));
 
     $response->assertStatus(422);
     $response->assertJsonValidationErrorFor('service_id');
@@ -46,7 +46,7 @@ test('service id should be existed', function () {
     $expert = Expert::query()->find($this->expertHall->expert_id);
     $expert->assignRole('manager');
     Sanctum::actingAs($expert, ['*'], 'expert');
-    $response = $this->postJson(route('expert.services.update', [$this->expertHall->hall_id, $this->hallService->id]), [
+    $response = $this->postJson(route('expert.services.update', $this->hallService->id), [
         'service_id' => 999999,
     ]);
 
@@ -60,7 +60,7 @@ test('duration is required', function () {
     $expert = Expert::query()->find($this->expertHall->expert_id);
     $expert->assignRole('manager');
     Sanctum::actingAs($expert, ['*'], 'expert');
-    $response = $this->postJson(route('expert.services.update', [$this->expertHall->hall_id, $this->hallService->id]));
+    $response = $this->postJson(route('expert.services.update', $this->hallService->id));
 
     $response->assertStatus(422);
     $response->assertJsonValidationErrorFor('duration');
@@ -70,7 +70,7 @@ test('duration should be integer', function () {
     $expert = Expert::query()->find($this->expertHall->expert_id);
     $expert->assignRole('manager');
     Sanctum::actingAs($expert, ['*'], 'expert');
-    $response = $this->postJson(route('expert.services.update', [$this->expertHall->hall_id, $this->hallService->id]), [
+    $response = $this->postJson(route('expert.services.update', $this->hallService->id), [
         'duration' => fake()->word(),
     ]);
 
@@ -84,7 +84,7 @@ test('price is required', function () {
     $expert = Expert::query()->find($this->expertHall->expert_id);
     $expert->assignRole('manager');
     Sanctum::actingAs($expert, ['*'], 'expert');
-    $response = $this->postJson(route('expert.services.update', [$this->expertHall->hall_id, $this->hallService->id]));
+    $response = $this->postJson(route('expert.services.update', $this->hallService->id));
 
     $response->assertStatus(422);
     $response->assertJsonValidationErrorFor('price');
@@ -94,7 +94,7 @@ test('price should be integer', function () {
     $expert = Expert::query()->find($this->expertHall->expert_id);
     $expert->assignRole('manager');
     Sanctum::actingAs($expert, ['*'], 'expert');
-    $response = $this->postJson(route('expert.services.update', [$this->expertHall->hall_id, $this->hallService->id]), [
+    $response = $this->postJson(route('expert.services.update', $this->hallService->id), [
         'price' => fake()->word(),
     ]);
 
@@ -108,7 +108,7 @@ test('is active is required', function () {
     $expert = Expert::query()->find($this->expertHall->expert_id);
     $expert->assignRole('manager');
     Sanctum::actingAs($expert, ['*'], 'expert');
-    $response = $this->postJson(route('expert.services.update', [$this->expertHall->hall_id, $this->hallService->id]));
+    $response = $this->postJson(route('expert.services.update', $this->hallService->id));
 
     $response->assertStatus(422);
     $response->assertJsonValidationErrorFor('is_active');
@@ -118,7 +118,7 @@ test('is active should be boolean', function () {
     $expert = Expert::query()->find($this->expertHall->expert_id);
     $expert->assignRole('manager');
     Sanctum::actingAs($expert, ['*'], 'expert');
-    $response = $this->postJson(route('expert.services.update', [$this->expertHall->hall_id, $this->hallService->id]), [
+    $response = $this->postJson(route('expert.services.update', $this->hallService->id), [
         'is_active' => 'not-a-boolean',
     ]);
 
@@ -144,7 +144,7 @@ test('manager can update a hall service', function () {
     ];
 
     $response = $this->postJson(
-        route('expert.services.update', [$this->expertHall->hall_id, $this->hallService->id]),
+        route('expert.services.update', $this->hallService->id),
         $data
     );
 
@@ -168,7 +168,7 @@ test('manager cannot update a service on a hall they do not own', function () {
     $intruder->assignRole('manager');
     Sanctum::actingAs($intruder, ['*'], 'expert');
 
-    $this->postJson(route('expert.services.update', [$this->expertHall->hall_id, $this->hallService->id]))
+    $this->postJson(route('expert.services.update', $this->hallService->id))
         ->assertForbidden();
 });
 
@@ -179,6 +179,6 @@ test('manager cannot update a service that belongs to another hall', function ()
 
     $foreignService = HallService::factory()->create();
 
-    $this->postJson(route('expert.services.update', [$this->expertHall->hall_id, $foreignService->id]))
+    $this->postJson(route('expert.services.update', $foreignService->id))
         ->assertForbidden();
 });
