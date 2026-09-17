@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Expert\Requests\Profile;
+namespace Expert\Profile\Application\Http\Requests;
 
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
-class DefineRoleRequest extends FormRequest
+class ChangePasswordRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -23,7 +23,8 @@ class DefineRoleRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'role' => 'required|exists:roles,id|in:2,3',
+            'current_password' => 'required|string|regex:/^(?=.*[a-zA-Z])(?=.*\d).+$/|min:8',
+            'new_password' => 'required|string|regex:/^(?=.*[a-zA-Z])(?=.*\d).+$/|min:8|confirmed',
         ];
     }
 }

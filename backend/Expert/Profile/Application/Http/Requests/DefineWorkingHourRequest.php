@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Expert\Requests\Profile;
+namespace Expert\Profile\Application\Http\Requests;
 
+use Expert\Profile\Domain\DTOs\SetWorkingHoursDto;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
@@ -30,5 +31,10 @@ class DefineWorkingHourRequest extends FormRequest
             'workingHours.*.from' => 'required|string',
             'workingHours.*.to' => 'required|string',
         ];
+    }
+
+    public function toDto(): SetWorkingHoursDto
+    {
+        return new SetWorkingHoursDto($this->workingHours);
     }
 }

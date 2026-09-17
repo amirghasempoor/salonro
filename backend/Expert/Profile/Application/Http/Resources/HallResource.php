@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Expert\Resources;
+namespace Expert\Profile\Application\Http\Resources;
 
 use App\Models\Expert;
 use Illuminate\Http\Request;

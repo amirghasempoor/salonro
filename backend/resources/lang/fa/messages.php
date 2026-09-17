@@ -11,4 +11,5 @@ return [
     'expert_not_in_hall' => 'این کارشناس در این سالن مشغول به کار نیست.',
     'outside_working_hours' => 'کارشناس در زمان انتخاب‌شده در دسترس نیست.',
     'reservation_conflict' => 'این بازه زمانی با یک رزرو دیگر تداخل دارد.',
+    'working_hour_outside_hall_schedule' => 'ساعت وارد شده خارج از ساعت کاری سالن است.',
 ];

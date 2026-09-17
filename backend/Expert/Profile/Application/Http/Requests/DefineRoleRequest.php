@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Expert\Requests\Profile;
+namespace Expert\Profile\Application\Http\Requests;
 
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
-class UploadPortfolioRequest extends FormRequest
+class DefineRoleRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -23,9 +23,7 @@ class UploadPortfolioRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'portfolio' => 'required|array',
-            'portfolio.*.image' => 'required|file|mimes:jpg,jpeg,png,gif',
-            'portfolio.*.title' => 'required|string',
+            'role' => 'required|exists:roles,id|in:2,3',
         ];
     }
 }

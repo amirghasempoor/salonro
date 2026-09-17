@@ -7,9 +7,9 @@ use App\Expert\Controllers\Manager\HallManagementController;
 use App\Expert\Controllers\Manager\HallServicesManagementController;
 use App\Expert\Controllers\Manager\JobOfferController as ManagerJobOfferController;
 use App\Expert\Controllers\Manager\ServiceManagementController;
-use App\Expert\Controllers\ProfileController;
 use App\Expert\Controllers\ReservationManagementController;
 use Expert\Auth\Application\Http\Controllers\AuthController;
+use Expert\Profile\Application\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('auth')
