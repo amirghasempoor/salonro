@@ -1,6 +1,5 @@
 <?php
 
-use App\Expert\Controllers\AuthController;
 use App\Expert\Controllers\JobOfferController;
 use App\Expert\Controllers\Manager\DiscountManagementController;
 use App\Expert\Controllers\Manager\ExpertManagementController;
@@ -10,6 +9,7 @@ use App\Expert\Controllers\Manager\JobOfferController as ManagerJobOfferControll
 use App\Expert\Controllers\Manager\ServiceManagementController;
 use App\Expert\Controllers\ProfileController;
 use App\Expert\Controllers\ReservationManagementController;
+use Expert\Auth\Application\Http\Controllers\AuthController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('auth')

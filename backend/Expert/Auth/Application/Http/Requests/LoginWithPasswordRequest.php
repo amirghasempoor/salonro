@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Expert\Requests\Auth;
+namespace Expert\Auth\Application\Http\Requests;
 
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
-class LoginWithOtpRequest extends FormRequest
+class LoginWithPasswordRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -23,8 +23,8 @@ class LoginWithOtpRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'verification_code' => 'required|string',
             'phone_number' => 'required|string',
+            'password' => 'required|string',
         ];
     }
 }
