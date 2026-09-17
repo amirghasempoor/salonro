@@ -4,6 +4,7 @@ namespace App\Expert\Requests\Profile;
 
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class DefineWorkingHourRequest extends FormRequest
 {
@@ -25,7 +26,7 @@ class DefineWorkingHourRequest extends FormRequest
         return [
             'workingHours' => 'required|array',
             'workingHours.*' => 'required|array',
-            'workingHours.*.day' => 'required|string',
+            'workingHours.*.day' => ['required', Rule::in(['sat', 'sun', 'mon', 'tue', 'wed', 'thu', 'fri'])],
             'workingHours.*.from' => 'required|string',
             'workingHours.*.to' => 'required|string',
         ];

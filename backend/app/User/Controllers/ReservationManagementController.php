@@ -10,6 +10,7 @@ use App\Models\Hall;
 use App\Models\Reservation;
 use App\Services\DiscountService;
 use App\Traits\ApiResponse;
+use App\Traits\EnsuresReservationAvailability;
 use App\Traits\ResolvesReservationPricing;
 use App\User\Requests\Reservation\StoreRequest;
 use App\User\Requests\Reservation\UpdateRequest;
@@ -22,6 +23,7 @@ use Illuminate\Support\Facades\DB;
 class ReservationManagementController extends Controller
 {
     use ApiResponse;
+    use EnsuresReservationAvailability;
     use ResolvesReservationPricing;
 
     public function __construct(
@@ -51,16 +53,26 @@ class ReservationManagementController extends Controller
         try {
             DB::transaction(function () use ($request) {
                 $user = Auth::guard('user')->user();
+                $expert = Expert::query()->findOrFail($request->expert_id);
+                $hall = Hall::query()->findOrFail($request->hall_id);
 
-                $priced = $this->priceReservationServices((int) $request->hall_id, $request->services);
+                $this->ensureReservationIsAvailable(
+                    $expert,
+                    $hall->id,
+                    $user->id,
+                    Carbon::parse($request->start_time),
+                    Carbon::parse($request->finish_time),
+                );
+
+                $priced = $this->priceReservationServices($hall->id, $request->services);
 
                 $reservation = Reservation::query()->create([
                     'user_id' => $user->id,
                     'user_name' => $user->first_name.' '.$user->last_name,
-                    'expert_id' => $request->expert_id,
-                    'expert_name' => Expert::query()->find($request->expert_id)->full_name,
-                    'hall_id' => $request->hall_id,
-                    'hall_name' => Hall::query()->find($request->hall_id)->name,
+                    'expert_id' => $expert->id,
+                    'expert_name' => $expert->full_name,
+                    'hall_id' => $hall->id,
+                    'hall_name' => $hall->name,
                     'state_id' => ReservationStates::Reserve->value,
                     'state_name' => ReservationStates::Reserve->label(),
                     'start_time' => $request->start_time,
@@ -71,7 +83,7 @@ class ReservationManagementController extends Controller
                 $reservation->services()->attach($priced['pivot']);
 
                 $best = $this->discountService->resolveBest(
-                    (int) $request->hall_id,
+                    $hall->id,
                     $user->id,
                     Carbon::parse($request->start_time),
                     $priced['baseTotal'],
@@ -97,20 +109,32 @@ class ReservationManagementController extends Controller
     {
         try {
             DB::transaction(function () use ($request, $reservation) {
-                $priced = $this->priceReservationServices((int) $request->hall_id, $request->services);
+                $expert = Expert::query()->findOrFail($request->expert_id);
+                $hall = Hall::query()->findOrFail($request->hall_id);
+
+                $this->ensureReservationIsAvailable(
+                    $expert,
+                    $hall->id,
+                    $reservation->user_id,
+                    Carbon::parse($request->start_time),
+                    Carbon::parse($request->finish_time),
+                    $reservation->id,
+                );
+
+                $priced = $this->priceReservationServices($hall->id, $request->services);
 
                 $reservation->update([
-                    'expert_id' => $request->expert_id,
-                    'expert_name' => Expert::query()->find($request->expert_id)->full_name,
-                    'hall_id' => $request->hall_id,
-                    'hall_name' => Hall::query()->find($request->hall_id)->name,
+                    'expert_id' => $expert->id,
+                    'expert_name' => $expert->full_name,
+                    'hall_id' => $hall->id,
+                    'hall_name' => $hall->name,
                     'start_time' => $request->start_time,
                     'finish_time' => $request->finish_time,
                 ]);
 
                 $reservation->services()->sync($priced['pivot']);
 
-                $this->discountService->recomputeExisting($reservation, (int) $request->hall_id, $priced['baseTotal']);
+                $this->discountService->recomputeExisting($reservation, $hall->id, $priced['baseTotal']);
             });
 
             return $this->successResponse();

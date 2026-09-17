@@ -8,11 +8,13 @@ use App\Expert\Requests\Reservation\UpdateRequest;
 use App\Expert\Resources\ReservationDetailsResource;
 use App\Facades\DataTable\DataTableFacade;
 use App\Http\Controllers\Controller;
+use App\Models\Expert;
 use App\Models\Hall;
 use App\Models\Reservation;
 use App\Models\User;
 use App\Services\DiscountService;
 use App\Traits\ApiResponse;
+use App\Traits\EnsuresReservationAvailability;
 use App\Traits\ResolvesReservationPricing;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -23,6 +25,7 @@ use Illuminate\Support\Facades\DB;
 class ReservationManagementController extends Controller
 {
     use ApiResponse;
+    use EnsuresReservationAvailability;
     use ResolvesReservationPricing;
 
     public function __construct(
@@ -77,6 +80,14 @@ class ReservationManagementController extends Controller
                         'first_name' => $request->first_name,
                         'last_name' => $request->last_name,
                     ]
+                );
+
+                $this->ensureReservationIsAvailable(
+                    $expert,
+                    $hall->id,
+                    $user->id,
+                    Carbon::parse($request->start_time),
+                    Carbon::parse($request->finish_time),
                 );
 
                 $priced = $this->priceReservationServices($hall->id, $request->services);
@@ -135,6 +146,17 @@ class ReservationManagementController extends Controller
 
         try {
             DB::transaction(function () use ($request, $hall, $reservation) {
+                $expert = Expert::query()->findOrFail($reservation->expert_id);
+
+                $this->ensureReservationIsAvailable(
+                    $expert,
+                    $hall->id,
+                    $reservation->user_id,
+                    Carbon::parse($request->start_time),
+                    Carbon::parse($request->finish_time),
+                    $reservation->id,
+                );
+
                 $priced = $this->priceReservationServices($hall->id, $request->services);
 
                 $reservation->update([

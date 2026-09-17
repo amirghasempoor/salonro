@@ -1,5 +1,7 @@
 <?php
 
+use App\Models\ExpertHall;
+use App\Models\WorkingHour;
 use Database\Seeders\ReservationStateSeeder;
 use Database\Seeders\RoleSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -64,4 +66,17 @@ function seedRoles(): void
 function seedReservationStates(): void
 {
     test()->seed(ReservationStateSeeder::class);
+}
+
+function seedFullWeekWorkingHours(ExpertHall $expertHall): void
+{
+    foreach (['sat', 'sun', 'mon', 'tue', 'wed', 'thu', 'fri'] as $day) {
+        WorkingHour::factory()->create([
+            'hourable_id' => $expertHall->id,
+            'hourable_type' => ExpertHall::class,
+            'day' => $day,
+            'from' => '00:00:00',
+            'to' => '23:59:59',
+        ]);
+    }
 }

@@ -1,11 +1,11 @@
 <?php
 
-namespace App\User\Requests\Reservation;
+namespace App\User\Requests\HomePage;
 
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
-class StoreRequest extends FormRequest
+class HallStaffRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -23,12 +23,8 @@ class StoreRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'expert_id' => 'required|exists:experts,id',
-            'hall_id' => 'required|exists:halls,id',
-            'services' => 'required|array|min:1',
-            'services.*.service_id' => 'required|integer|exists:services,id',
-            'start_time' => 'required|date',
-            'finish_time' => 'required|date|after:start_time',
+            'service_ids' => 'required|array|min:1',
+            'service_ids.*' => 'integer|exists:services,id',
         ];
     }
 }

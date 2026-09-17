@@ -8,6 +8,7 @@ use App\Models\Hall;
 use App\Models\Service;
 use App\Traits\ApiResponse;
 use App\User\Requests\HomePage\HallsInAreaRequest;
+use App\User\Requests\HomePage\HallStaffRequest;
 use Illuminate\Http\JsonResponse;
 
 class HomePageController extends Controller
@@ -50,8 +51,16 @@ class HomePageController extends Controller
         return $this->successResponse($services);
     }
 
-    public function hallStaff(Hall $hall): JsonResponse
+    public function hallStaff(HallStaffRequest $request, Hall $hall): JsonResponse
     {
-        return $this->successResponse($hall->experts()->get(['first_name', 'last_name', 'avatar', 'experts.id']));
+        $staff = $hall->experts()
+            ->whereHas(
+                'expertHalls',
+                fn ($expertHall) => $expertHall->where('hall_id', $hall->id)
+                    ->whereHas('services', fn ($service) => $service->whereIn('services.id', $request->service_ids))
+            )
+            ->get(['first_name', 'last_name', 'avatar', 'experts.id']);
+
+        return $this->successResponse($staff);
     }
 }

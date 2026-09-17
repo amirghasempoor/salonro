@@ -3,9 +3,13 @@
 use App\Enums\ReservationStates;
 use App\Models\Discount;
 use App\Models\Expert;
+use App\Models\ExpertHall;
 use App\Models\Hall;
 use App\Models\HallService;
+use App\Models\Reservation;
 use App\Models\Service;
+use App\Models\User;
+use Illuminate\Support\Carbon;
 use Laravel\Sanctum\Sanctum;
 
 beforeEach(function () {
@@ -21,6 +25,12 @@ beforeEach(function () {
         'price' => 200000,
         'duration' => 60,
     ]);
+
+    $this->expertHall = ExpertHall::factory()->create([
+        'expert_id' => $this->owner->id,
+        'hall_id' => $this->hall->id,
+    ]);
+    seedFullWeekWorkingHours($this->expertHall);
 
     $this->payload = [
         'phone_number' => '09120000000',
@@ -120,4 +130,83 @@ test('store auto-applies the best matching discount to the server total', functi
         'discount_amount' => 20000,
         'total_price' => 180000,
     ]);
+});
+
+test('store rejects a finish time that is not after the start time', function () {
+    Sanctum::actingAs($this->owner, ['*'], 'expert');
+
+    $response = $this->postJson(route('expert.reservation.store', [$this->hall->id]), [
+        ...$this->payload,
+        'finish_time' => $this->payload['start_time'],
+    ]);
+
+    $response->assertStatus(422)->assertJsonValidationErrors(['finish_time']);
+    $this->assertDatabaseCount('reservations', 0);
+});
+
+test('store rejects a time outside the expert working hours', function () {
+    $this->expertHall->workingHours()->delete();
+
+    Sanctum::actingAs($this->owner, ['*'], 'expert');
+
+    $response = $this->postJson(route('expert.reservation.store', [$this->hall->id]), $this->payload);
+
+    $response->assertStatus(422);
+    $response->assertJsonPath('message', __('messages.outside_working_hours'));
+    $this->assertDatabaseCount('reservations', 0);
+});
+
+test('store succeeds when the reservation exactly fits the expert working-hours window', function () {
+    $start = Carbon::parse($this->payload['start_time']);
+    $finish = Carbon::parse($this->payload['finish_time']);
+
+    $this->expertHall->workingHours()->delete();
+    $this->expertHall->workingHours()->create([
+        'day' => strtolower($start->format('D')),
+        'from' => $start->format('H:i:s'),
+        'to' => $finish->format('H:i:s'),
+    ]);
+
+    Sanctum::actingAs($this->owner, ['*'], 'expert');
+
+    $response = $this->postJson(route('expert.reservation.store', [$this->hall->id]), $this->payload);
+
+    $response->assertOk();
+});
+
+test('store rejects a time that overlaps the expert\'s existing reservation', function () {
+    Reservation::factory()->create([
+        'expert_id' => $this->owner->id,
+        'hall_id' => $this->hall->id,
+        'state_id' => ReservationStates::Reserve->value,
+        'start_time' => $this->payload['start_time'],
+        'finish_time' => $this->payload['finish_time'],
+    ]);
+
+    Sanctum::actingAs($this->owner, ['*'], 'expert');
+
+    $response = $this->postJson(route('expert.reservation.store', [$this->hall->id]), $this->payload);
+
+    $response->assertStatus(422);
+    $response->assertJsonPath('message', __('messages.reservation_conflict'));
+    $this->assertDatabaseCount('reservations', 1);
+});
+
+test('store rejects a time that overlaps the same user\'s existing reservation at another hall', function () {
+    $existingUser = User::factory()->create(['phone_number' => $this->payload['phone_number']]);
+
+    Reservation::factory()->create([
+        'user_id' => $existingUser->id,
+        'state_id' => ReservationStates::Reserve->value,
+        'start_time' => $this->payload['start_time'],
+        'finish_time' => $this->payload['finish_time'],
+    ]);
+
+    Sanctum::actingAs($this->owner, ['*'], 'expert');
+
+    $response = $this->postJson(route('expert.reservation.store', [$this->hall->id]), $this->payload);
+
+    $response->assertStatus(422);
+    $response->assertJsonPath('message', __('messages.reservation_conflict'));
+    $this->assertDatabaseCount('reservations', 1);
 });
