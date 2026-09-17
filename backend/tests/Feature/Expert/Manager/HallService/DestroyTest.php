@@ -20,14 +20,14 @@ beforeEach(function () {
 });
 
 test('manager should be authenticated to delete a hall service', function () {
-    $this->deleteJson(route('expert.services.destroy', [$this->expertHall->hall_id, $this->hallService->id]))
+    $this->deleteJson(route('expert.services.destroy', $this->hallService->id))
         ->assertUnauthorized();
 });
 
 test('manager should be authenticated with guard expert', function () {
     $expert = Expert::factory()->create();
     Sanctum::actingAs($expert, ['*'], 'user');
-    $this->deleteJson(route('expert.services.destroy', [$this->expertHall->hall_id, $this->hallService->id]))
+    $this->deleteJson(route('expert.services.destroy', $this->hallService->id))
         ->assertUnauthorized();
 });
 
@@ -35,7 +35,7 @@ test('manager can delete a hall service', function () {
     $expert = Expert::query()->find($this->expertHall->expert_id);
     $expert->assignRole('manager');
     Sanctum::actingAs($expert, ['*'], 'expert');
-    $response = $this->delete(route('expert.services.destroy', [$this->expertHall->hall_id, $this->hallService->id]));
+    $response = $this->delete(route('expert.services.destroy', $this->hallService->id));
 
     $response->assertOk();
     $response->assertExactJson([
@@ -52,7 +52,7 @@ test('manager cannot delete a service on a hall they do not own', function () {
     $intruder->assignRole('manager');
     Sanctum::actingAs($intruder, ['*'], 'expert');
 
-    $this->deleteJson(route('expert.services.destroy', [$this->expertHall->hall_id, $this->hallService->id]))
+    $this->deleteJson(route('expert.services.destroy', $this->hallService->id))
         ->assertForbidden();
 });
 
@@ -63,6 +63,6 @@ test('manager cannot delete a service that belongs to another hall', function ()
 
     $foreignService = HallService::factory()->create();
 
-    $this->deleteJson(route('expert.services.destroy', [$this->expertHall->hall_id, $foreignService->id]))
+    $this->deleteJson(route('expert.services.destroy', $foreignService->id))
         ->assertForbidden();
 });

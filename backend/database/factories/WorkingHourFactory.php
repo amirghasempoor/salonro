@@ -21,7 +21,7 @@ class WorkingHourFactory extends Factory
         return [
             'hourable_id' => ExpertHall::factory(),
             'hourable_type' => ExpertHall::class,
-            'day' => fake()->unique()->randomElement(['saturday', 'sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday']),
+            'day' => fake()->unique()->randomElement(['sat', 'sun', 'mon', 'tue', 'wed', 'thu', 'fri']),
             'from' => '09:00:00',
             'to' => '18:00:00',
         ];

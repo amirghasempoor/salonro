@@ -9,4 +9,7 @@ return [
     'otp' => 'your otp token is : ',
     'incorrect_otp' => 'Incorrect OTP code.',
     'expert_not_in_hall' => 'The expert does not work in this hall.',
+    'outside_working_hours' => 'The expert is not available at the selected time.',
+    'reservation_conflict' => 'This time slot conflicts with an existing reservation.',
+    'working_hour_outside_hall_schedule' => 'The specified hours fall outside the hall\'s working hours.',
 ];
