@@ -7,6 +7,7 @@ use App\Models\City;
 use App\Models\Expert;
 use App\Models\Hall;
 use App\Models\Province;
+use Expert\Application\Http\Requests\Manager\Hall\StoreRequest;
 use Expert\Application\Http\Requests\Manager\Hall\UpdateRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -32,7 +33,7 @@ class HallManagementService
     /**
      * @throws Throwable
      */
-    public function store(Request $request): Hall
+    public function store(StoreRequest $request): Hall
     {
         return DB::transaction(function () use ($request) {
             $owner = Auth::guard('expert')->user();
@@ -91,15 +92,6 @@ class HallManagementService
                 'description' => $request->description,
             ]);
         });
-
-        foreach ($request->services as $service) {
-            $services[$service['service_id']] = [
-                'price' => $service['price'],
-                'duration' => $service['duration'],
-            ];
-        }
-
-        $hall->services()->sync($services);
     }
 
     /**

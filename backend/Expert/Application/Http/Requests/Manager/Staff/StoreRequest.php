@@ -23,8 +23,6 @@ class StoreRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'first_name' => 'required|string|max:255',
-            'last_name' => 'required|string|max:255',
             'phone_number' => 'required|string|max:255',
             'services' => 'required|array',
             'services.*' => 'integer|exists:services,id',

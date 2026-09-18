@@ -1,11 +1,11 @@
 <?php
 
-namespace Expert\Application\Http\Requests\Manager\Staff;
+namespace Expert\Application\Http\Requests\Auth;
 
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
-class UpdateRequest extends FormRequest
+class LoginWithOtpRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -23,9 +23,8 @@ class UpdateRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'first_name' => 'required|string|max:255',
-            'last_name' => 'required|string|max:255',
-            'phone_number' => 'required|string|max:255|unique:users,phone_number',
+            'verification_code' => 'required|string',
+            'phone_number' => 'required|string',
         ];
     }
 }

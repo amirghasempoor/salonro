@@ -4,16 +4,17 @@ namespace Expert\Application\Services;
 
 use App\Enums\Roles;
 use App\Facades\File\File;
-use Expert\Application\Http\Requests\ChangePasswordRequest;
-use Expert\Application\Http\Requests\DefineRoleRequest;
-use Expert\Application\Http\Requests\UploadPortfolioRequest;
-use Illuminate\Http\Request;
+use Expert\Application\Http\Requests\Profile\ChangePasswordRequest;
+use Expert\Application\Http\Requests\Profile\CompleteRequest;
+use Expert\Application\Http\Requests\Profile\DefineRoleRequest;
+use Expert\Application\Http\Requests\Profile\UpdateRequest;
+use Expert\Application\Http\Requests\Profile\UploadPortfolioRequest;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 
 class ProfileService
 {
-    public function complete(Request $request): void
+    public function complete(CompleteRequest $request): void
     {
         Auth::guard('expert')->user()->update([
             'first_name' => $request->first_name,
@@ -25,25 +26,26 @@ class ProfileService
         ]);
     }
 
-    public function update(Request $request): void
+    public function update(UpdateRequest $request): void
     {
         $expert = Auth::guard('expert')->user();
+
+        $data = [
+            'first_name' => $request->first_name,
+            'last_name' => $request->last_name,
+            'bio' => $request->bio ?? $expert->bio,
+            'is_active' => $request->is_active,
+        ];
 
         if ($request->avatar) {
             if ($expert->avatar) {
                 File::delete($expert->avatar, true);
             }
 
-            $avatar = File::save($request->avatar, '/experts/avatars');
+            $data['avatar'] = File::save($request->avatar, '/experts/avatars');
         }
 
-        $expert->update([
-            'first_name' => $request->first_name,
-            'last_name' => $request->last_name,
-            'avatar' => $avatar ?? $expert->avatar,
-            'bio' => $request->bio ?? $expert->bio,
-            'is_active' => $request->is_active,
-        ]);
+        $expert->update($data);
     }
 
     public function changePassword(ChangePasswordRequest $request): bool

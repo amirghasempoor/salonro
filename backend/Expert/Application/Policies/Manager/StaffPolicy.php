@@ -17,7 +17,7 @@ class StaffPolicy
         return $manager->id === $hall->owner_id;
     }
 
-    public function update(Expert $manager, Hall $hall, Expert $expert): bool
+    public function toggleActivation(Expert $manager, Hall $hall, Expert $expert): bool
     {
         return $manager->id === $hall->owner_id
             && $hall->experts()->where('experts.id', $expert->id)->exists();

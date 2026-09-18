@@ -84,7 +84,7 @@ Route::prefix('staff')
         Route::get('/{hall}', 'index')->name('index')->can('staff.view', 'hall');
         Route::post('/{hall}', 'store')->name('store')->can('staff.store', 'hall');
         Route::get('/details/{expert}', 'show')->name('show');
-        Route::post('/{hall}/{expert}', 'update')->name('update')->can('staff.update', ['hall', 'expert']);
+        Route::post('/{hall}/{expert}', 'toggleActivation')->name('toggleActivation')->can('staff.toggleActivation', ['hall', 'expert']);
         Route::delete('/{hall}/{expert}', 'destroy')->name('destroy')->can('staff.delete', ['hall', 'expert']);
     });
 

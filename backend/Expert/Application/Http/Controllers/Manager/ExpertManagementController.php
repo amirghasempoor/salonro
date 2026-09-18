@@ -7,7 +7,7 @@ use App\Models\Expert;
 use App\Models\Hall;
 use App\Traits\ApiResponse;
 use Expert\Application\Http\Requests\Manager\Staff\StoreRequest;
-use Expert\Application\Http\Requests\Manager\Staff\UpdateRequest;
+use Expert\Application\Http\Requests\Manager\Staff\ToggleActivationRequest;
 use Expert\Application\Http\Resources\Manager\ExpertDetailsResource;
 use Expert\Application\Services\Manager\StaffManagementService;
 use Illuminate\Http\JsonResponse;
@@ -54,23 +54,23 @@ class ExpertManagementController extends Controller
     }
 
     /**
-     * Update the specified resource in storage.
+     * Toggle the staff member's active status at this hall.
      */
-    public function update(UpdateRequest $request, Hall $hall, Expert $expert): JsonResponse
+    public function toggleActivation(ToggleActivationRequest $request, Hall $hall, Expert $expert): JsonResponse
     {
-        $this->staffManagementService->update($request, $expert);
+        $this->staffManagementService->toggleActivation($request, $hall, $expert);
 
         return $this->successResponse();
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Remove the expert from this hall only.
      *
      * @throws Throwable
      */
     public function destroy(Hall $hall, Expert $expert): JsonResponse
     {
-        $this->staffManagementService->destroy($expert);
+        $this->staffManagementService->destroy($hall, $expert);
 
         return $this->successResponse();
     }

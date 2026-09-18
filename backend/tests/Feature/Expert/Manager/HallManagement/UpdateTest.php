@@ -5,7 +5,6 @@ use App\Models\Expert;
 use App\Models\ExpertHall;
 use App\Models\Hall;
 use App\Models\Province;
-use App\Models\Service;
 use Laravel\Sanctum\Sanctum;
 
 beforeEach(function () {
@@ -220,16 +219,6 @@ test('city id should be existed', function () {
     ]);
 });
 
-test('services is required', function () {
-    $expert = Expert::query()->find($this->expertHall->expert_id);
-    $expert->assignRole('manager');
-    Sanctum::actingAs($expert, ['*'], 'expert');
-    $response = $this->postJson(route('expert.hall.update', [$this->expertHall->hall_id]));
-
-    $response->assertStatus(422);
-    $response->assertJsonValidationErrorFor('services');
-});
-
 test('manager can update a hall', function () {
     $expert = Expert::query()->find($this->expertHall->expert_id);
 
@@ -240,9 +229,6 @@ test('manager can update a hall', function () {
 
     $city = City::factory()->create();
 
-    $service1 = Service::factory()->create();
-    $service2 = Service::factory()->create();
-
     $data = [
         'name' => fake()->name,
         'lat' => (string) fake()->latitude,
@@ -252,18 +238,6 @@ test('manager can update a hall', function () {
         'telephone' => fake()->phoneNumber,
         'province_id' => $province->id,
         'city_id' => $city->id,
-        'services' => [
-            [
-                'service_id' => $service1->id,
-                'duration' => fake()->numberBetween(1, 100),
-                'price' => fake()->numberBetween(1, 100),
-            ],
-            [
-                'service_id' => $service2->id,
-                'duration' => fake()->numberBetween(1, 100),
-                'price' => fake()->numberBetween(1, 100),
-            ],
-        ],
     ];
 
     $response = $this->postJson(route('expert.hall.update', [$this->expertHall->hall_id]), $data);
@@ -283,18 +257,6 @@ test('manager can update a hall', function () {
         'telephone' => $data['telephone'],
         'province_id' => $province->id,
         'city_id' => $city->id,
-    ]);
-
-    $this->assertDatabaseHas('hall_service', [
-        'service_id' => $service1->id,
-        'duration' => $data['services'][0]['duration'],
-        'price' => $data['services'][0]['price'],
-    ]);
-
-    $this->assertDatabaseHas('hall_service', [
-        'service_id' => $service2->id,
-        'duration' => $data['services'][1]['duration'],
-        'price' => $data['services'][1]['price'],
     ]);
 
     $this->assertDatabaseHas('expert_hall', [

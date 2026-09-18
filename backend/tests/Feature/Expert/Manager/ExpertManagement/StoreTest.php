@@ -22,50 +22,6 @@ test('manager should be authenticated with guard expert', function () {
     $this->postJson(route('expert.staff.store', [$this->hall->id]))->assertUnauthorized();
 });
 
-test('first name is required', function () {
-    $this->owner->assignRole('manager');
-    Sanctum::actingAs($this->owner, ['*'], 'expert');
-    $response = $this->postJson(route('expert.staff.store', [$this->hall->id]));
-
-    $response->assertStatus(422);
-    $response->assertJsonValidationErrorFor('first_name');
-});
-
-test('first name should be string', function () {
-    $this->owner->assignRole('manager');
-    Sanctum::actingAs($this->owner, ['*'], 'expert');
-    $response = $this->postJson(route('expert.staff.store', [$this->hall->id]), [
-        'first_name' => fake()->numberBetween(1, 100),
-    ]);
-
-    $response->assertStatus(422);
-    $response->assertJsonValidationErrors([
-        'first_name' => __('validation.string', ['attribute' => 'first name']),
-    ]);
-});
-
-test('last name is required', function () {
-    $this->owner->assignRole('manager');
-    Sanctum::actingAs($this->owner, ['*'], 'expert');
-    $response = $this->postJson(route('expert.staff.store', [$this->hall->id]));
-
-    $response->assertStatus(422);
-    $response->assertJsonValidationErrorFor('last_name');
-});
-
-test('last name should be string', function () {
-    $this->owner->assignRole('manager');
-    Sanctum::actingAs($this->owner, ['*'], 'expert');
-    $response = $this->postJson(route('expert.staff.store', [$this->hall->id]), [
-        'last_name' => fake()->numberBetween(1, 100),
-    ]);
-
-    $response->assertStatus(422);
-    $response->assertJsonValidationErrors([
-        'last_name' => __('validation.string', ['attribute' => 'last name']),
-    ]);
-});
-
 test('phone number is required', function () {
     $this->owner->assignRole('manager');
     Sanctum::actingAs($this->owner, ['*'], 'expert');
@@ -130,8 +86,6 @@ test('manager can store a staff', function () {
     $service = Service::factory()->create();
 
     $data = [
-        'first_name' => fake()->firstName(),
-        'last_name' => fake()->lastName(),
         'phone_number' => '09'.fake()->numerify('#########'),
         'services' => [$service->id],
     ];
@@ -144,8 +98,6 @@ test('manager can store a staff', function () {
     ]);
 
     $this->assertDatabaseHas('experts', [
-        'first_name' => $data['first_name'],
-        'last_name' => $data['last_name'],
         'phone_number' => $data['phone_number'],
     ]);
 

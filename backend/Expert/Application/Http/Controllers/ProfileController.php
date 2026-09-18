@@ -4,12 +4,12 @@ namespace Expert\Application\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Traits\ApiResponse;
-use Expert\Application\Http\Requests\ChangePasswordRequest;
-use Expert\Application\Http\Requests\CompleteRequest;
-use Expert\Application\Http\Requests\DefineRoleRequest;
-use Expert\Application\Http\Requests\DefineWorkingHourRequest;
-use Expert\Application\Http\Requests\UpdateRequest;
-use Expert\Application\Http\Requests\UploadPortfolioRequest;
+use Expert\Application\Http\Requests\Profile\ChangePasswordRequest;
+use Expert\Application\Http\Requests\Profile\CompleteRequest;
+use Expert\Application\Http\Requests\Profile\DefineRoleRequest;
+use Expert\Application\Http\Requests\Profile\DefineWorkingHourRequest;
+use Expert\Application\Http\Requests\Profile\UpdateRequest;
+use Expert\Application\Http\Requests\Profile\UploadPortfolioRequest;
 use Expert\Application\Http\Resources\ExpertProfileResource;
 use Expert\Application\Services\ProfileService;
 use Expert\Domain\Actions\SetWorkingHoursAction;
