@@ -221,9 +221,9 @@ test('omitting the avatar leaves the underlying file in place', function () {
 
     $response->assertOk();
 
-    // update() with no new upload persists the accessor URL back into the column
+    // update() with no new upload leaves the raw column untouched
     expect($this->expert->fresh()->getRawOriginal('avatar'))
-        ->toBe(Storage::disk('public')->url($existingAvatar));
+        ->toBe($existingAvatar);
 
     // the stored file itself is untouched
     Storage::disk('public')->assertExists($existingAvatar);

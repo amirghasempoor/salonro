@@ -51,3 +51,11 @@ test('manager can see the hall job offers', function () {
     ]);
     $response->assertJsonPath('meta.totalRowCount', 2);
 });
+
+test('manager cannot see job offers of a hall they do not own', function () {
+    $intruder = Expert::factory()->create();
+    $intruder->assignRole('manager');
+    Sanctum::actingAs($intruder, ['*'], 'expert');
+
+    $this->getJson(route('expert.job_offers.index', [$this->hall->id]))->assertForbidden();
+});

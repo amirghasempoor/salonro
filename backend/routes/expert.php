@@ -2,14 +2,14 @@
 
 use App\Expert\Controllers\JobOfferController;
 use App\Expert\Controllers\Manager\DiscountManagementController;
-use App\Expert\Controllers\Manager\ExpertManagementController;
-use App\Expert\Controllers\Manager\HallManagementController;
-use App\Expert\Controllers\Manager\JobOfferController as ManagerJobOfferController;
 use App\Expert\Controllers\Manager\ServiceManagementController;
 use App\Expert\Controllers\ReservationManagementController;
-use Expert\Auth\Application\Http\Controllers\AuthController;
-use Expert\Manager\HallService\Application\Http\Controllers\HallServicesManagementController;
-use Expert\Profile\Application\Http\Controllers\ProfileController;
+use Expert\Application\Http\Controllers\AuthController;
+use Expert\Application\Http\Controllers\Manager\ExpertManagementController;
+use Expert\Application\Http\Controllers\Manager\HallManagementController;
+use Expert\Application\Http\Controllers\Manager\HallServicesManagementController;
+use Expert\Application\Http\Controllers\Manager\JobOfferController as ManagerJobOfferController;
+use Expert\Application\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('auth')
@@ -44,10 +44,10 @@ Route::prefix('halls')
     ->group(function () {
         Route::get('/', 'index')->name('index');
         Route::post('/', 'store')->name('store');
-        Route::get('/{hall}', 'show')->name('show')->can('view', 'hall');
-        Route::post('/{hall}', 'update')->name('update')->can('update', 'hall');
-        Route::delete('/{hall}', 'destroy')->name('destroy')->can('delete', 'hall');
-        Route::get('/services/{hall}', 'services')->name('services')->can('view', 'hall');
+        Route::get('/{hall}', 'show')->name('show')->can('hall.view', 'hall');
+        Route::post('/{hall}', 'update')->name('update')->can('hall.update', 'hall');
+        Route::delete('/{hall}', 'destroy')->name('destroy')->can('hall.delete', 'hall');
+        Route::get('/services/{hall}', 'services')->name('services')->can('hall.view', 'hall');
     });
 
 Route::prefix('reservations')
@@ -80,12 +80,12 @@ Route::prefix('staff')
     ->middleware(['auth:expert', 'role:manager|admin'])
     ->controller(ExpertManagementController::class)
     ->group(function () {
-        Route::get('/list/{hall}', 'list')->name('list')->where('hall', '[0-9]+');
-        Route::get('/{hall}', 'index')->name('index');
-        Route::post('/{hall}', 'store')->name('store');
+        Route::get('/list/{hall}', 'staffList')->name('list')->where('hall', '[0-9]+')->can('staff.view', 'hall');
+        Route::get('/{hall}', 'index')->name('index')->can('staff.view', 'hall');
+        Route::post('/{hall}', 'store')->name('store')->can('staff.store', 'hall');
         Route::get('/details/{expert}', 'show')->name('show');
-        Route::post('/{hall}/{expert}', 'update')->name('update');
-        Route::delete('/{hall}/{expert}', 'destroy')->name('destroy');
+        Route::post('/{hall}/{expert}', 'toggleActivation')->name('toggleActivation')->can('staff.toggleActivation', ['hall', 'expert']);
+        Route::delete('/{hall}/{expert}', 'destroy')->name('destroy')->can('staff.delete', ['hall', 'expert']);
     });
 
 Route::prefix('services')
@@ -117,14 +117,14 @@ Route::prefix('job_offers')
     ->middleware(['auth:expert', 'role:manager|admin'])
     ->controller(ManagerJobOfferController::class)
     ->group(function () {
-        Route::get('/{hall}', 'index')->name('index');
-        Route::post('/{hall}', 'store')->name('store');
-        Route::get('/details/{jobOffer}', 'show')->name('show');
-        Route::post('/update/{jobOffer}', 'update')->name('update');
-        Route::delete('/delete/{jobOffer}', 'destroy')->name('destroy');
-        Route::get('/applications/{jobOffer}', 'applications')->name('applications');
-        Route::post('/accept/{application}', 'acceptApplication')->name('acceptApplication');
-        Route::post('/reject/{application}', 'rejectApplication')->name('rejectApplication');
+        Route::get('/{hall}', 'index')->name('index')->can('jobOffer.view', 'hall');
+        Route::post('/{hall}', 'store')->name('store')->can('jobOffer.store', 'hall');
+        Route::get('/details/{jobOffer}', 'show')->name('show')->can('jobOffer.show', 'jobOffer');
+        Route::post('/update/{jobOffer}', 'update')->name('update')->can('jobOffer.update', 'jobOffer');
+        Route::delete('/delete/{jobOffer}', 'destroy')->name('destroy')->can('jobOffer.delete', 'jobOffer');
+        Route::get('/applications/{jobOffer}', 'applications')->name('applications')->can('jobOffer.applications', 'jobOffer');
+        Route::post('/accept/{application}', 'acceptApplication')->name('acceptApplication')->can('jobOffer.acceptApplication', 'application');
+        Route::post('/reject/{application}', 'rejectApplication')->name('rejectApplication')->can('jobOffer.rejectApplication', 'application');
     });
 
 Route::prefix('jobs')

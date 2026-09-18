@@ -12,4 +12,5 @@ return [
     'outside_working_hours' => 'The expert is not available at the selected time.',
     'reservation_conflict' => 'This time slot conflicts with an existing reservation.',
     'working_hour_outside_hall_schedule' => 'The specified hours fall outside the hall\'s working hours.',
+    'job_offer_application_not_pending' => 'This application has already been accepted or rejected.',
 ];
