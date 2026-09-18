@@ -94,3 +94,11 @@ test('manager can store a job offer', function () {
         'description' => $data['description'],
     ]);
 });
+
+test('manager cannot store a job offer on a hall they do not own', function () {
+    $intruder = Expert::factory()->create();
+    $intruder->assignRole('manager');
+    Sanctum::actingAs($intruder, ['*'], 'expert');
+
+    $this->postJson(route('expert.job_offers.store', [$this->hall->id]))->assertForbidden();
+});

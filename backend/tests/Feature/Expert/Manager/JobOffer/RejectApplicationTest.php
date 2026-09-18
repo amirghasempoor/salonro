@@ -36,3 +36,12 @@ test('manager can reject an application', function () {
         'status' => JobOfferApplication::STATUS_REJECTED,
     ]);
 });
+
+test('manager cannot reject an application for a job offer they do not own', function () {
+    $intruder = Expert::factory()->create();
+    $intruder->assignRole('manager');
+    Sanctum::actingAs($intruder, ['*'], 'expert');
+
+    $this->postJson(route('expert.job_offers.rejectApplication', [$this->application->id]))
+        ->assertForbidden();
+});

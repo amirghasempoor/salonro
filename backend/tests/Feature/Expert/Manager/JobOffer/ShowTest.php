@@ -42,3 +42,11 @@ test('manager can see a job offer details', function () {
         ],
     ]);
 });
+
+test('manager cannot see a job offer they do not own', function () {
+    $intruder = Expert::factory()->create();
+    $intruder->assignRole('manager');
+    Sanctum::actingAs($intruder, ['*'], 'expert');
+
+    $this->getJson(route('expert.job_offers.show', [$this->jobOffer->id]))->assertForbidden();
+});

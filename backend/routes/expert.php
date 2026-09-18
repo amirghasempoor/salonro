@@ -2,14 +2,14 @@
 
 use App\Expert\Controllers\JobOfferController;
 use App\Expert\Controllers\Manager\DiscountManagementController;
-use App\Expert\Controllers\Manager\JobOfferController as ManagerJobOfferController;
 use App\Expert\Controllers\Manager\ServiceManagementController;
 use App\Expert\Controllers\ReservationManagementController;
-use Expert\Auth\Application\Http\Controllers\AuthController;
-use Expert\Manager\Hall\Application\Http\Controllers\HallManagementController;
-use Expert\Manager\HallService\Application\Http\Controllers\HallServicesManagementController;
-use Expert\Manager\Staff\Application\Http\Controllers\ExpertManagementController;
-use Expert\Profile\Application\Http\Controllers\ProfileController;
+use Expert\Application\Http\Controllers\AuthController;
+use Expert\Application\Http\Controllers\Manager\ExpertManagementController;
+use Expert\Application\Http\Controllers\Manager\HallManagementController;
+use Expert\Application\Http\Controllers\Manager\HallServicesManagementController;
+use Expert\Application\Http\Controllers\Manager\JobOfferController as ManagerJobOfferController;
+use Expert\Application\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('auth')
@@ -117,14 +117,14 @@ Route::prefix('job_offers')
     ->middleware(['auth:expert', 'role:manager|admin'])
     ->controller(ManagerJobOfferController::class)
     ->group(function () {
-        Route::get('/{hall}', 'index')->name('index');
-        Route::post('/{hall}', 'store')->name('store');
-        Route::get('/details/{jobOffer}', 'show')->name('show');
-        Route::post('/update/{jobOffer}', 'update')->name('update');
-        Route::delete('/delete/{jobOffer}', 'destroy')->name('destroy');
-        Route::get('/applications/{jobOffer}', 'applications')->name('applications');
-        Route::post('/accept/{application}', 'acceptApplication')->name('acceptApplication');
-        Route::post('/reject/{application}', 'rejectApplication')->name('rejectApplication');
+        Route::get('/{hall}', 'index')->name('index')->can('jobOffer.view', 'hall');
+        Route::post('/{hall}', 'store')->name('store')->can('jobOffer.store', 'hall');
+        Route::get('/details/{jobOffer}', 'show')->name('show')->can('jobOffer.show', 'jobOffer');
+        Route::post('/update/{jobOffer}', 'update')->name('update')->can('jobOffer.update', 'jobOffer');
+        Route::delete('/delete/{jobOffer}', 'destroy')->name('destroy')->can('jobOffer.delete', 'jobOffer');
+        Route::get('/applications/{jobOffer}', 'applications')->name('applications')->can('jobOffer.applications', 'jobOffer');
+        Route::post('/accept/{application}', 'acceptApplication')->name('acceptApplication')->can('jobOffer.acceptApplication', 'application');
+        Route::post('/reject/{application}', 'rejectApplication')->name('rejectApplication')->can('jobOffer.rejectApplication', 'application');
     });
 
 Route::prefix('jobs')

@@ -35,3 +35,11 @@ test('manager can delete a job offer', function () {
         'id' => $this->jobOffer->id,
     ]);
 });
+
+test('manager cannot delete a job offer they do not own', function () {
+    $intruder = Expert::factory()->create();
+    $intruder->assignRole('manager');
+    Sanctum::actingAs($intruder, ['*'], 'expert');
+
+    $this->deleteJson(route('expert.job_offers.destroy', [$this->jobOffer->id]))->assertForbidden();
+});

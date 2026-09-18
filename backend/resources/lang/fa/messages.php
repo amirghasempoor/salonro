@@ -12,4 +12,5 @@ return [
     'outside_working_hours' => 'کارشناس در زمان انتخاب‌شده در دسترس نیست.',
     'reservation_conflict' => 'این بازه زمانی با یک رزرو دیگر تداخل دارد.',
     'working_hour_outside_hall_schedule' => 'ساعت وارد شده خارج از ساعت کاری سالن است.',
+    'job_offer_application_not_pending' => 'این درخواست قبلاً پذیرفته یا رد شده است.',
 ];

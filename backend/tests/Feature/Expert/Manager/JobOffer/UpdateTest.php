@@ -86,3 +86,11 @@ test('manager can update a job offer', function () {
         'is_active' => 0,
     ]);
 });
+
+test('manager cannot update a job offer they do not own', function () {
+    $intruder = Expert::factory()->create();
+    $intruder->assignRole('manager');
+    Sanctum::actingAs($intruder, ['*'], 'expert');
+
+    $this->postJson(route('expert.job_offers.update', [$this->jobOffer->id]))->assertForbidden();
+});

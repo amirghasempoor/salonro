@@ -49,3 +49,11 @@ test('manager can see the job offer applications', function () {
         ],
     ]);
 });
+
+test('manager cannot see applications for a job offer they do not own', function () {
+    $intruder = Expert::factory()->create();
+    $intruder->assignRole('manager');
+    Sanctum::actingAs($intruder, ['*'], 'expert');
+
+    $this->getJson(route('expert.job_offers.applications', [$this->jobOffer->id]))->assertForbidden();
+});
