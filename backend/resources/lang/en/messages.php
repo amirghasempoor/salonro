@@ -13,4 +13,6 @@ return [
     'reservation_conflict' => 'This time slot conflicts with an existing reservation.',
     'working_hour_outside_hall_schedule' => 'The specified hours fall outside the hall\'s working hours.',
     'job_offer_application_not_pending' => 'This application has already been accepted or rejected.',
+    'already_applied' => 'You have already applied to this job offer.',
+    'service_not_offered_by_hall' => 'One or more selected services are not offered by this hall.',
 ];

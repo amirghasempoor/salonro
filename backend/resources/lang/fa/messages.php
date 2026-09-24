@@ -13,4 +13,6 @@ return [
     'reservation_conflict' => 'این بازه زمانی با یک رزرو دیگر تداخل دارد.',
     'working_hour_outside_hall_schedule' => 'ساعت وارد شده خارج از ساعت کاری سالن است.',
     'job_offer_application_not_pending' => 'این درخواست قبلاً پذیرفته یا رد شده است.',
+    'already_applied' => 'شما قبلاً برای این آگهی درخواست داده‌اید.',
+    'service_not_offered_by_hall' => 'یک یا چند خدمت انتخاب‌شده در این سالن ارائه نمی‌شود.',
 ];

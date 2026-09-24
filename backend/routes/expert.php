@@ -1,15 +1,15 @@
 <?php
 
-use App\Expert\Controllers\JobOfferController;
-use App\Expert\Controllers\Manager\DiscountManagementController;
-use App\Expert\Controllers\Manager\ServiceManagementController;
-use App\Expert\Controllers\ReservationManagementController;
 use Expert\Application\Http\Controllers\AuthController;
+use Expert\Application\Http\Controllers\JobApplicationController;
+use Expert\Application\Http\Controllers\Manager\DiscountManagementController;
 use Expert\Application\Http\Controllers\Manager\ExpertManagementController;
 use Expert\Application\Http\Controllers\Manager\HallManagementController;
 use Expert\Application\Http\Controllers\Manager\HallServicesManagementController;
 use Expert\Application\Http\Controllers\Manager\JobOfferController as ManagerJobOfferController;
+use Expert\Application\Http\Controllers\Manager\ServiceManagementController;
 use Expert\Application\Http\Controllers\ProfileController;
+use Expert\Application\Http\Controllers\ReservationManagementController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('auth')
@@ -55,11 +55,11 @@ Route::prefix('reservations')
     ->middleware(['auth:expert'])
     ->controller(ReservationManagementController::class)
     ->group(function () {
-        Route::get('/{hall}', 'index')->name('index');
-        Route::post('/{hall}', 'store')->name('store');
-        Route::get('/details/{reservation}', 'show')->name('show');
-        Route::post('/{hall}/{reservation}', 'update')->name('update');
-        Route::delete('/{hall}/{reservation}', 'destroy')->name('destroy');
+        Route::get('/{hall}', 'index')->name('index')->can('reservation.view', 'hall');
+        Route::post('/{hall}', 'store')->name('store')->can('reservation.store', 'hall');
+        Route::get('/details/{reservation}', 'show')->name('show')->can('reservation.show', 'reservation');
+        Route::post('/{hall}/{reservation}', 'update')->name('update')->can('reservation.update', ['hall', 'reservation']);
+        Route::delete('/{hall}/{reservation}', 'destroy')->name('destroy')->can('reservation.delete', ['hall', 'reservation']);
     });
 
 Route::prefix('service_categories')
@@ -105,11 +105,11 @@ Route::prefix('discounts')
     ->middleware(['auth:expert'])
     ->controller(DiscountManagementController::class)
     ->group(function () {
-        Route::get('/{hall}', 'index')->name('index');
-        Route::post('/{hall}', 'store')->name('store');
-        Route::get('/details/{hall}/{discount}', 'show')->name('show');
-        Route::post('/{hall}/{discount}', 'update')->name('update');
-        Route::delete('/{hall}/{discount}', 'destroy')->name('destroy');
+        Route::get('/{hall}', 'index')->name('index')->can('discount.view', 'hall');
+        Route::post('/{hall}', 'store')->name('store')->can('discount.store', 'hall');
+        Route::get('/details/{hall}/{discount}', 'show')->name('show')->can('discount.show', ['hall', 'discount']);
+        Route::post('/{hall}/{discount}', 'update')->name('update')->can('discount.update', ['hall', 'discount']);
+        Route::delete('/{hall}/{discount}', 'destroy')->name('destroy')->can('discount.delete', ['hall', 'discount']);
     });
 
 Route::prefix('job_offers')
@@ -130,7 +130,7 @@ Route::prefix('job_offers')
 Route::prefix('jobs')
     ->name('jobs.')
     ->middleware(['auth:expert', 'role:expert|admin'])
-    ->controller(JobOfferController::class)
+    ->controller(JobApplicationController::class)
     ->group(function () {
         Route::get('/', 'index')->name('index');
         Route::get('/my_applications', 'myApplications')->name('myApplications');

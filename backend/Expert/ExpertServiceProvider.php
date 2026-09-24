@@ -4,12 +4,16 @@ namespace Expert;
 
 use Expert\Application\Persistence\EloquentExpertHallRepository;
 use Expert\Application\Persistence\Manager\EloquentJobOfferApplicationRepository;
+use Expert\Application\Persistence\Reservation\EloquentReservationRepository;
+use Expert\Application\Policies\Manager\DiscountPolicy;
 use Expert\Application\Policies\Manager\HallPolicy;
 use Expert\Application\Policies\Manager\HallServicePolicy;
 use Expert\Application\Policies\Manager\JobOfferPolicy;
 use Expert\Application\Policies\Manager\StaffPolicy;
+use Expert\Application\Policies\ReservationPolicy;
 use Expert\Domain\Repositories\ExpertHallRepositoryInterface;
 use Expert\Domain\Repositories\Manager\JobOfferApplicationRepositoryInterface;
+use Expert\Domain\Repositories\Reservation\ReservationRepositoryInterface;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 
@@ -23,6 +27,7 @@ class ExpertServiceProvider extends ServiceProvider
     public array $bindings = [
         ExpertHallRepositoryInterface::class => EloquentExpertHallRepository::class,
         JobOfferApplicationRepositoryInterface::class => EloquentJobOfferApplicationRepository::class,
+        ReservationRepositoryInterface::class => EloquentReservationRepository::class,
     ];
 
     /**
@@ -47,6 +52,18 @@ class ExpertServiceProvider extends ServiceProvider
         Gate::define('staff.store', [StaffPolicy::class, 'store']);
         Gate::define('staff.toggleActivation', [StaffPolicy::class, 'toggleActivation']);
         Gate::define('staff.delete', [StaffPolicy::class, 'delete']);
+
+        Gate::define('discount.view', [DiscountPolicy::class, 'forHall']);
+        Gate::define('discount.store', [DiscountPolicy::class, 'forHall']);
+        Gate::define('discount.show', [DiscountPolicy::class, 'forDiscount']);
+        Gate::define('discount.update', [DiscountPolicy::class, 'forDiscount']);
+        Gate::define('discount.delete', [DiscountPolicy::class, 'forDiscount']);
+
+        Gate::define('reservation.view', [ReservationPolicy::class, 'forHall']);
+        Gate::define('reservation.store', [ReservationPolicy::class, 'forHall']);
+        Gate::define('reservation.show', [ReservationPolicy::class, 'forReservationHall']);
+        Gate::define('reservation.update', [ReservationPolicy::class, 'forReservation']);
+        Gate::define('reservation.delete', [ReservationPolicy::class, 'forReservation']);
 
         Gate::define('jobOffer.view', [JobOfferPolicy::class, 'forHall']);
         Gate::define('jobOffer.store', [JobOfferPolicy::class, 'forHall']);

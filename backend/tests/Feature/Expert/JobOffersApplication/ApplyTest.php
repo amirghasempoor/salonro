@@ -53,7 +53,7 @@ test('expert cannot apply twice to the same job offer', function () {
     $response->assertStatus(422);
     $response->assertJson([
         'type' => 'logical_exception',
-        'message' => __('messages.already_applied'),
+        'message' => 'You have already applied to this job offer.',
     ]);
 
     $this->assertDatabaseCount('job_offer_applications', 1);

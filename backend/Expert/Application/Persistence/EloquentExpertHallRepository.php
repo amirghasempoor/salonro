@@ -36,4 +36,20 @@ class EloquentExpertHallRepository implements ExpertHallRepositoryInterface
             ->where('day', '=', $day)
             ->first();
     }
+
+    /**
+     * @return array<int, array{day: string, from: string, to: string}>
+     */
+    public function workingHours(int $expertId, int $hallId): array
+    {
+        return Expert::query()->findOrFail($expertId)
+            ->workingHoursAtHall($hallId)
+            ->get(['day', 'from', 'to'])
+            ->map(fn (WorkingHour $window) => [
+                'day' => $window->day,
+                'from' => $window->from,
+                'to' => $window->to,
+            ])
+            ->all();
+    }
 }

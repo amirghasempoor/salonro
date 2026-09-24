@@ -21,20 +21,20 @@ class SmsClass
      */
     public function send($phone_number, $message): void
     {
-        try {
-            $response = SmsIr::bulkSend($this->lineNumber, $message, [$phone_number]);
-
-            SmsHistory::query()->create([
-                'phone_number' => $phone_number,
-                'status' => $response->status,
-                'message' => $response->message,
-                'pack_id' => $response->data['packId'],
-                'message_ids' => json_encode($response->data['messageIds']),
-                'cost' => $response->data['cost'],
-            ]);
-        } catch (Exception $e) {
-            Log::channel('sms')->error($e->getMessage());
-            throw $e;
-        }
+//        try {
+//            $response = SmsIr::bulkSend($this->lineNumber, $message, [$phone_number]);
+//
+//            SmsHistory::query()->create([
+//                'phone_number' => $phone_number,
+//                'status' => $response->status,
+//                'message' => $response->message,
+//                'pack_id' => $response->data['packId'],
+//                'message_ids' => json_encode($response->data['messageIds']),
+//                'cost' => $response->data['cost'],
+//            ]);
+//        } catch (Exception $e) {
+//            Log::channel('sms')->error($e->getMessage());
+//            throw $e;
+//        }
     }
 }
