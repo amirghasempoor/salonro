@@ -13,7 +13,7 @@ use Throwable;
 class ReservationManagementService
 {
     /**
-     * A plain expert sees only their own reservations at the hall; the owner
+     * A plain expert sees only their own reservations in the hall; the owner
      * and other managers see all of them.
      */
     public function index(Request $request, Hall $hall, Expert $expert): array

@@ -3,6 +3,7 @@
 use App\Models\Expert;
 use App\Models\ExpertHall;
 use App\Models\Hall;
+use App\Models\Service;
 use App\Models\WorkingHour;
 use Laravel\Sanctum\Sanctum;
 
@@ -60,4 +61,39 @@ test('profile info includes the expert working hours for each hall', function ()
     $response->assertJsonPath('data.halls.0.working_hours.0.day', 'sat');
     $response->assertJsonPath('data.halls.0.working_hours.0.from', '09:00:00');
     $response->assertJsonPath('data.halls.0.working_hours.0.to', '18:00:00');
+});
+
+test('profile info includes the expert services for each hall', function () {
+    $expert = Expert::factory()->create();
+    $hall = Hall::factory()->create();
+    $otherHall = Hall::factory()->create();
+    $expertHall = ExpertHall::factory()->create(['expert_id' => $expert->id, 'hall_id' => $hall->id]);
+    $otherExpertHall = ExpertHall::factory()->create(['expert_id' => $expert->id, 'hall_id' => $otherHall->id]);
+
+    $atHall = Service::factory()->create();
+    $atOtherHall = Service::factory()->create();
+    $expertHall->services()->attach($atHall->id);
+    $otherExpertHall->services()->attach($atOtherHall->id);
+
+    Sanctum::actingAs($expert, ['*'], 'expert');
+    $response = $this->getJson(route('expert.profile.info'));
+
+    $response->assertOk();
+
+    $halls = collect($response->json('data.halls'))->keyBy('id');
+
+    expect($halls[$hall->id]['services'])->toBe([['id' => $atHall->id, 'name' => $atHall->sub_cat_name]])
+        ->and($halls[$otherHall->id]['services'])->toBe([['id' => $atOtherHall->id, 'name' => $atOtherHall->sub_cat_name]]);
+});
+
+test('profile info returns an empty services list for a hall where the expert has none', function () {
+    $expert = Expert::factory()->create();
+    $hall = Hall::factory()->create();
+    ExpertHall::factory()->create(['expert_id' => $expert->id, 'hall_id' => $hall->id]);
+
+    Sanctum::actingAs($expert, ['*'], 'expert');
+
+    $this->getJson(route('expert.profile.info'))
+        ->assertOk()
+        ->assertJsonPath('data.halls.0.services', []);
 });
