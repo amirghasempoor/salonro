@@ -6,6 +6,7 @@ use App\Providers\FileServiceProvider;
 use App\Providers\OtpServiceProvider;
 use App\Providers\SmsServiceProvider;
 use Expert\ExpertServiceProvider;
+use User\UserServiceProvider;
 
 return [
     AppServiceProvider::class,
@@ -14,4 +15,5 @@ return [
     FileServiceProvider::class,
     SmsServiceProvider::class,
     ExpertServiceProvider::class,
+    UserServiceProvider::class,
 ];

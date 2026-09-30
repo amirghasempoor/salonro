@@ -1,11 +1,11 @@
 <?php
 
-namespace App\User\Requests\HomePage;
+namespace User\Application\Http\Requests\Profile;
 
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
-class HallStaffRequest extends FormRequest
+class ChangeAvatarRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -23,8 +23,7 @@ class HallStaffRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'service_ids' => 'required|array|min:1',
-            'service_ids.*' => 'integer|exists:services,id',
+            'avatar' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ];
     }
 }

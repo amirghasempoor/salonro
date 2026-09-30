@@ -5,9 +5,11 @@ namespace Expert\Application\Http\Controllers\Manager;
 use App\Http\Controllers\Controller;
 use App\Models\Hall;
 use App\Traits\ApiResponse;
+use Expert\Application\Http\Requests\Manager\Hall\DefineWorkingHoursRequest;
 use Expert\Application\Http\Requests\Manager\Hall\StoreRequest;
 use Expert\Application\Http\Requests\Manager\Hall\UpdateRequest;
 use Expert\Application\Services\Manager\HallManagementService;
+use Expert\Domain\Actions\Manager\DefineHallWorkingHoursAction;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Throwable;
@@ -75,5 +77,17 @@ class HallManagementController extends Controller
     public function services(Hall $hall): JsonResponse
     {
         return $this->successResponse($hall->services()->get(['services.id', 'sub_cat_name']));
+    }
+
+    /**
+     * Replace the hall's own weekly working hours.
+     *
+     * @throws Throwable
+     */
+    public function defineWorkingHours(DefineWorkingHoursRequest $request, Hall $hall, DefineHallWorkingHoursAction $action): JsonResponse
+    {
+        $action->execute($hall, $request->toDto());
+
+        return $this->successResponse();
     }
 }

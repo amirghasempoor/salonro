@@ -1,11 +1,11 @@
 <?php
 
-namespace App\User\Requests\Auth;
+namespace User\Application\Http\Requests\HomePage;
 
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
-class LoginWithPasswordRequest extends FormRequest
+class HallStaffRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -23,8 +23,8 @@ class LoginWithPasswordRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'phone_number' => 'required|string',
-            'password' => 'required|string',
+            'service_ids' => 'required|array|min:1',
+            'service_ids.*' => 'integer|exists:services,id',
         ];
     }
 }

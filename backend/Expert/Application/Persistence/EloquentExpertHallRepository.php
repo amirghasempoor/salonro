@@ -52,4 +52,33 @@ class EloquentExpertHallRepository implements ExpertHallRepositoryInterface
             ])
             ->all();
     }
+
+    /**
+     * @return array<int, array{day: string, from: string, to: string}>
+     */
+    public function staffWorkingHours(int $hallId): array
+    {
+        return WorkingHour::query()
+            ->where('hourable_type', '=', ExpertHall::class)
+            ->whereIn('hourable_id', ExpertHall::query()->where('hall_id', '=', $hallId)->select('id'))
+            ->get(['day', 'from', 'to'])
+            ->map(fn (WorkingHour $window) => [
+                'day' => $window->day,
+                'from' => $window->from,
+                'to' => $window->to,
+            ])
+            ->all();
+    }
+
+    /**
+     * @param  array<int, array{day: string, from: string, to: string}>  $workingHours
+     */
+    public function replaceHallWorkingHours(Hall $hall, array $workingHours): void
+    {
+        $hall->workingHours()->delete();
+
+        foreach ($workingHours as $workingHour) {
+            $hall->workingHours()->create($workingHour);
+        }
+    }
 }

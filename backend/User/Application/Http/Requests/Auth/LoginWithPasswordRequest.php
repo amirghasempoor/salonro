@@ -1,11 +1,11 @@
 <?php
 
-namespace App\User\Requests\HomePage;
+namespace User\Application\Http\Requests\Auth;
 
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
-class HallsInAreaRequest extends FormRequest
+class LoginWithPasswordRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -23,8 +23,8 @@ class HallsInAreaRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'lat' => 'required|numeric|between:-90,90',
-            'lng' => 'required|numeric|between:-180,180',
+            'phone_number' => 'required|string',
+            'password' => 'required|string',
         ];
     }
 }

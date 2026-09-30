@@ -48,6 +48,7 @@ Route::prefix('halls')
         Route::post('/{hall}', 'update')->name('update')->can('hall.update', 'hall');
         Route::delete('/{hall}', 'destroy')->name('destroy')->can('hall.delete', 'hall');
         Route::get('/services/{hall}', 'services')->name('services')->can('hall.view', 'hall');
+        Route::post('/working_hours/{hall}', 'defineWorkingHours')->name('defineWorkingHours')->can('hall.update', 'hall');
     });
 
 Route::prefix('reservations')

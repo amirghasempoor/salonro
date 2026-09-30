@@ -1,36 +1,25 @@
 <?php
 
-namespace App\User\Controllers;
+namespace User\Application\Services;
 
 use App\Facades\File\File;
-use App\Http\Controllers\Controller;
 use App\Models\City;
 use App\Models\Province;
-use App\Traits\ApiResponse;
-use App\User\Requests\Profile\ChangeAvatarRequest;
-use App\User\Requests\Profile\ChangePasswordRequest;
-use App\User\Requests\Profile\CompleteRequest;
-use App\User\Requests\Profile\EditRequest;
-use App\User\Resources\UserResource;
-use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\Auth;
+use App\Models\User;
 use Illuminate\Support\Facades\Hash;
+use User\Application\Http\Requests\Profile\ChangeAvatarRequest;
+use User\Application\Http\Requests\Profile\ChangePasswordRequest;
+use User\Application\Http\Requests\Profile\CompleteRequest;
+use User\Application\Http\Requests\Profile\EditRequest;
 
-class ProfileController extends Controller
+class ProfileService
 {
-    use ApiResponse;
-
-    public function info(): JsonResponse
-    {
-        return $this->successResponse(new UserResource(Auth::guard('user')->user()));
-    }
-
-    public function complete(CompleteRequest $request): JsonResponse
+    public function complete(CompleteRequest $request, User $user): void
     {
         $province = Province::query()->find($request->province_id);
         $city = City::query()->find($request->city_id);
 
-        Auth::guard('user')->user()->update([
+        $user->update([
             'first_name' => $request->first_name,
             'last_name' => $request->last_name,
             'avatar' => $request->avatar ? File::save($request->avatar, '/users/avatars') : null,
@@ -44,16 +33,14 @@ class ProfileController extends Controller
             'province_name' => $province->name,
             'city_name' => $city->name,
         ]);
-
-        return $this->successResponse();
     }
 
-    public function edit(EditRequest $request): JsonResponse
+    public function edit(EditRequest $request, User $user): void
     {
         $province = Province::query()->find($request->province_id);
         $city = City::query()->find($request->city_id);
 
-        Auth::guard('user')->user()->update([
+        $user->update([
             'first_name' => $request->first_name,
             'last_name' => $request->last_name,
             'phone_number' => $request->phone_number,
@@ -66,29 +53,26 @@ class ProfileController extends Controller
             'city_name' => $city->name,
             'kyc_status' => 1,
         ]);
-
-        return $this->successResponse();
     }
 
-    public function changePassword(ChangePasswordRequest $request): JsonResponse
+    /**
+     * @return bool false when the current password is incorrect
+     */
+    public function changePassword(ChangePasswordRequest $request, User $user): bool
     {
-        $user = Auth::guard('user')->user();
-
         if (! Hash::check($request->current_password, $user->password)) {
-            return $this->errorResponse(__('messages.incorrect_current_password'));
+            return false;
         }
 
         $user->update([
             'password' => Hash::make($request->new_password),
         ]);
 
-        return $this->successResponse();
+        return true;
     }
 
-    public function changeAvatar(ChangeAvatarRequest $request): JsonResponse
+    public function changeAvatar(ChangeAvatarRequest $request, User $user): void
     {
-        $user = Auth::guard('user')->user();
-
         if ($user->avatar) {
             File::delete($user->avatar, true);
         }
@@ -96,7 +80,5 @@ class ProfileController extends Controller
         $user->update([
             'avatar' => File::save($request->avatar, '/users/avatars'),
         ]);
-
-        return $this->successResponse();
     }
 }
