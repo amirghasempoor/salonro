@@ -1,11 +1,11 @@
 <?php
 
-use App\User\Controllers\AuthController;
 use App\User\Controllers\DiscountController;
-use App\User\Controllers\HomePageController;
-use App\User\Controllers\ProfileController;
 use App\User\Controllers\ReservationManagementController;
 use Illuminate\Support\Facades\Route;
+use User\Application\Http\Controllers\AuthController;
+use User\Application\Http\Controllers\HomePageController;
+use User\Application\Http\Controllers\ProfileController;
 
 Route::prefix('home')
     ->name('home.')

@@ -1,11 +1,11 @@
 <?php
 
-namespace App\User\Requests\Auth;
+namespace User\Application\Http\Requests\Auth;
 
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
-class RegisterRequest extends FormRequest
+class LoginWithOtpRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -23,10 +23,8 @@ class RegisterRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'first_name' => 'required|string|max:255',
-            'last_name' => 'required|string|max:255',
-            'password' => 'required|string|min:8|confirmed',
-            'phone_number' => 'required|string|max:255|unique:users,phone_number',
+            'verification_code' => 'required|string',
+            'phone_number' => 'required|string',
         ];
     }
 }

@@ -15,4 +15,5 @@ return [
     'job_offer_application_not_pending' => 'This application has already been accepted or rejected.',
     'already_applied' => 'You have already applied to this job offer.',
     'service_not_offered_by_hall' => 'One or more selected services are not offered by this hall.',
+    'hall_schedule_below_staff_schedule' => "The hall's new schedule would leave one or more staff members outside their assigned working hours.",
 ];
