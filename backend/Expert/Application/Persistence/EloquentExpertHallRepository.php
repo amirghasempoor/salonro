@@ -21,8 +21,10 @@ class EloquentExpertHallRepository implements ExpertHallRepositoryInterface
     /**
      * @param  array<int, array{day: string, from: string, to: string}>  $workingHours
      */
-    public function addWorkingHours(ExpertHall $expertHall, array $workingHours): void
+    public function replaceWorkingHours(ExpertHall $expertHall, array $workingHours): void
     {
+        $expertHall->workingHours()->delete();
+
         foreach ($workingHours as $workingHour) {
             $expertHall->workingHours()->create($workingHour);
         }

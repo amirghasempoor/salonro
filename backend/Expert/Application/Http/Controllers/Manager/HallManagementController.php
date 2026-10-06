@@ -79,6 +79,11 @@ class HallManagementController extends Controller
         return $this->successResponse($hall->services()->get(['services.id', 'sub_cat_name']));
     }
 
+    public function workingHours(Hall $hall): JsonResponse
+    {
+        return $this->successResponse($hall->workingHours);
+    }
+
     /**
      * Replace the hall's own weekly working hours.
      *

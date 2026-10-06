@@ -4,8 +4,11 @@ use App\Models\Expert;
 use App\Models\ExpertHall;
 use App\Models\Hall;
 use App\Models\Service;
+use App\Models\User;
+use Laravel\Sanctum\Sanctum;
 
 beforeEach(function () {
+    $this->user = User::factory()->create();
     $this->hall = Hall::factory()->create();
     $this->serviceA = Service::factory()->create();
     $this->serviceB = Service::factory()->create();
@@ -25,27 +28,42 @@ beforeEach(function () {
     $expertHallB->services()->attach($this->serviceB->id);
 });
 
-test('the endpoint is public and requires no authentication', function () {
-    $this->getJson(route('user.home.hallStaff', [
+test('the user should be authenticated to see a hall staff', function () {
+    $this->getJson(route('user.reservation.staff', [
         $this->hall->id,
         'service_ids' => [$this->serviceA->id],
-    ]))->assertOk();
+    ]))->assertUnauthorized();
+});
+
+test('the user should be authenticated with guard user', function () {
+    Sanctum::actingAs($this->user, ['*'], 'expert');
+
+    $this->getJson(route('user.reservation.staff', [
+        $this->hall->id,
+        'service_ids' => [$this->serviceA->id],
+    ]))->assertUnauthorized();
 });
 
 test('it requires service_ids', function () {
-    $this->getJson(route('user.home.hallStaff', $this->hall->id))
+    Sanctum::actingAs($this->user, ['*'], 'user');
+
+    $this->getJson(route('user.reservation.staff', $this->hall->id))
         ->assertStatus(422)
         ->assertJsonValidationErrors(['service_ids']);
 });
 
 test('it validates service_ids', function () {
-    $this->getJson(route('user.home.hallStaff', [$this->hall->id, 'service_ids' => ['not-an-id']]))
+    Sanctum::actingAs($this->user, ['*'], 'user');
+
+    $this->getJson(route('user.reservation.staff', [$this->hall->id, 'service_ids' => ['not-an-id']]))
         ->assertStatus(422)
         ->assertJsonValidationErrors(['service_ids.0']);
 });
 
 test('it returns only staff offering the requested service', function () {
-    $response = $this->getJson(route('user.home.hallStaff', [
+    Sanctum::actingAs($this->user, ['*'], 'user');
+
+    $response = $this->getJson(route('user.reservation.staff', [
         $this->hall->id,
         'service_ids' => [$this->serviceA->id],
     ]));
@@ -58,7 +76,9 @@ test('it returns only staff offering the requested service', function () {
 });
 
 test('it returns staff matching any of several requested services', function () {
-    $response = $this->getJson(route('user.home.hallStaff', [
+    Sanctum::actingAs($this->user, ['*'], 'user');
+
+    $response = $this->getJson(route('user.reservation.staff', [
         $this->hall->id,
         'service_ids' => [$this->serviceA->id, $this->serviceB->id],
     ]));

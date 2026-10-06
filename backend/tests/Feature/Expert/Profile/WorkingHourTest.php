@@ -126,3 +126,36 @@ test('expert can set working hours that fit inside the hall schedule', function 
     $response->assertOk();
     $this->assertDatabaseHas('working_hours', ['day' => 'tue', 'from' => '11:00', 'to' => '15:00']);
 });
+
+test('setting working hours again replaces the previous schedule instead of appending to it', function () {
+    $this->postJson(route('expert.profile.defineWorkingHour', 3), [
+        'workingHours' => [
+            ['day' => 'sun', 'from' => '8:00', 'to' => '14:00'],
+        ],
+    ])->assertOk();
+
+    $response = $this->postJson(route('expert.profile.defineWorkingHour', 3), [
+        'workingHours' => [
+            ['day' => 'mon', 'from' => '9:00', 'to' => '13:00'],
+        ],
+    ]);
+
+    $response->assertOk();
+
+    $expertHall = ExpertHall::query()->where('expert_id', $this->expert->id)->where('hall_id', 3)->first();
+    $this->assertDatabaseCount('working_hours', 3); // the hall's 2 own rows + the expert's 1 remaining row
+
+    $this->assertDatabaseMissing('working_hours', [
+        'hourable_type' => ExpertHall::class,
+        'hourable_id' => $expertHall->id,
+        'day' => 'sun',
+    ]);
+
+    $this->assertDatabaseHas('working_hours', [
+        'hourable_type' => ExpertHall::class,
+        'hourable_id' => $expertHall->id,
+        'day' => 'mon',
+        'from' => '9:00',
+        'to' => '13:00',
+    ]);
+});

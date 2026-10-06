@@ -12,9 +12,11 @@ interface ExpertHallRepositoryInterface
     public function findActiveMembership(Expert $expert, int $hallId): ?ExpertHall;
 
     /**
+     * Replace the expert's own weekly schedule in the hall.
+     *
      * @param  array<int, array{day: string, from: string, to: string}>  $workingHours
      */
-    public function addWorkingHours(ExpertHall $expertHall, array $workingHours): void;
+    public function replaceWorkingHours(ExpertHall $expertHall, array $workingHours): void;
 
     public function hallWorkingHourForDay(int $hallId, string $day): ?WorkingHour;
 

@@ -1,9 +1,12 @@
 <?php
 
-namespace App\User\Requests\Reservation;
+namespace User\Application\Http\Requests\Reservation;
 
+use App\Models\User;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Carbon;
+use User\Domain\DTOs\Reservation\BookReservationDto;
 
 class StoreRequest extends FormRequest
 {
@@ -30,5 +33,18 @@ class StoreRequest extends FormRequest
             'start_time' => 'required|date',
             'finish_time' => 'required|date|after:start_time',
         ];
+    }
+
+    public function toDto(User $user): BookReservationDto
+    {
+        return new BookReservationDto(
+            hallId: (int) $this->hall_id,
+            expertId: (int) $this->expert_id,
+            userId: $user->id,
+            userName: $user->first_name.' '.$user->last_name,
+            serviceIds: collect($this->services)->pluck('service_id')->all(),
+            start: Carbon::parse($this->start_time)->toImmutable(),
+            finish: Carbon::parse($this->finish_time)->toImmutable(),
+        );
     }
 }

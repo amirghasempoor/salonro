@@ -168,3 +168,11 @@ test('updating recomputes an already granted discount against the new total', fu
         'total_price' => 180000,
     ]);
 });
+
+test('another customer cannot update someone else\'s reservation', function () {
+    $stranger = User::factory()->create();
+    Sanctum::actingAs($stranger, ['*'], 'user');
+
+    $this->postJson(route('user.reservation.update', $this->reservation->id), $this->payload)
+        ->assertForbidden();
+});

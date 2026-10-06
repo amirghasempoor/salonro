@@ -37,23 +37,4 @@ class HomePageService
     {
         return $this->hallRepository->find($hall->id)->services();
     }
-
-    /**
-     * Staff in the hall who provide at least one of the requested services.
-     *
-     * @param  list<int>  $serviceIds
-     * @return list<array{id: int, first_name: string, last_name: string, avatar: ?string}>
-     */
-    public function hallStaff(Hall $hall, array $serviceIds): array
-    {
-        return array_map(
-            fn (array $member) => [
-                'id' => $member['id'],
-                'first_name' => $member['first_name'],
-                'last_name' => $member['last_name'],
-                'avatar' => $member['avatar'],
-            ],
-            $this->hallRepository->find($hall->id)->staffOffering($serviceIds),
-        );
-    }
 }
