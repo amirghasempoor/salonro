@@ -11,7 +11,7 @@ use Illuminate\Support\Carbon;
 use Throwable;
 
 /**
- * Record an expert's working hours at a hall they are actively assigned to.
+ * Replace an expert's working hours at a hall they are actively assigned to.
  */
 readonly class SetWorkingHoursAction
 {
@@ -34,7 +34,7 @@ readonly class SetWorkingHoursAction
             $this->assertWithinHallSchedule($hallId, $workingHour);
         }
 
-        $this->expertHallRepository->addWorkingHours($expertHall, $dto->workingHours);
+        $this->expertHallRepository->replaceWorkingHours($expertHall, $dto->workingHours);
     }
 
     /**

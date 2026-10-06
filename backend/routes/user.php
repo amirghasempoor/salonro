@@ -1,11 +1,11 @@
 <?php
 
-use App\User\Controllers\AuthController;
 use App\User\Controllers\DiscountController;
-use App\User\Controllers\HomePageController;
-use App\User\Controllers\ProfileController;
-use App\User\Controllers\ReservationManagementController;
 use Illuminate\Support\Facades\Route;
+use User\Application\Http\Controllers\AuthController;
+use User\Application\Http\Controllers\HomePageController;
+use User\Application\Http\Controllers\ProfileController;
+use User\Application\Http\Controllers\ReservationManagementController;
 
 Route::prefix('home')
     ->name('home.')
@@ -14,7 +14,6 @@ Route::prefix('home')
         Route::get('halls', 'hallsInArea')->name('hallsInArea');
         Route::get('halls/{hall}', 'hallDetails')->name('hallDetails');
         Route::get('halls/services/{hall}', 'hallServices')->name('hallServices');
-        Route::get('halls/staff/{hall}', 'hallStaff')->name('hallStaff');
     });
 
 Route::prefix('auth')
@@ -42,14 +41,17 @@ Route::prefix('profile')
 
 Route::prefix('reservations')
     ->name('reservation.')
-    ->middleware('auth:user')
+//    ->middleware('auth:user')
     ->controller(ReservationManagementController::class)
     ->group(function () {
         Route::get('/', 'index')->name('index');
         Route::post('/', 'store')->name('store');
-        Route::get('/{reservation}', 'show')->name('show');
-        Route::post('/{reservation}', 'update')->name('update');
-        Route::delete('/{reservation}', 'destroy')->name('destroy');
+        Route::get('/staff/schedule', 'staffSchedule')->name('staffSchedule');
+        Route::get('/staff/{hall}', 'staff')->name('staff');
+        Route::get('/staff/working_hours/{hall}/{expert}', 'staffWorkingHours')->name('staffWorkingHours');
+        Route::get('/{reservation}', 'show')->name('show')->can('userReservation.show', 'reservation');
+        Route::post('/{reservation}', 'update')->name('update')->can('userReservation.update', 'reservation');
+        Route::delete('/{reservation}', 'destroy')->name('destroy')->can('userReservation.delete', 'reservation');
     });
 
 Route::prefix('discounts')

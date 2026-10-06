@@ -34,7 +34,7 @@ Route::prefix('profile')
         Route::post('change_password', 'changePassword')->name('changePassword');
         Route::post('upload_portfolio', 'uploadPortfolio')->name('uploadPortfolio');
         Route::post('define_role', 'defineRole')->name('defineRole');
-        Route::post('define_working_hour/{hall}', 'defineWorkingHour')->name('defineWorkingHour');
+        Route::post('define_working_hours/{hall}', 'defineWorkingHour')->name('defineWorkingHour');
     });
 
 Route::prefix('halls')
@@ -48,6 +48,8 @@ Route::prefix('halls')
         Route::post('/{hall}', 'update')->name('update')->can('hall.update', 'hall');
         Route::delete('/{hall}', 'destroy')->name('destroy')->can('hall.delete', 'hall');
         Route::get('/services/{hall}', 'services')->name('services')->can('hall.view', 'hall');
+        Route::get('/working_hours/{hall}', 'workingHours')->name('workingHours')->withoutMiddleware(['auth:expert', 'role:manager|admin']);
+        Route::post('/define_working_hours/{hall}', 'defineWorkingHours')->name('defineWorkingHours')->can('hall.update', 'hall');
     });
 
 Route::prefix('reservations')
