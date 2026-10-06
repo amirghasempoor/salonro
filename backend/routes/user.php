@@ -41,7 +41,7 @@ Route::prefix('profile')
 
 Route::prefix('reservations')
     ->name('reservation.')
-//    ->middleware('auth:user')
+    ->middleware('auth:user')
     ->controller(ReservationManagementController::class)
     ->group(function () {
         Route::get('/', 'index')->name('index');
