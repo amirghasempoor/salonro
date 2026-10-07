@@ -1,8 +1,8 @@
 <?php
 
-use App\User\Controllers\DiscountController;
 use Illuminate\Support\Facades\Route;
 use User\Application\Http\Controllers\AuthController;
+use User\Application\Http\Controllers\DiscountManagementController;
 use User\Application\Http\Controllers\HomePageController;
 use User\Application\Http\Controllers\ProfileController;
 use User\Application\Http\Controllers\ReservationManagementController;
@@ -57,9 +57,9 @@ Route::prefix('reservations')
 Route::prefix('discounts')
     ->name('discount.')
     ->middleware('auth:user')
-    ->controller(DiscountController::class)
+    ->controller(DiscountManagementController::class)
     ->group(function () {
         Route::get('/', 'index')->name('index');
         Route::get('/available', 'available')->name('available');
-        Route::get('/{discount}', 'show')->name('show');
+        Route::get('/{discount}', 'show')->name('show')->can('userDiscount.show', 'discount');
     });
