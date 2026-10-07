@@ -15,6 +15,7 @@ use Expert\Application\Services\ProfileService;
 use Expert\Domain\Actions\SetWorkingHoursAction;
 use Expert\Domain\Exceptions\ExpertNotAssignedToHallException;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Throwable;
 
@@ -73,5 +74,10 @@ class ProfileController extends Controller
         $this->profileService->defineRole($request);
 
         return $this->successResponse();
+    }
+
+    public function myHalls(Request $request): JsonResponse
+    {
+        return response()->json($this->profileService->myHalls($request));
     }
 }

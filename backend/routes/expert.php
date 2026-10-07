@@ -34,6 +34,7 @@ Route::prefix('profile')
         Route::post('change_password', 'changePassword')->name('changePassword');
         Route::post('upload_portfolio', 'uploadPortfolio')->name('uploadPortfolio');
         Route::post('define_role', 'defineRole')->name('defineRole');
+        Route::get('my_halls', 'myHalls')->name('myHalls');
         Route::post('define_working_hours/{hall}', 'defineWorkingHour')->name('defineWorkingHour');
     });
 
