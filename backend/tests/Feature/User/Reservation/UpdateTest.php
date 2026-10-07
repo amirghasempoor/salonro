@@ -42,7 +42,7 @@ beforeEach(function () {
     $this->payload = [
         'expert_id' => $this->expert->id,
         'hall_id' => $this->hall->id,
-        'services' => [['service_id' => $this->service->id]],
+        'services' => [$this->service->id],
         'start_time' => now()->addDays(2)->toDateTimeString(),
         'finish_time' => now()->addDays(2)->addHour()->toDateTimeString(),
     ];

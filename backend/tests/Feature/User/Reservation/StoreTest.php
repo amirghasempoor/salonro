@@ -35,7 +35,7 @@ beforeEach(function () {
     $this->payload = [
         'expert_id' => $this->expert->id,
         'hall_id' => $this->hall->id,
-        'services' => [['service_id' => $this->service->id]],
+        'services' => [$this->service->id],
         'start_time' => now()->addDay()->toDateTimeString(),
         'finish_time' => now()->addDay()->addHour()->toDateTimeString(),
     ];
@@ -76,7 +76,7 @@ test('store rejects a service not offered by the hall', function () {
 
     $response = $this->postJson(route('user.reservation.store'), [
         ...$this->payload,
-        'services' => [['service_id' => $foreignService->id]],
+        'services' => [$foreignService->id],
     ]);
 
     $response->assertStatus(422);

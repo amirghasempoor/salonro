@@ -11,8 +11,10 @@ use App\Models\User;
 use App\Models\WorkingHour;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Throwable;
+use User\Domain\Entities\StaffAvailability;
 use User\Domain\Repositories\HallRepositoryInterface;
 
 class ReservationManagementService
@@ -76,14 +78,49 @@ class ReservationManagementService
         return $expert->workingHoursAtHall($hall->id)->get(['day', 'from', 'to']);
     }
 
-    public function staffSchedule(Request $request): Collection
+    /**
+     * The staff member's free slots in the requested period, at this hall:
+     * their recurring working hours there, minus any slot they're already
+     * booked for — at this hall or any other, since a double-booked expert
+     * isn't available anywhere.
+     *
+     * @return list<array{start_time: string, finish_time: string}>
+     */
+    public function staffSchedule(Request $request): array
     {
-        return Reservation::query()
-            ->where('expert_id', '=', $request->expert_id)
+        $expert = Expert::query()->findOrFail($request->expert_id);
+        $from = Carbon::parse($request->from_date);
+        $to = Carbon::parse($request->to_date);
+
+        $workingHours = $expert->workingHoursAtHall($request->hall_id)
+            ->get(['day', 'from', 'to'])
+            ->map(fn (WorkingHour $window) => [
+                'day' => $window->day,
+                'from' => $window->from,
+                'to' => $window->to,
+            ])
+            ->all();
+
+        $busySlots = Reservation::query()
+            ->where('expert_id', '=', $expert->id)
             ->where('state_id', '!=', ReservationStates::Cancel->value)
-            ->where('start_time', '<', $request->to_date)
-            ->where('finish_time', '>', $request->from_date)
-            ->orderBy('start_time')
-            ->get(['start_time', 'finish_time']);
+            ->where('start_time', '<', $to)
+            ->where('finish_time', '>', $from)
+            ->get(['start_time', 'finish_time'])
+            ->map(fn (Reservation $reservation) => [
+                'start' => $reservation->start_time,
+                'finish' => $reservation->finish_time,
+            ])
+            ->all();
+
+        $availability = new StaffAvailability($workingHours);
+
+        return array_map(
+            fn (array $slot) => [
+                'start_time' => $slot['start']->format('Y-m-d H:i:s'),
+                'finish_time' => $slot['finish']->format('Y-m-d H:i:s'),
+            ],
+            $availability->freeSlots($from, $to, $busySlots),
+        );
     }
 }

@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 use User\Application\Persistence\EloquentHallRepository;
 use User\Application\Persistence\Reservation\EloquentReservationRepository;
+use User\Application\Policies\DiscountPolicy;
 use User\Application\Policies\ReservationPolicy;
 use User\Domain\Repositories\HallRepositoryInterface;
 use User\Domain\Repositories\Reservation\ReservationRepositoryInterface;
@@ -24,5 +25,7 @@ class UserServiceProvider extends ServiceProvider
         Gate::define('userReservation.show', [ReservationPolicy::class, 'owns']);
         Gate::define('userReservation.update', [ReservationPolicy::class, 'owns']);
         Gate::define('userReservation.delete', [ReservationPolicy::class, 'owns']);
+
+        Gate::define('userDiscount.show', [DiscountPolicy::class, 'view']);
     }
 }

@@ -29,7 +29,7 @@ class StoreRequest extends FormRequest
             'expert_id' => 'required|exists:experts,id',
             'hall_id' => 'required|exists:halls,id',
             'services' => 'required|array|min:1',
-            'services.*.service_id' => 'required|integer|exists:services,id',
+            'services.*' => 'required|integer|exists:services,id',
             'start_time' => 'required|date',
             'finish_time' => 'required|date|after:start_time',
         ];
@@ -42,7 +42,7 @@ class StoreRequest extends FormRequest
             expertId: (int) $this->expert_id,
             userId: $user->id,
             userName: $user->first_name.' '.$user->last_name,
-            serviceIds: collect($this->services)->pluck('service_id')->all(),
+            serviceIds: collect($this->services)->all(),
             start: Carbon::parse($this->start_time)->toImmutable(),
             finish: Carbon::parse($this->finish_time)->toImmutable(),
         );
