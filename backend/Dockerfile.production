@@ -19,46 +19,41 @@ COPY . .
 RUN composer dump-autoload --optimize --classmap-authoritative --no-dev --no-scripts
 
 # ---------------------------------------------------------------------------
-# Stage 2: Compile PHP extensions with build tooling, produce artifacts only
+# Stage 2: FrankenPHP runtime - a single Caddy-based process that replaces
+# the old nginx + php-fpm pair.
+#
+# FrankenPHP embeds a thread-safe (ZTS) PHP build inside Caddy, so extensions
+# can't be reused from the regular php:*-fpm-alpine image (that build is
+# NTS) - they're compiled here, against this image's own PHP.
+#
+# Verify this tag still exists for your PHP version before building:
+# https://hub.docker.com/r/dunglas/frankenphp/tags
 # ---------------------------------------------------------------------------
-FROM php:8.5.3-fpm-alpine3.23 AS extensions
+FROM dunglas/frankenphp:1-php8.5-alpine AS application
 
 RUN apk add --no-cache \
-    libpng-dev \
-    libjpeg-turbo-dev \
-    freetype-dev \
-    libwebp-dev \
-    libxml2-dev \
-    libzip-dev \
-    libpq-dev \
+        bash \
+        curl \
+        libpng \
+        libjpeg-turbo \
+        freetype \
+        libwebp \
+        libxml2 \
+        libzip \
+        libpq \
+    && apk add --no-cache --virtual .build-deps \
+        $PHPIZE_DEPS \
+        libpng-dev \
+        libjpeg-turbo-dev \
+        freetype-dev \
+        libwebp-dev \
+        libxml2-dev \
+        libzip-dev \
+        libpq-dev \
     && docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp \
-    && docker-php-ext-install pdo_pgsql gd zip \
-    && docker-php-ext-install pcntl \
-    && docker-php-ext-install opcache
+    && docker-php-ext-install pdo_pgsql gd zip pcntl \
+    && apk del .build-deps
 
-# ---------------------------------------------------------------------------
-# Stage 3: Slim runtime image - runtime libs only, no build tools
-# ---------------------------------------------------------------------------
-FROM php:8.5.3-fpm-alpine3.23 AS application
-
-RUN apk add --no-cache \
-    bash \
-    curl \
-    libpng \
-    libjpeg-turbo \
-    freetype \
-    libwebp \
-    libxml2 \
-    libzip \
-    libpq
-
-COPY --from=extensions /usr/local/lib/php/extensions/ /usr/local/lib/php/extensions/
-COPY --from=extensions /usr/local/etc/php/conf.d/docker-php-ext-gd.ini \
-     /usr/local/etc/php/conf.d/docker-php-ext-pdo_pgsql.ini \
-     /usr/local/etc/php/conf.d/docker-php-ext-zip.ini \
-     /usr/local/etc/php/conf.d/docker-php-ext-opcache.ini \
-     /usr/local/etc/php/conf.d/docker-php-ext-pcntl.ini \
-     /usr/local/etc/php/conf.d/
 COPY docker/opcache-production.ini /usr/local/etc/php/conf.d/zz-opcache.ini
 
 WORKDIR /var/www/salonro
@@ -71,12 +66,10 @@ RUN chmod +x /usr/local/bin/entrypoint.sh \
     && find storage bootstrap/cache -type d -exec chmod 775 {} + \
     && find storage bootstrap/cache -type f -exec chmod 664 {} +
 
-USER www-data
-
-EXPOSE 9000
+EXPOSE 80 443 443/udp
 
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
-    CMD php -r "exit(@fsockopen('127.0.0.1',9000,\$errno,\$errstr,1)?0:1);"
+    CMD curl -sS -H "Host: api.salonro.ir" -o /dev/null http://127.0.0.1/ || exit 1
 
 ENTRYPOINT ["entrypoint.sh"]
-CMD ["php-fpm"]
+CMD ["frankenphp", "run", "--config", "/etc/caddy/Caddyfile"]

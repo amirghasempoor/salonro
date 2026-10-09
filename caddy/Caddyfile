@@ -1,0 +1,21 @@
+# Dev: plain HTTP, no ACME/TLS (":80" as the site address disables Caddy's
+# automatic HTTPS, same as nginx/salonro.conf's `server_name _;` catch-all).
+:80 {
+	root * /var/www/salonro/public
+	encode gzip
+
+	route {
+		@denyDotfiles {
+			path_regexp /\.
+			not path */.well-known/*
+		}
+		respond @denyDotfiles 404
+
+		@static {
+			path *.css *.js *.jpg *.jpeg *.gif *.png *.webp *.svg *.ico *.woff *.woff2 *.ttf *.eot
+		}
+		header @static Cache-Control "public, max-age=604800, immutable"
+
+		php_server
+	}
+}
