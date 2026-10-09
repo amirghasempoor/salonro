@@ -30,9 +30,10 @@ class ReservationManagementService
             $query,
             $request,
             allowedFilters: ['*'],
+            allowedRelations: ['services:id,sub_cat_name'],
             allowedSortings: ['*'],
             allowedSelects: [
-                'id', 'user_name', 'state_name', 'start_time', 'finish_time',
+                'id', 'hall_name', 'state_name', 'start_time', 'finish_time',
             ]
         );
     }
