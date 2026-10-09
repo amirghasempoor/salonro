@@ -20,6 +20,7 @@ class DatabaseSeeder extends Seeder
             ServiceSeeder::class,
             ProfessionSeeder::class,
             RoleSeeder::class,
+            ReservationStateSeeder::class,
         ]);
     }
 }

@@ -3,12 +3,14 @@
 namespace Expert\Application\Services;
 
 use App\Enums\Roles;
+use App\Facades\DataTable\DataTableFacade;
 use App\Facades\File\File;
 use Expert\Application\Http\Requests\Profile\ChangePasswordRequest;
 use Expert\Application\Http\Requests\Profile\CompleteRequest;
 use Expert\Application\Http\Requests\Profile\DefineRoleRequest;
 use Expert\Application\Http\Requests\Profile\UpdateRequest;
 use Expert\Application\Http\Requests\Profile\UploadPortfolioRequest;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 
@@ -77,5 +79,20 @@ class ProfileService
     public function defineRole(DefineRoleRequest $request): void
     {
         Auth::guard('expert')->user()->assignRole(Roles::labels($request->role));
+    }
+
+    public function myHalls(Request $request): array
+    {
+        $query = Auth::guard('expert')
+            ->user()
+            ->halls()
+            ->select(['halls.id', 'owner_name', 'name', 'lat', 'lng', 'address']);
+
+        return DataTableFacade::run(
+            $query,
+            $request,
+            allowedFilters: ['*'],
+            allowedSortings: ['*'],
+        );
     }
 }

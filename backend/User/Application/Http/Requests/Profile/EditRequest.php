@@ -4,6 +4,7 @@ namespace User\Application\Http\Requests\Profile;
 
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class EditRequest extends FormRequest
 {
@@ -25,7 +26,10 @@ class EditRequest extends FormRequest
         return [
             'first_name' => 'required|string',
             'last_name' => 'required|string',
-            'phone_number' => 'required|regex:/^09\d{9}$/|numeric|digits:11|unique:users,phone_number',
+            'phone_number' => [
+                'required', 'regex:/^09\d{9}$/', 'numeric', 'digits:11',
+                Rule::unique('users', 'phone_number')->ignore($this->user('user')?->id),
+            ],
             'email' => 'required|string|email|unique:users,email',
             'gender' => 'required|in:0,1',
             'birth_date' => 'required|date',

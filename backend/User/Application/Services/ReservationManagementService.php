@@ -7,6 +7,7 @@ use App\Facades\DataTable\DataTableFacade;
 use App\Models\Expert;
 use App\Models\Hall;
 use App\Models\Reservation;
+use App\Models\Service;
 use App\Models\User;
 use App\Models\WorkingHour;
 use Illuminate\Database\Eloquent\Collection;
@@ -29,9 +30,10 @@ class ReservationManagementService
             $query,
             $request,
             allowedFilters: ['*'],
+            allowedRelations: ['services:id,sub_cat_name'],
             allowedSortings: ['*'],
             allowedSelects: [
-                'id', 'user_name', 'state_name', 'start_time', 'finish_time',
+                'id', 'hall_name', 'state_name', 'start_time', 'finish_time',
             ]
         );
     }
@@ -49,21 +51,29 @@ class ReservationManagementService
 
     /**
      * Staff at the hall who provide at least one of the requested services —
-     * so a customer booking can see who they're able to choose from.
+     * so a customer booking can see who they're able to choose from, and
+     * which of the requested services each of them can actually perform.
      *
      * @param  list<int>  $serviceIds
-     * @return list<array{id: int, first_name: string, last_name: string, avatar: ?string}>
+     * @return list<array{id: int, first_name: string, last_name: string, avatar: ?string, services: list<string>}>
      */
     public function staff(Hall $hall, array $serviceIds): array
     {
+        $hallEntity = $this->hallRepository->find($hall->id);
+        $serviceNames = Service::query()->whereIn('id', $serviceIds)->pluck('sub_cat_name', 'id');
+
         return array_map(
             fn (array $member) => [
                 'id' => $member['id'],
                 'first_name' => $member['first_name'],
                 'last_name' => $member['last_name'],
                 'avatar' => $member['avatar'],
+                'services' => array_values(array_map(
+                    fn (int $serviceId) => $serviceNames[$serviceId],
+                    array_intersect($member['service_ids'], $serviceIds),
+                )),
             ],
-            $this->hallRepository->find($hall->id)->staffOffering($serviceIds),
+            $hallEntity->staffOffering($serviceIds),
         );
     }
 

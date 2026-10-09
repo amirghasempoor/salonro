@@ -73,6 +73,7 @@ test('it returns only staff offering the requested service', function () {
 
     expect($data)->toHaveCount(1);
     expect($data[0]['id'])->toBe($this->expertWithA->id);
+    expect($data[0]['services'])->toBe([$this->serviceA->sub_cat_name]);
 });
 
 test('it returns staff matching any of several requested services', function () {
@@ -85,4 +86,26 @@ test('it returns staff matching any of several requested services', function () 
 
     $response->assertOk();
     expect($response->json('data'))->toHaveCount(2);
+});
+
+test('services only lists the requested services a staff member actually offers', function () {
+    $thirdService = Service::factory()->create();
+    ExpertHall::query()
+        ->where('expert_id', $this->expertWithA->id)
+        ->first()
+        ->services()
+        ->attach($thirdService->id);
+
+    Sanctum::actingAs($this->user, ['*'], 'user');
+
+    $response = $this->getJson(route('user.reservation.staff', [
+        $this->hall->id,
+        'service_ids' => [$this->serviceA->id],
+    ]));
+
+    $response->assertOk();
+    $data = $response->json('data');
+
+    expect($data)->toHaveCount(1);
+    expect($data[0]['services'])->toBe([$this->serviceA->sub_cat_name]);
 });

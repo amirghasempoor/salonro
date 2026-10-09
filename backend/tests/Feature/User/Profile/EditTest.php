@@ -65,14 +65,24 @@ test('phone number should match the expected format', function () {
 });
 
 test('phone number should be unique among users', function () {
+    $otherUser = User::factory()->create();
+
     $response = $this->postJson(route('user.profile.edit'), [
-        'phone_number' => $this->user->phone_number,
+        'phone_number' => $otherUser->phone_number,
     ]);
 
     $response->assertStatus(422);
     $response->assertJsonValidationErrors([
         'phone_number' => __('validation.unique', ['attribute' => 'phone number']),
     ]);
+});
+
+test('phone number uniqueness ignores the user own current phone number', function () {
+    $response = $this->postJson(route('user.profile.edit'), [
+        'phone_number' => $this->user->phone_number,
+    ]);
+
+    $response->assertJsonMissingValidationErrors(['phone_number']);
 });
 
 test('email is required', function () {

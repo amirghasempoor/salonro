@@ -1,0 +1,51 @@
+{
+	# Contact email for Let's Encrypt (Caddy handles ACME + renewal automatically
+	# for every domain listed as a site address below - no certbot needed).
+	email admin@salonro.ir
+}
+
+# api.salonro.ir -> Laravel, served directly by FrankenPHP (replaces the old
+# nginx + php-fpm pair).
+api.salonro.ir {
+	root * /var/www/salonro/public
+	encode gzip
+
+	route {
+		request_body {
+			max_size 20MB
+		}
+
+		# Same as nginx's `location ~ /\.(?!well-known).* { deny all; }`.
+		# (Go's RE2 regex engine has no negative lookahead, so this is done
+		# as "path contains /." AND NOT "path is under .well-known".)
+		@denyDotfiles {
+			path_regexp /\.
+			not path */.well-known/*
+		}
+		respond @denyDotfiles 404
+
+		@static {
+			path *.css *.js *.jpg *.jpeg *.gif *.png *.webp *.svg *.ico *.woff *.woff2 *.ttf *.eot
+		}
+		header @static Cache-Control "public, max-age=604800, immutable"
+
+		# Serves public/ and routes everything else through index.php -
+		# the FrankenPHP equivalent of nginx's try_files + fastcgi_pass.
+		php_server
+	}
+}
+
+# salonro.ir / www.salonro.ir -> the frontend container.
+# Assumes a docker-compose service named "frontend", joined to the same
+# "salonro" network as this container, listening on port 3016.
+salonro.ir, www.salonro.ir {
+	encode gzip
+	reverse_proxy frontend:3016
+}
+
+# Reject anything that doesn't match a known host (plain IP access, stale
+# DNS, cache-probing bots) instead of serving it through one of the sites
+# above. Caddy's nearest equivalent to nginx's `return 444`.
+:80 {
+	abort
+}
