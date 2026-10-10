@@ -30,6 +30,7 @@
         "psr-4": {
             "App\\": "app/",
             "Expert\\": "Expert/",
+            "Shared\\": "Shared/",
             "User\\": "User/",
             "Database\\Factories\\": "database/factories/",
             "Database\\Seeders\\": "database/seeders/"

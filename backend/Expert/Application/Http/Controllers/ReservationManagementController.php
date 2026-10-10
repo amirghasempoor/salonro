@@ -5,7 +5,6 @@ namespace Expert\Application\Http\Controllers;
 use App\Http\Controllers\Controller;
 use App\Models\Hall;
 use App\Models\Reservation;
-use App\Traits\ApiResponse;
 use Expert\Application\Http\Requests\Reservation\StoreRequest;
 use Expert\Application\Http\Requests\Reservation\UpdateRequest;
 use Expert\Application\Http\Resources\ReservationDetailsResource;
@@ -15,6 +14,7 @@ use Expert\Domain\Actions\Reservation\RescheduleReservationAction;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Shared\Traits\ApiResponse;
 use Throwable;
 
 class ReservationManagementController extends Controller

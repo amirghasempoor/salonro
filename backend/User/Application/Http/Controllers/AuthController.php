@@ -3,9 +3,9 @@
 namespace User\Application\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use App\Traits\ApiResponse;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
+use Shared\Traits\ApiResponse;
 use Throwable;
 use User\Application\Http\Requests\Auth\LoginWithOtpRequest;
 use User\Application\Http\Requests\Auth\LoginWithPasswordRequest;

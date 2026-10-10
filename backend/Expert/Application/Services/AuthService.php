@@ -3,8 +3,6 @@
 namespace Expert\Application\Services;
 
 use App\Enums\Roles;
-use App\Facades\File\File;
-use App\Facades\Otp\OtpFacade;
 use App\Models\Expert;
 use Expert\Application\Http\Requests\Auth\LoginWithOtpRequest;
 use Expert\Application\Http\Requests\Auth\LoginWithPasswordRequest;
@@ -13,6 +11,8 @@ use Expert\Application\Http\Requests\Auth\SendOtpRequest;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Shared\Facades\File\File;
+use Shared\Facades\Otp\OtpFacade;
 use Throwable;
 
 class AuthService

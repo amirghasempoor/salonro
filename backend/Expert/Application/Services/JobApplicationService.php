@@ -2,12 +2,12 @@
 
 namespace Expert\Application\Services;
 
-use App\Facades\DataTable\DataTableFacade;
 use App\Models\Expert;
 use App\Models\JobOffer;
 use App\Models\JobOfferApplication;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
+use Shared\Facades\DataTable\DataTableFacade;
 
 class JobApplicationService
 {

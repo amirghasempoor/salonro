@@ -2,8 +2,8 @@
 
 namespace App\Providers;
 
-use App\Facades\File\File;
 use Illuminate\Support\ServiceProvider;
+use Shared\Facades\File\File;
 
 class FileServiceProvider extends ServiceProvider
 {

@@ -3,7 +3,6 @@
 namespace Expert\Application\Services\Manager;
 
 use App\Enums\Roles;
-use App\Facades\DataTable\DataTableFacade;
 use App\Models\Expert;
 use App\Models\ExpertHall;
 use App\Models\Hall;
@@ -11,6 +10,7 @@ use Expert\Application\Http\Requests\Manager\Staff\StoreRequest;
 use Expert\Application\Http\Requests\Manager\Staff\ToggleActivationRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Shared\Facades\DataTable\DataTableFacade;
 use Throwable;
 
 class StaffManagementService

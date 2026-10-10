@@ -2,11 +2,11 @@
 
 namespace User\Application\Services;
 
-use App\Facades\File\File;
 use App\Models\City;
 use App\Models\Province;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
+use Shared\Facades\File\File;
 use User\Application\Http\Requests\Profile\ChangeAvatarRequest;
 use User\Application\Http\Requests\Profile\ChangePasswordRequest;
 use User\Application\Http\Requests\Profile\CompleteRequest;

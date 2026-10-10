@@ -1,6 +1,6 @@
 <?php
 
-use App\Facades\Otp\OtpFacade;
+use Shared\Facades\Otp\OtpFacade;
 
 test('phone number is required', function () {
     $response = $this->postJson(route('expert.auth.sendOtp'));

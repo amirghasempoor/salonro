@@ -2,7 +2,6 @@
 
 namespace Expert\Application\Services\Manager;
 
-use App\Facades\DataTable\DataTableFacade;
 use App\Models\Hall;
 use App\Models\JobOffer;
 use App\Models\JobOfferApplication;
@@ -11,6 +10,7 @@ use Expert\Application\Http\Requests\Manager\JobOffer\StoreRequest;
 use Expert\Application\Http\Requests\Manager\JobOffer\UpdateRequest;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
+use Shared\Facades\DataTable\DataTableFacade;
 
 class JobOfferManagementService
 {

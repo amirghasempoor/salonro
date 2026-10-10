@@ -2,8 +2,8 @@
 
 namespace App\Providers;
 
-use App\Facades\Sms\SmsClass;
 use Illuminate\Support\ServiceProvider;
+use Shared\Facades\Sms\SmsClass;
 
 class SmsServiceProvider extends ServiceProvider
 {

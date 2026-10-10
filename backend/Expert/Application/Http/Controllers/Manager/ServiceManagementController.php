@@ -4,12 +4,12 @@ namespace Expert\Application\Http\Controllers\Manager;
 
 use App\Http\Controllers\Controller;
 use App\Models\Service;
-use App\Traits\ApiResponse;
 use Expert\Application\Http\Requests\Manager\ServiceCategory\StoreRequest;
 use Expert\Application\Http\Requests\Manager\ServiceCategory\UpdateRequest;
 use Expert\Application\Services\Manager\ServiceManagementService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Shared\Traits\ApiResponse;
 use Throwable;
 
 class ServiceManagementController extends Controller

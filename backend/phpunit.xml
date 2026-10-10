@@ -16,6 +16,7 @@
         <include>
             <directory>app</directory>
             <directory>Expert</directory>
+            <directory>Shared</directory>
         </include>
     </source>
     <php>

@@ -3,8 +3,6 @@
 namespace Expert\Application\Services;
 
 use App\Enums\Roles;
-use App\Facades\DataTable\DataTableFacade;
-use App\Facades\File\File;
 use Expert\Application\Http\Requests\Profile\ChangePasswordRequest;
 use Expert\Application\Http\Requests\Profile\CompleteRequest;
 use Expert\Application\Http\Requests\Profile\DefineRoleRequest;
@@ -13,6 +11,8 @@ use Expert\Application\Http\Requests\Profile\UploadPortfolioRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Shared\Facades\DataTable\DataTableFacade;
+use Shared\Facades\File\File;
 
 class ProfileService
 {

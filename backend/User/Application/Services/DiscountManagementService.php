@@ -5,9 +5,9 @@ namespace User\Application\Services;
 use App\Enums\DiscountType;
 use App\Models\Discount;
 use App\Models\User;
-use App\Services\DiscountService;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
+use Shared\Services\DiscountService;
 
 class DiscountManagementService
 {

@@ -2,7 +2,6 @@
 
 namespace Expert\Application\Services\Manager;
 
-use App\Facades\DataTable\DataTableFacade;
 use App\Models\City;
 use App\Models\Expert;
 use App\Models\Hall;
@@ -12,6 +11,7 @@ use Expert\Application\Http\Requests\Manager\Hall\UpdateRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Shared\Facades\DataTable\DataTableFacade;
 use Throwable;
 
 class HallManagementService

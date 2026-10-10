@@ -4,7 +4,6 @@ namespace Expert\Application\Http\Controllers\Manager;
 
 use App\Http\Controllers\Controller;
 use App\Models\Hall;
-use App\Traits\ApiResponse;
 use Expert\Application\Http\Requests\Manager\Hall\DefineWorkingHoursRequest;
 use Expert\Application\Http\Requests\Manager\Hall\StoreRequest;
 use Expert\Application\Http\Requests\Manager\Hall\UpdateRequest;
@@ -12,6 +11,7 @@ use Expert\Application\Services\Manager\HallManagementService;
 use Expert\Domain\Actions\Manager\DefineHallWorkingHoursAction;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Shared\Traits\ApiResponse;
 use Throwable;
 
 class HallManagementController extends Controller

@@ -2,12 +2,12 @@
 
 namespace Expert\Application\Services;
 
-use App\Facades\DataTable\DataTableFacade;
 use App\Models\Expert;
 use App\Models\Hall;
 use App\Models\Reservation;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Shared\Facades\DataTable\DataTableFacade;
 use Throwable;
 
 class ReservationManagementService

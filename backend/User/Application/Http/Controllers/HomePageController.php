@@ -4,8 +4,8 @@ namespace User\Application\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Models\Hall;
-use App\Traits\ApiResponse;
 use Illuminate\Http\JsonResponse;
+use Shared\Traits\ApiResponse;
 use User\Application\Http\Requests\HomePage\HallsInAreaRequest;
 use User\Application\Services\HomePageService;
 

@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\City;
-use App\Traits\ApiResponse;
+use Shared\Traits\ApiResponse;
 
 class CityController extends Controller
 {

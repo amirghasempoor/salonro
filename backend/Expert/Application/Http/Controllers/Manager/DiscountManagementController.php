@@ -5,7 +5,6 @@ namespace Expert\Application\Http\Controllers\Manager;
 use App\Http\Controllers\Controller;
 use App\Models\Discount;
 use App\Models\Hall;
-use App\Traits\ApiResponse;
 use Expert\Application\Http\Requests\Manager\Discount\StoreRequest;
 use Expert\Application\Http\Requests\Manager\Discount\UpdateRequest;
 use Expert\Application\Http\Resources\Manager\DiscountDetailsResource;
@@ -13,6 +12,7 @@ use Expert\Application\Services\Manager\DiscountManagementService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Shared\Traits\ApiResponse;
 
 class DiscountManagementController extends Controller
 {

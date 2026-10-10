@@ -2,10 +2,10 @@
 
 namespace User\Application\Services;
 
-use App\Facades\Otp\OtpFacade;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Shared\Facades\Otp\OtpFacade;
 use Throwable;
 use User\Application\Http\Requests\Auth\LoginWithOtpRequest;
 use User\Application\Http\Requests\Auth\LoginWithPasswordRequest;

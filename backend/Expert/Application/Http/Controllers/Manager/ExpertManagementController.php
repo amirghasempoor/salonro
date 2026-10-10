@@ -5,13 +5,13 @@ namespace Expert\Application\Http\Controllers\Manager;
 use App\Http\Controllers\Controller;
 use App\Models\Expert;
 use App\Models\Hall;
-use App\Traits\ApiResponse;
 use Expert\Application\Http\Requests\Manager\Staff\StoreRequest;
 use Expert\Application\Http\Requests\Manager\Staff\ToggleActivationRequest;
 use Expert\Application\Http\Resources\Manager\ExpertDetailsResource;
 use Expert\Application\Services\Manager\StaffManagementService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Shared\Traits\ApiResponse;
 use Throwable;
 
 class ExpertManagementController extends Controller
