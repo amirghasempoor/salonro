@@ -3,13 +3,13 @@
 namespace Expert\Application\Services\Manager;
 
 use App\Enums\DiscountType;
-use App\Facades\DataTable\DataTableFacade;
 use App\Models\Discount;
 use App\Models\Expert;
 use App\Models\Hall;
 use Expert\Application\Http\Requests\Manager\Discount\StoreRequest;
 use Expert\Application\Http\Requests\Manager\Discount\UpdateRequest;
 use Illuminate\Http\Request;
+use Shared\Facades\DataTable\DataTableFacade;
 
 class DiscountManagementService
 {

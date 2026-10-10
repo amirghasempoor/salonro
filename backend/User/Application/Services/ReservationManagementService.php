@@ -3,7 +3,6 @@
 namespace User\Application\Services;
 
 use App\Enums\ReservationStates;
-use App\Facades\DataTable\DataTableFacade;
 use App\Models\Expert;
 use App\Models\Hall;
 use App\Models\Reservation;
@@ -14,6 +13,7 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
+use Shared\Facades\DataTable\DataTableFacade;
 use Throwable;
 use User\Domain\Entities\StaffAvailability;
 use User\Domain\Repositories\HallRepositoryInterface;

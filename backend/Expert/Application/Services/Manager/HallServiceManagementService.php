@@ -2,12 +2,12 @@
 
 namespace Expert\Application\Services\Manager;
 
-use App\Facades\DataTable\DataTableFacade;
 use App\Models\Hall;
 use App\Models\HallService;
 use Expert\Application\Http\Requests\Manager\HallService\StoreRequest;
 use Expert\Application\Http\Requests\Manager\HallService\UpdateRequest;
 use Illuminate\Http\Request;
+use Shared\Facades\DataTable\DataTableFacade;
 
 class HallServiceManagementService
 {

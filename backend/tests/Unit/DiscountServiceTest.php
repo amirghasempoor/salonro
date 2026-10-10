@@ -4,8 +4,8 @@ use App\Enums\DiscountType;
 use App\Models\Discount;
 use App\Models\Hall;
 use App\Models\User;
-use App\Services\DiscountService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Shared\Services\DiscountService;
 use Tests\TestCase;
 
 uses(TestCase::class, RefreshDatabase::class);

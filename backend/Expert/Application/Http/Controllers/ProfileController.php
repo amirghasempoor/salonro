@@ -3,7 +3,6 @@
 namespace Expert\Application\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use App\Traits\ApiResponse;
 use Expert\Application\Http\Requests\Profile\ChangePasswordRequest;
 use Expert\Application\Http\Requests\Profile\CompleteRequest;
 use Expert\Application\Http\Requests\Profile\DefineRoleRequest;
@@ -17,6 +16,7 @@ use Expert\Domain\Exceptions\ExpertNotAssignedToHallException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Shared\Traits\ApiResponse;
 use Throwable;
 
 class ProfileController extends Controller

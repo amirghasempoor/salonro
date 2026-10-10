@@ -3,8 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Service;
-use App\Traits\ApiResponse;
 use Illuminate\Http\JsonResponse;
+use Shared\Traits\ApiResponse;
 
 class ServiceController extends Controller
 {

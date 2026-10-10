@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Models\Hall;
 use App\Models\JobOffer;
 use App\Models\JobOfferApplication;
-use App\Traits\ApiResponse;
 use Expert\Application\Http\Requests\Manager\JobOffer\StoreRequest;
 use Expert\Application\Http\Requests\Manager\JobOffer\UpdateRequest;
 use Expert\Application\Http\Resources\Manager\JobOfferApplicationResource;
@@ -15,6 +14,7 @@ use Expert\Application\Services\Manager\JobOfferManagementService;
 use Expert\Domain\Actions\Manager\AcceptJobOfferApplicationAction;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Shared\Traits\ApiResponse;
 use Throwable;
 
 class JobOfferController extends Controller

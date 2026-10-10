@@ -1,6 +1,6 @@
 <?php
 
-use App\Facades\Otp\OtpFacade;
+use Shared\Facades\Otp\OtpFacade;
 
 test('verification code is required', function () {
     $response = $this->postJson(route('expert.auth.loginWithOtp'));

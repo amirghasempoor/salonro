@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Province;
-use App\Traits\ApiResponse;
+use Shared\Traits\ApiResponse;
 
 class ProvinceController extends Controller
 {

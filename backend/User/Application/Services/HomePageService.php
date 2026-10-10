@@ -2,9 +2,9 @@
 
 namespace User\Application\Services;
 
-use App\Facades\DataTable\DataTableFacade;
 use App\Models\Hall;
 use Illuminate\Http\Request;
+use Shared\Facades\DataTable\DataTableFacade;
 use User\Domain\Repositories\HallRepositoryInterface;
 
 class HomePageService

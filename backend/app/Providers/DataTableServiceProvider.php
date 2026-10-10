@@ -2,8 +2,8 @@
 
 namespace App\Providers;
 
-use App\Facades\DataTable\DataTable;
 use Illuminate\Support\ServiceProvider;
+use Shared\Facades\DataTable\DataTable;
 
 class DataTableServiceProvider extends ServiceProvider
 {

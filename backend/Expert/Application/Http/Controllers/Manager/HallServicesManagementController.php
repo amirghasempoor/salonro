@@ -5,13 +5,13 @@ namespace Expert\Application\Http\Controllers\Manager;
 use App\Http\Controllers\Controller;
 use App\Models\Hall;
 use App\Models\HallService;
-use App\Traits\ApiResponse;
 use Expert\Application\Http\Requests\Manager\HallService\StoreRequest;
 use Expert\Application\Http\Requests\Manager\HallService\UpdateRequest;
 use Expert\Application\Http\Resources\Manager\HallServiceResource;
 use Expert\Application\Services\Manager\HallServiceManagementService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Shared\Traits\ApiResponse;
 
 class HallServicesManagementController extends Controller
 {

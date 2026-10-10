@@ -2,8 +2,8 @@
 
 namespace App\Providers;
 
-use App\Facades\Otp\Otp;
 use Illuminate\Support\ServiceProvider;
+use Shared\Facades\Otp\Otp;
 
 class OtpServiceProvider extends ServiceProvider
 {

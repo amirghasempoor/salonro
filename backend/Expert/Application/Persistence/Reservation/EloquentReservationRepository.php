@@ -8,7 +8,6 @@ use App\Models\Hall as HallModel;
 use App\Models\HallService;
 use App\Models\Reservation as ReservationModel;
 use App\Models\User;
-use App\Services\DiscountService;
 use DateTimeImmutable;
 use DateTimeInterface;
 use Expert\Domain\Entities\Hall;
@@ -16,6 +15,7 @@ use Expert\Domain\Entities\Reservation;
 use Expert\Domain\Repositories\Reservation\ReservationRepositoryInterface;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
+use Shared\Services\DiscountService;
 
 class EloquentReservationRepository implements ReservationRepositoryInterface
 {

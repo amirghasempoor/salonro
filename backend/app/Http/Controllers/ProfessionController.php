@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Profession;
-use App\Traits\ApiResponse;
+use Shared\Traits\ApiResponse;
 
 class ProfessionController extends Controller
 {

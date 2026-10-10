@@ -3,13 +3,13 @@
 namespace Expert\Application\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use App\Traits\ApiResponse;
 use Expert\Application\Http\Requests\Auth\LoginWithOtpRequest;
 use Expert\Application\Http\Requests\Auth\LoginWithPasswordRequest;
 use Expert\Application\Http\Requests\Auth\RegisterRequest;
 use Expert\Application\Http\Requests\Auth\SendOtpRequest;
 use Expert\Application\Services\AuthService;
 use Illuminate\Http\JsonResponse;
+use Shared\Traits\ApiResponse;
 use Throwable;
 
 class AuthController extends Controller

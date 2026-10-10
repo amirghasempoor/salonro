@@ -5,11 +5,11 @@ namespace User\Application\Persistence\Reservation;
 use App\Enums\ReservationStates;
 use App\Models\Expert;
 use App\Models\Reservation as ReservationModel;
-use App\Services\DiscountService;
 use DateTimeImmutable;
 use DateTimeInterface;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
+use Shared\Services\DiscountService;
 use User\Domain\Entities\Reservation;
 use User\Domain\Repositories\Reservation\ReservationRepositoryInterface;
 

@@ -3,9 +3,9 @@
 namespace User\Application\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use App\Traits\ApiResponse;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
+use Shared\Traits\ApiResponse;
 use User\Application\Http\Requests\Profile\ChangeAvatarRequest;
 use User\Application\Http\Requests\Profile\ChangePasswordRequest;
 use User\Application\Http\Requests\Profile\CompleteRequest;
