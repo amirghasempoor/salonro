@@ -27,7 +27,7 @@ class UpdateRequest extends FormRequest
             'last_name' => 'required|string',
             'bio' => 'nullable|string|max:255',
             'is_active' => 'required|boolean',
-            'avatar' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'avatar' => 'image|mimes:jpeg,png,jpg,gif,svg|max:10240',
         ];
     }
 }

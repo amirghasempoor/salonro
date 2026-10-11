@@ -26,7 +26,7 @@ class CompleteRequest extends FormRequest
         return [
             'first_name' => 'required|string',
             'last_name' => 'required|string',
-            'avatar' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'avatar' => 'image|mimes:jpeg,png,jpg,gif,svg|max:10240',
             'bio' => 'string|max:255',
             'password' => 'required|string|regex:/^(?=.*[a-zA-Z])(?=.*\d).+$/|min:8',
         ];
