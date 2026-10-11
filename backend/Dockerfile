@@ -27,6 +27,7 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 ENV COMPOSER_ALLOW_SUPERUSER=1
 
 COPY docker/opcache-dev.ini /usr/local/etc/php/conf.d/zz-opcache.ini
+COPY docker/uploads.ini /usr/local/etc/php/conf.d/zz-uploads.ini
 COPY docker/entrypoint-dev.sh /usr/local/bin/entrypoint.sh
 RUN chmod +x /usr/local/bin/entrypoint.sh
 
