@@ -7,6 +7,7 @@ if [ ! -f vendor/autoload.php ]; then
 fi
 
 if [ -f artisan ]; then
+    [ -L public/storage ] || php artisan storage:link
     php artisan package:discover --ansi || true
     php artisan optimize || true
 fi

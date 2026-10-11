@@ -15,6 +15,7 @@ use User\Application\Http\Requests\Reservation\HallStaffRequest;
 use User\Application\Http\Requests\Reservation\StaffScheduleRequest;
 use User\Application\Http\Requests\Reservation\StoreRequest;
 use User\Application\Http\Requests\Reservation\UpdateRequest;
+use User\Application\Http\Resources\ReservationDetailsResource;
 use User\Application\Services\ReservationManagementService;
 use User\Domain\Actions\Reservation\BookReservationAction;
 use User\Domain\Actions\Reservation\RescheduleReservationAction;
@@ -44,7 +45,9 @@ class ReservationManagementController extends Controller
 
     public function show(Reservation $reservation): JsonResponse
     {
-        return $this->successResponse($reservation);
+        return $this->successResponse(new ReservationDetailsResource(
+            $reservation->load('services:id,sub_cat_name')
+        ));
     }
 
     /**

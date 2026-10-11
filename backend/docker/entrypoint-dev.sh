@@ -6,4 +6,8 @@ if [ -f composer.json ] && [ ! -d vendor ]; then
     composer install --no-interaction --prefer-dist --optimize-autoloader
 fi
 
+if [ -f artisan ]; then
+    [ -L public/storage ] || php artisan storage:link
+fi
+
 exec "$@"
