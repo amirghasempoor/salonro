@@ -38,7 +38,15 @@ class HallFactory extends Factory
                 return City::query()->find($attributes['city_id'])->name;
             },
             'is_active' => true,
+            'is_solo' => false,
             'description' => null,
         ];
+    }
+
+    public function solo(): static
+    {
+        return $this->state(fn () => [
+            'is_solo' => true,
+        ]);
     }
 }

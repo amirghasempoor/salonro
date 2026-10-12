@@ -299,3 +299,80 @@ test('manager can store a hall', function () {
         'hall_id' => Hall::query()->first()->id,
     ]);
 });
+
+test('a hall is not solo by default', function () {
+    $expert = Expert::factory()->create();
+    $expert->assignRole('manager');
+    Sanctum::actingAs($expert, ['*'], 'expert');
+
+    $province = Province::factory()->create();
+    $city = City::factory()->create();
+    $service = Service::factory()->create();
+
+    $response = $this->postJson(route('expert.hall.store'), [
+        'name' => fake()->name,
+        'lat' => (string) fake()->latitude,
+        'lng' => (string) fake()->longitude,
+        'address' => fake()->address,
+        'postal_code' => fake()->numerify(),
+        'telephone' => fake()->phoneNumber,
+        'province_id' => $province->id,
+        'city_id' => $city->id,
+        'services' => [
+            [
+                'service_id' => $service->id,
+                'duration' => fake()->numberBetween(1, 100),
+                'price' => fake()->numberBetween(1, 100),
+            ],
+        ],
+    ]);
+
+    $response->assertOk();
+
+    $this->assertDatabaseHas('halls', [
+        'id' => $response->json('data.hall_id'),
+        'is_solo' => false,
+    ]);
+});
+
+test('manager can store a solo hall for herself as a freelancer', function () {
+    $expert = Expert::factory()->create();
+    $expert->assignRole('manager');
+    Sanctum::actingAs($expert, ['*'], 'expert');
+
+    $province = Province::factory()->create();
+    $city = City::factory()->create();
+    $service = Service::factory()->create();
+
+    $response = $this->postJson(route('expert.hall.store'), [
+        'name' => fake()->name,
+        'lat' => (string) fake()->latitude,
+        'lng' => (string) fake()->longitude,
+        'address' => fake()->address,
+        'postal_code' => fake()->numerify(),
+        'telephone' => fake()->phoneNumber,
+        'province_id' => $province->id,
+        'city_id' => $city->id,
+        'is_solo' => true,
+        'services' => [
+            [
+                'service_id' => $service->id,
+                'duration' => fake()->numberBetween(1, 100),
+                'price' => fake()->numberBetween(1, 100),
+            ],
+        ],
+    ]);
+
+    $response->assertOk();
+
+    $this->assertDatabaseHas('halls', [
+        'id' => $response->json('data.hall_id'),
+        'owner_id' => $expert->id,
+        'is_solo' => true,
+    ]);
+
+    $this->assertDatabaseHas('expert_hall', [
+        'expert_id' => $expert->id,
+        'hall_id' => $response->json('data.hall_id'),
+    ]);
+});

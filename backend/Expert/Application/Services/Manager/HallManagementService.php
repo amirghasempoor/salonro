@@ -54,6 +54,7 @@ class HallManagementService
                 'city_id' => $city->id,
                 'city_name' => $city->name,
                 'description' => $request->description,
+                'is_solo' => $request->boolean('is_solo'),
             ]);
 
             foreach ($request->services as $service) {
