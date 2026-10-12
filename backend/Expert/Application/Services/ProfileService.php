@@ -86,7 +86,7 @@ class ProfileService
         $query = Auth::guard('expert')
             ->user()
             ->halls()
-            ->select(['halls.id', 'owner_name', 'name', 'lat', 'lng', 'address']);
+            ->select(['halls.id', 'owner_name', 'name', 'lat', 'lng', 'address', 'is_solo']);
 
         return DataTableFacade::run(
             $query,

@@ -20,7 +20,7 @@ class HallManagementService
     {
         $query = Expert::query()
             ->find(Auth::guard('expert')->user()->id)
-            ->halls()->select(['halls.id', 'owner_name', 'name', 'lat', 'lng', 'address']);
+            ->halls()->select(['halls.id', 'owner_name', 'name', 'lat', 'lng', 'address', 'is_solo']);
 
         return DataTableFacade::run(
             $query,
