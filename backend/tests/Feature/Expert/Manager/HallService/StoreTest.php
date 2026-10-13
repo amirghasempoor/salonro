@@ -50,68 +50,6 @@ test('service id should be existed', function () {
     ]);
 });
 
-test('description should be string', function () {
-    $expert = Expert::query()->find($this->expertHall->expert_id);
-    $expert->assignRole('manager');
-    Sanctum::actingAs($expert, ['*'], 'expert');
-    $response = $this->postJson(route('expert.services.store', [$this->expertHall->hall_id]), [
-        'description' => fake()->numberBetween(1, 100),
-    ]);
-
-    $response->assertStatus(422);
-    $response->assertJsonValidationErrors([
-        'description' => __('validation.string', ['attribute' => 'description']),
-    ]);
-});
-
-test('duration is required', function () {
-    $expert = Expert::query()->find($this->expertHall->expert_id);
-    $expert->assignRole('manager');
-    Sanctum::actingAs($expert, ['*'], 'expert');
-    $response = $this->postJson(route('expert.services.store', [$this->expertHall->hall_id]));
-
-    $response->assertStatus(422);
-    $response->assertJsonValidationErrorFor('duration');
-});
-
-test('duration should be integer', function () {
-    $expert = Expert::query()->find($this->expertHall->expert_id);
-    $expert->assignRole('manager');
-    Sanctum::actingAs($expert, ['*'], 'expert');
-    $response = $this->postJson(route('expert.services.store', [$this->expertHall->hall_id]), [
-        'duration' => fake()->word(),
-    ]);
-
-    $response->assertStatus(422);
-    $response->assertJsonValidationErrors([
-        'duration' => __('validation.integer', ['attribute' => 'duration']),
-    ]);
-});
-
-test('price is required', function () {
-    $expert = Expert::query()->find($this->expertHall->expert_id);
-    $expert->assignRole('manager');
-    Sanctum::actingAs($expert, ['*'], 'expert');
-    $response = $this->postJson(route('expert.services.store', [$this->expertHall->hall_id]));
-
-    $response->assertStatus(422);
-    $response->assertJsonValidationErrorFor('price');
-});
-
-test('price should be integer', function () {
-    $expert = Expert::query()->find($this->expertHall->expert_id);
-    $expert->assignRole('manager');
-    Sanctum::actingAs($expert, ['*'], 'expert');
-    $response = $this->postJson(route('expert.services.store', [$this->expertHall->hall_id]), [
-        'price' => fake()->word(),
-    ]);
-
-    $response->assertStatus(422);
-    $response->assertJsonValidationErrors([
-        'price' => __('validation.integer', ['attribute' => 'price']),
-    ]);
-});
-
 test('manager can store a hall service', function () {
     $expert = Expert::query()->find($this->expertHall->expert_id);
     $expert->assignRole('manager');
@@ -119,14 +57,9 @@ test('manager can store a hall service', function () {
 
     $service = Service::factory()->create();
 
-    $data = [
+    $response = $this->postJson(route('expert.services.store', [$this->expertHall->hall_id]), [
         'service_id' => $service->id,
-        'description' => fake()->sentence(),
-        'duration' => fake()->numberBetween(1, 100),
-        'price' => fake()->numberBetween(1, 100),
-    ];
-
-    $response = $this->postJson(route('expert.services.store', [$this->expertHall->hall_id]), $data);
+    ]);
 
     $response->assertOk();
     $response->assertJsonStructure([
@@ -138,9 +71,6 @@ test('manager can store a hall service', function () {
     $this->assertDatabaseHas('hall_service', [
         'hall_id' => $this->expertHall->hall_id,
         'service_id' => $service->id,
-        'description' => $data['description'],
-        'duration' => $data['duration'],
-        'price' => $data['price'],
     ]);
 });
 

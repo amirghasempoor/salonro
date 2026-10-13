@@ -4,6 +4,7 @@ use App\Enums\ReservationStates;
 use App\Models\Discount;
 use App\Models\Expert;
 use App\Models\ExpertHall;
+use App\Models\ExpertService;
 use App\Models\Hall;
 use App\Models\HallService;
 use App\Models\Reservation;
@@ -22,8 +23,6 @@ beforeEach(function () {
     HallService::factory()->create([
         'hall_id' => $this->hall->id,
         'service_id' => $this->service->id,
-        'price' => 200000,
-        'duration' => 60,
     ]);
 
     $this->expertHall = ExpertHall::factory()->create([
@@ -31,6 +30,14 @@ beforeEach(function () {
         'hall_id' => $this->hall->id,
     ]);
     seedFullWeekWorkingHours($this->expertHall);
+
+    ExpertService::factory()->create([
+        'serviceable_type' => ExpertHall::class,
+        'serviceable_id' => $this->expertHall->id,
+        'service_id' => $this->service->id,
+        'price' => 200000,
+        'duration' => 60,
+    ]);
 
     $this->payload = [
         'expert_id' => $this->expert->id,

@@ -245,18 +245,7 @@ test('manager can store a hall', function () {
         'telephone' => fake()->phoneNumber,
         'province_id' => $province->id,
         'city_id' => $city->id,
-        'services' => [
-            [
-                'service_id' => $service1->id,
-                'duration' => fake()->numberBetween(1, 100),
-                'price' => fake()->numberBetween(1, 100),
-            ],
-            [
-                'service_id' => $service2->id,
-                'duration' => fake()->numberBetween(1, 100),
-                'price' => fake()->numberBetween(1, 100),
-            ],
-        ],
+        'services' => [$service1->id, $service2->id],
     ];
 
     $response = $this->postJson(route('expert.hall.store'), $data);
@@ -284,14 +273,10 @@ test('manager can store a hall', function () {
 
     $this->assertDatabaseHas('hall_service', [
         'service_id' => $service1->id,
-        'duration' => $data['services'][0]['duration'],
-        'price' => $data['services'][0]['price'],
     ]);
 
     $this->assertDatabaseHas('hall_service', [
         'service_id' => $service2->id,
-        'duration' => $data['services'][1]['duration'],
-        'price' => $data['services'][1]['price'],
     ]);
 
     $this->assertDatabaseHas('expert_hall', [
@@ -318,13 +303,7 @@ test('a hall is not solo by default', function () {
         'telephone' => fake()->phoneNumber,
         'province_id' => $province->id,
         'city_id' => $city->id,
-        'services' => [
-            [
-                'service_id' => $service->id,
-                'duration' => fake()->numberBetween(1, 100),
-                'price' => fake()->numberBetween(1, 100),
-            ],
-        ],
+        'services' => [$service->id],
     ]);
 
     $response->assertOk();
@@ -354,13 +333,7 @@ test('manager can store a solo hall for herself as a freelancer', function () {
         'province_id' => $province->id,
         'city_id' => $city->id,
         'is_solo' => true,
-        'services' => [
-            [
-                'service_id' => $service->id,
-                'duration' => fake()->numberBetween(1, 100),
-                'price' => fake()->numberBetween(1, 100),
-            ],
-        ],
+        'services' => [$service->id],
     ]);
 
     $response->assertOk();

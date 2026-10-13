@@ -14,7 +14,8 @@ return [
     'working_hour_outside_hall_schedule' => 'The specified hours fall outside the hall\'s working hours.',
     'job_offer_application_not_pending' => 'This application has already been accepted or rejected.',
     'already_applied' => 'You have already applied to this job offer.',
-    'service_not_offered_by_hall' => 'One or more selected services are not offered by this hall.',
     'hall_schedule_below_staff_schedule' => "The hall's new schedule would leave one or more staff members outside their assigned working hours.",
     'solo_hall_cannot_have_staff' => 'This hall belongs to a solo expert and cannot have additional staff.',
+    'hall_does_not_offer_service' => 'This hall does not offer the selected service.',
+    'service_not_priced_by_expert' => 'The expert has not set a price for one or more selected services.',
 ];

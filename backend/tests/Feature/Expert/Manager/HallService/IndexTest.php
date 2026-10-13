@@ -45,9 +45,6 @@ test('manager can see the halls services', function () {
             [
                 'id',
                 'service_id',
-                'description',
-                'duration',
-                'price',
                 'is_active',
             ],
         ],

@@ -4,6 +4,7 @@ use App\Enums\ReservationStates;
 use App\Models\Discount;
 use App\Models\Expert;
 use App\Models\ExpertHall;
+use App\Models\ExpertService;
 use App\Models\Hall;
 use App\Models\HallService;
 use App\Models\Reservation;
@@ -12,7 +13,7 @@ use Expert\Domain\Actions\Reservation\RescheduleReservationAction;
 use Expert\Domain\DTOs\Reservation\RescheduleReservationDto;
 use Expert\Domain\Exceptions\Reservation\OutsideWorkingHoursException;
 use Expert\Domain\Exceptions\Reservation\ReservationConflictException;
-use Expert\Domain\Exceptions\Reservation\ServiceNotOfferedByHallException;
+use Expert\Domain\Exceptions\Reservation\ServiceNotPricedByExpertException;
 use Illuminate\Support\Carbon;
 
 beforeEach(function () {
@@ -25,8 +26,6 @@ beforeEach(function () {
     HallService::factory()->create([
         'hall_id' => $this->hall->id,
         'service_id' => $this->service->id,
-        'price' => 200000,
-        'duration' => 90,
     ]);
 
     $this->expertHall = ExpertHall::factory()->create([
@@ -34,6 +33,14 @@ beforeEach(function () {
         'hall_id' => $this->hall->id,
     ]);
     seedFullWeekWorkingHours($this->expertHall);
+
+    ExpertService::factory()->create([
+        'serviceable_type' => ExpertHall::class,
+        'serviceable_id' => $this->expertHall->id,
+        'service_id' => $this->service->id,
+        'price' => 200000,
+        'duration' => 90,
+    ]);
 
     $this->start = Carbon::now()->addDays(2)->setTime(10, 0)->toImmutable();
     $this->finish = $this->start->addHour();
@@ -129,8 +136,8 @@ test('it rejects a slot outside the expert working hours and leaves the reservat
     expect($this->reservation->fresh()->start_time->format('H:i'))->toBe('10:00');
 });
 
-test('it rejects a service the hall does not offer', function () {
+test('it rejects a service the expert has not priced', function () {
     $other = Service::factory()->create();
 
     app(RescheduleReservationAction::class)->execute($this->reservation->id, rescheduleDto($this, ['serviceIds' => [$other->id]]));
-})->throws(ServiceNotOfferedByHallException::class);
+})->throws(ServiceNotPricedByExpertException::class);

@@ -4,6 +4,7 @@ namespace Expert\Domain\Repositories;
 
 use App\Models\Expert;
 use App\Models\ExpertHall;
+use App\Models\ExpertService;
 use App\Models\Hall;
 use App\Models\WorkingHour;
 
@@ -40,4 +41,15 @@ interface ExpertHallRepositoryInterface
      * @param  array<int, array{day: string, from: string, to: string}>  $workingHours
      */
     public function replaceHallWorkingHours(Hall $hall, array $workingHours): void;
+
+    /**
+     * Whether the hall's own catalog (set by its manager) includes this service.
+     */
+    public function hallOffersService(int $hallId, int $serviceId): bool;
+
+    /**
+     * Set (create or update) the expert's own price and duration for a
+     * service she offers at this hall.
+     */
+    public function defineService(ExpertHall $expertHall, int $serviceId, float $price, float $duration): ExpertService;
 }

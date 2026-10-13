@@ -10,7 +10,7 @@ test('the hall services endpoint is public and requires no authentication', func
     $this->getJson(route('user.home.hallServices', $hall))->assertOk();
 });
 
-test('it returns the services attached to the hall with price and duration flattened', function () {
+test('it returns the services attached to the hall', function () {
     $hall = Hall::factory()->create();
     $service = Service::factory()->create([
         'cat_name' => 'خدمات مو',
@@ -19,8 +19,6 @@ test('it returns the services attached to the hall with price and duration flatt
     HallService::factory()->create([
         'hall_id' => $hall->id,
         'service_id' => $service->id,
-        'price' => 50000,
-        'duration' => 60,
     ]);
 
     $response = $this->getJson(route('user.home.hallServices', $hall));
@@ -29,16 +27,13 @@ test('it returns the services attached to the hall with price and duration flatt
     $response->assertJsonCount(1, 'data');
     $response->assertJsonStructure([
         'data' => [
-            ['id', 'cat_id', 'cat_name', 'sub_cat_id', 'sub_cat_name', 'icon', 'price', 'duration'],
+            ['id', 'cat_id', 'cat_name', 'sub_cat_id', 'sub_cat_name', 'icon'],
         ],
     ]);
     $response->assertJsonPath('data.0.id', $service->id);
     $response->assertJsonPath('data.0.cat_name', 'خدمات مو');
     $response->assertJsonMissingPath('data.0.pivot');
-
-    $data = $response->json('data');
-    expect((float) $data[0]['price'])->toBe(50000.0)
-        ->and((float) $data[0]['duration'])->toBe(60.0);
+    $response->assertJsonMissingPath('data.0.price');
 });
 
 test('it returns an empty list when the hall has no services', function () {

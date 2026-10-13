@@ -4,8 +4,9 @@ namespace Expert\Application\Persistence\Reservation;
 
 use App\Enums\ReservationStates;
 use App\Models\Expert;
+use App\Models\ExpertHall;
+use App\Models\ExpertService;
 use App\Models\Hall as HallModel;
-use App\Models\HallService;
 use App\Models\Reservation as ReservationModel;
 use App\Models\User;
 use DateTimeImmutable;
@@ -39,22 +40,30 @@ class EloquentReservationRepository implements ReservationRepositoryInterface
         return Expert::query()->findOrFail($expertId)->full_name;
     }
 
-    public function findHall(int $hallId): Hall
+    public function findHall(int $hallId, int $expertId): Hall
     {
         $hall = HallModel::query()->findOrFail($hallId);
 
-        $offered = HallService::query()
+        $expertHall = ExpertHall::query()
+            ->where('expert_id', $expertId)
             ->where('hall_id', $hallId)
-            ->with('service')
-            ->get()
-            ->mapWithKeys(fn (HallService $hallService) => [
-                $hallService->service_id => [
-                    'name' => $hallService->service->sub_cat_name,
-                    'price' => (int) $hallService->price,
-                    'duration' => $hallService->duration === null ? null : (int) $hallService->duration,
-                ],
-            ])
-            ->all();
+            ->first();
+
+        $offered = $expertHall === null
+            ? []
+            : ExpertService::query()
+                ->where('serviceable_type', ExpertHall::class)
+                ->where('serviceable_id', $expertHall->id)
+                ->with('service')
+                ->get()
+                ->mapWithKeys(fn (ExpertService $expertService) => [
+                    $expertService->service_id => [
+                        'name' => $expertService->service->sub_cat_name,
+                        'price' => (int) $expertService->price,
+                        'duration' => $expertService->duration === null ? null : (int) $expertService->duration,
+                    ],
+                ])
+                ->all();
 
         return new Hall($hall->id, $hall->name, $offered);
     }

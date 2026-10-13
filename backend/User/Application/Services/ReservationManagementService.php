@@ -70,7 +70,7 @@ class ReservationManagementService
                 'avatar' => $member['avatar'],
                 'services' => array_values(array_map(
                     fn (int $serviceId) => $serviceNames[$serviceId],
-                    array_intersect($member['service_ids'], $serviceIds),
+                    array_intersect(array_column($member['services'], 'id'), $serviceIds),
                 )),
             ],
             $hallEntity->staffOffering($serviceIds),

@@ -6,7 +6,7 @@ use Expert\Domain\DTOs\Reservation\RescheduleReservationDto;
 use Expert\Domain\Entities\Reservation;
 use Expert\Domain\Exceptions\Reservation\OutsideWorkingHoursException;
 use Expert\Domain\Exceptions\Reservation\ReservationConflictException;
-use Expert\Domain\Exceptions\Reservation\ServiceNotOfferedByHallException;
+use Expert\Domain\Exceptions\Reservation\ServiceNotPricedByExpertException;
 use Expert\Domain\Repositories\ExpertHallRepositoryInterface;
 use Expert\Domain\Repositories\Reservation\ReservationRepositoryInterface;
 use Illuminate\Support\Facades\DB;
@@ -27,7 +27,7 @@ readonly class RescheduleReservationAction
     /**
      * @throws OutsideWorkingHoursException when the slot does not fit the expert's working hours
      * @throws ReservationConflictException when the expert or the customer is already booked in that slot
-     * @throws ServiceNotOfferedByHallException when a requested service is not offered by the hall
+     * @throws ServiceNotPricedByExpertException when the expert has not priced a requested service
      * @throws Throwable
      */
     public function execute(int $reservationId, RescheduleReservationDto $dto): Reservation
@@ -36,7 +36,7 @@ readonly class RescheduleReservationAction
             $reservation = $this->reservations->find($reservationId);
 
             $rescheduled = $reservation->reschedule(
-                hall: $this->reservations->findHall($reservation->hallId),
+                hall: $this->reservations->findHall($reservation->hallId, $reservation->expertId),
                 serviceIds: $dto->serviceIds,
                 start: $dto->start,
                 finish: $dto->finish,

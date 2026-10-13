@@ -35,6 +35,6 @@ class ExpertHall extends Model
 
     public function services(): MorphToMany
     {
-        return $this->morphToMany(Service::class, 'serviceable', 'expert_service');
+        return $this->morphToMany(Service::class, 'serviceable', 'expert_service')->withPivot('price', 'duration');
     }
 }

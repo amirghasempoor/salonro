@@ -20,7 +20,7 @@ class HallServiceManagementService
             allowedRelations: ['service'],
             allowedSortings: ['*'],
             allowedSelects: [
-                'id', 'service_id', 'description', 'duration', 'price', 'is_active',
+                'id', 'service_id', 'is_active',
             ]
         );
     }
@@ -30,9 +30,6 @@ class HallServiceManagementService
         return HallService::query()->create([
             'hall_id' => $hall->id,
             'service_id' => $request->service_id,
-            'description' => $request->description,
-            'duration' => $request->duration,
-            'price' => $request->price,
         ]);
     }
 
@@ -40,9 +37,6 @@ class HallServiceManagementService
     {
         $hallService->update([
             'service_id' => $request->service_id,
-            'description' => $request->description,
-            'duration' => $request->duration,
-            'price' => $request->price,
             'is_active' => $request->is_active,
         ]);
     }

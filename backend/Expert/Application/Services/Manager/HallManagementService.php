@@ -57,12 +57,7 @@ class HallManagementService
                 'is_solo' => $request->boolean('is_solo'),
             ]);
 
-            foreach ($request->services as $service) {
-                $hall->services()->attach($service['service_id'], [
-                    'price' => $service['price'],
-                    'duration' => $service['duration'],
-                ]);
-            }
+            $hall->services()->attach($request->services);
 
             $hall->experts()->attach($owner->id);
 

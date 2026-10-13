@@ -38,7 +38,7 @@ class Hall extends Model
 
     public function services(): BelongsToMany
     {
-        return $this->belongsToMany(Service::class)->withPivot('description', 'price', 'duration');
+        return $this->belongsToMany(Service::class);
     }
 
     public function jobOffers(): HasMany

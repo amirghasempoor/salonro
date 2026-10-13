@@ -2,17 +2,17 @@
 
 namespace User\Domain\Entities;
 
-use User\Domain\Exceptions\Reservation\ServiceNotOfferedByHallException;
+use User\Domain\Exceptions\Reservation\ServiceNotPricedByExpertException;
 
 /**
- * A hall as seen by a customer: the services it offers, priced for that hall,
- * and the staff assigned there.
+ * A hall as seen by a customer: the services it offers, and the staff
+ * assigned there, each priced individually by the staff member themself.
  */
 final readonly class Hall
 {
     /**
-     * @param  list<array{id: int, cat_id: int, cat_name: string, sub_cat_id: int, sub_cat_name: string, icon: ?string, price: mixed, duration: mixed}>  $services  services the hall offers, priced for this hall
-     * @param  list<array{id: int, first_name: string, last_name: string, avatar: ?string, service_ids: list<int>}>  $staff  staff assigned to the hall, with the services each of them provides here
+     * @param  list<array{id: int, cat_id: int, cat_name: string, sub_cat_id: int, sub_cat_name: string, icon: ?string}>  $services  the hall's own service catalog, for browsing — carries no price, which is set per expert
+     * @param  list<array{id: int, first_name: string, last_name: string, avatar: ?string, services: list<array{id: int, sub_cat_name: string, price: mixed, duration: mixed}>}>  $staff  staff assigned to the hall, each with the services they personally price
      */
     public function __construct(
         public int $id,
@@ -22,7 +22,7 @@ final readonly class Hall
     ) {}
 
     /**
-     * @return list<array{id: int, cat_id: int, cat_name: string, sub_cat_id: int, sub_cat_name: string, icon: ?string, price: mixed, duration: mixed}>
+     * @return list<array{id: int, cat_id: int, cat_name: string, sub_cat_id: int, sub_cat_name: string, icon: ?string}>
      */
     public function services(): array
     {
@@ -35,49 +35,66 @@ final readonly class Hall
      * booking, not only someone who can do all of it alone.
      *
      * @param  list<int>  $serviceIds
-     * @return list<array{id: int, first_name: string, last_name: string, avatar: ?string, service_ids: list<int>}>
+     * @return list<array{id: int, first_name: string, last_name: string, avatar: ?string, services: list<array{id: int, sub_cat_name: string, price: mixed, duration: mixed}>}>
      */
     public function staffOffering(array $serviceIds): array
     {
         return array_values(array_filter(
             $this->staff,
-            fn (array $member) => array_intersect($member['service_ids'], $serviceIds) !== [],
+            fn (array $member) => array_intersect(array_column($member['services'], 'id'), $serviceIds) !== [],
         ));
     }
 
     /**
-     * Price the requested services from what the hall offers. Prices and
-     * durations always come from here, never from client input.
+     * Price the requested services from the chosen expert's own prices.
+     * Prices and durations always come from the expert, never from client
+     * input — there is no hall-level fallback.
      *
      * @param  list<int>  $serviceIds
      * @return array{lines: array<int, array{service_name: string, price: int, duration: int|null}>, baseTotal: int}
      *
-     * @throws ServiceNotOfferedByHallException when a requested service is not offered by this hall
+     * @throws ServiceNotPricedByExpertException when the expert has not priced a requested service
      */
-    public function priceServices(array $serviceIds): array
+    public function priceServices(array $serviceIds, int $expertId): array
     {
+        $member = $this->findStaff($expertId);
+
         $lines = [];
         $baseTotal = 0;
 
         foreach (array_unique($serviceIds) as $serviceId) {
-            $service = $this->findOfferedService($serviceId);
+            $priced = $member === null ? null : $this->findPricedService($member['services'], $serviceId);
 
-            throw_if($service === null, ServiceNotOfferedByHallException::forService($serviceId));
+            throw_if($priced === null, ServiceNotPricedByExpertException::forService($serviceId));
 
             $lines[$serviceId] = [
-                'service_name' => $service['sub_cat_name'],
-                'price' => (int) $service['price'],
-                'duration' => $service['duration'] === null ? null : (int) $service['duration'],
+                'service_name' => $priced['sub_cat_name'],
+                'price' => (int) $priced['price'],
+                'duration' => $priced['duration'] === null ? null : (int) $priced['duration'],
             ];
-            $baseTotal += (int) $service['price'];
+            $baseTotal += (int) $priced['price'];
         }
 
         return ['lines' => $lines, 'baseTotal' => $baseTotal];
     }
 
-    private function findOfferedService(int $serviceId): ?array
+    private function findStaff(int $expertId): ?array
     {
-        foreach ($this->services as $service) {
+        foreach ($this->staff as $member) {
+            if ($member['id'] === $expertId) {
+                return $member;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * @param  list<array{id: int, sub_cat_name: string, price: mixed, duration: mixed}>  $services
+     */
+    private function findPricedService(array $services, int $serviceId): ?array
+    {
+        foreach ($services as $service) {
             if ($service['id'] === $serviceId) {
                 return $service;
             }

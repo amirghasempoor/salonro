@@ -4,12 +4,21 @@ use User\Domain\Entities\Hall;
 
 function staff(int $id, array $serviceIds): array
 {
-    return ['id' => $id, 'first_name' => "Expert{$id}", 'last_name' => 'Test', 'avatar' => null, 'service_ids' => $serviceIds];
+    return [
+        'id' => $id,
+        'first_name' => "Expert{$id}",
+        'last_name' => 'Test',
+        'avatar' => null,
+        'services' => array_map(
+            fn (int $serviceId) => ['id' => $serviceId, 'sub_cat_name' => "Service{$serviceId}", 'price' => 100, 'duration' => 30],
+            $serviceIds,
+        ),
+    ];
 }
 
 test('it returns the services it was given as-is', function () {
     $services = [
-        ['id' => 1, 'cat_id' => 1, 'cat_name' => 'Hair', 'sub_cat_id' => 10, 'sub_cat_name' => 'Cut', 'icon' => null, 'price' => 100, 'duration' => 30],
+        ['id' => 1, 'cat_id' => 1, 'cat_name' => 'Hair', 'sub_cat_id' => 10, 'sub_cat_name' => 'Cut', 'icon' => null],
     ];
 
     $hall = new Hall(1, 'Rose Salon', $services, []);

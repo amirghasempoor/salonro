@@ -8,6 +8,7 @@ use Expert\Application\Http\Controllers\Manager\HallManagementController;
 use Expert\Application\Http\Controllers\Manager\HallServicesManagementController;
 use Expert\Application\Http\Controllers\Manager\JobOfferController as ManagerJobOfferController;
 use Expert\Application\Http\Controllers\Manager\ServiceManagementController;
+use Expert\Application\Http\Controllers\MyServiceController;
 use Expert\Application\Http\Controllers\ProfileController;
 use Expert\Application\Http\Controllers\ReservationManagementController;
 use Illuminate\Support\Facades\Route;
@@ -45,10 +46,10 @@ Route::prefix('halls')
     ->group(function () {
         Route::get('/', 'index')->name('index');
         Route::post('/', 'store')->name('store');
-        Route::get('/{hall}', 'show')->name('show')->can('hall.view', 'hall');
+        Route::get('/{hall}', 'show')->name('show')->withoutMiddleware('role:manager|admin')->can('hall.view', 'hall');
         Route::post('/{hall}', 'update')->name('update')->can('hall.update', 'hall');
         Route::delete('/{hall}', 'destroy')->name('destroy')->can('hall.delete', 'hall');
-        Route::get('/services/{hall}', 'services')->name('services')->can('hall.view', 'hall');
+        Route::get('/services/{hall}', 'services')->name('services')->withoutMiddleware('role:manager|admin')->can('hall.view', 'hall');
         Route::get('/working_hours/{hall}', 'workingHours')->name('workingHours')->withoutMiddleware(['auth:expert', 'role:manager|admin']);
         Route::post('/define_working_hours/{hall}', 'defineWorkingHours')->name('defineWorkingHours')->can('hall.update', 'hall');
     });
@@ -63,6 +64,18 @@ Route::prefix('reservations')
         Route::get('/details/{reservation}', 'show')->name('show')->can('reservation.show', 'reservation');
         Route::post('/{hall}/{reservation}', 'update')->name('update')->can('reservation.update', ['hall', 'reservation']);
         Route::delete('/{hall}/{reservation}', 'destroy')->name('destroy')->can('reservation.delete', ['hall', 'reservation']);
+    });
+
+Route::prefix('my_services')
+    ->name('myService.')
+    ->middleware(['auth:expert'])
+    ->controller(MyServiceController::class)
+    ->group(function () {
+        Route::get('/{hall}', 'index')->name('index');
+        Route::post('/{hall}', 'store')->name('store');
+        Route::get('/show/{expertService}', 'show')->name('show')->can('myService.show', 'expertService');
+        Route::post('/update/{expertService}', 'update')->name('update')->can('myService.update', 'expertService');
+        Route::delete('/delete/{expertService}', 'destroy')->name('destroy')->can('myService.delete', 'expertService');
     });
 
 Route::prefix('service_categories')

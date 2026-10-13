@@ -17,9 +17,6 @@ class HallServiceResource extends JsonResource
         return [
             'id' => $this->id,
             'service_id' => $this->service_id,
-            'description' => $this->description,
-            'duration' => $this->duration,
-            'price' => $this->price,
             'is_active' => $this->is_active,
             'service' => [
                 'id' => $this->service->id,

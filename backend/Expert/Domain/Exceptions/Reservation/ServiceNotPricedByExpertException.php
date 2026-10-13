@@ -4,10 +4,10 @@ namespace Expert\Domain\Exceptions\Reservation;
 
 use Expert\Domain\Exceptions\ExpertException;
 
-class ServiceNotOfferedByHallException extends ExpertException
+class ServiceNotPricedByExpertException extends ExpertException
 {
     public static function forService(int $serviceId): self
     {
-        return new self(__('messages.service_not_offered_by_hall'));
+        return new self(__('messages.service_not_priced_by_expert'));
     }
 }

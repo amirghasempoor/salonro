@@ -9,7 +9,8 @@ class HallPolicy
 {
     public function view(Expert $expert, Hall $hall): bool
     {
-        return $expert->id === $hall->owner_id;
+        return $expert->id === $hall->owner_id
+            || $hall->experts()->where('experts.id', $expert->id)->exists();
     }
 
     public function update(Expert $expert, Hall $hall): bool
