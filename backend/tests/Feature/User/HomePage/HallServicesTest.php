@@ -1,5 +1,7 @@
 <?php
 
+use App\Models\Expert;
+use App\Models\ExpertHall;
 use App\Models\Hall;
 use App\Models\HallService;
 use App\Models\Service;
@@ -27,13 +29,45 @@ test('it returns the services attached to the hall', function () {
     $response->assertJsonCount(1, 'data');
     $response->assertJsonStructure([
         'data' => [
-            ['id', 'cat_id', 'cat_name', 'sub_cat_id', 'sub_cat_name', 'icon'],
+            ['id', 'cat_id', 'cat_name', 'sub_cat_id', 'sub_cat_name', 'icon', 'price_min', 'price_max'],
         ],
     ]);
     $response->assertJsonPath('data.0.id', $service->id);
     $response->assertJsonPath('data.0.cat_name', 'خدمات مو');
     $response->assertJsonMissingPath('data.0.pivot');
     $response->assertJsonMissingPath('data.0.price');
+});
+
+test('a service with no staff pricing it yet has a null price range', function () {
+    $hall = Hall::factory()->create();
+    $service = Service::factory()->create();
+    HallService::factory()->create(['hall_id' => $hall->id, 'service_id' => $service->id]);
+
+    $response = $this->getJson(route('user.home.hallServices', $hall));
+
+    $response->assertOk();
+    $response->assertJsonPath('data.0.price_min', null);
+    $response->assertJsonPath('data.0.price_max', null);
+});
+
+test('a service is annotated with the min and max price staff at the hall charge for it', function () {
+    $hall = Hall::factory()->create();
+    $service = Service::factory()->create();
+    HallService::factory()->create(['hall_id' => $hall->id, 'service_id' => $service->id]);
+
+    $cheaperExpert = Expert::factory()->create();
+    $cheaperExpertHall = ExpertHall::factory()->create(['expert_id' => $cheaperExpert->id, 'hall_id' => $hall->id]);
+    $cheaperExpertHall->services()->attach($service->id, ['price' => 100000, 'duration' => 30]);
+
+    $pricierExpert = Expert::factory()->create();
+    $pricierExpertHall = ExpertHall::factory()->create(['expert_id' => $pricierExpert->id, 'hall_id' => $hall->id]);
+    $pricierExpertHall->services()->attach($service->id, ['price' => 300000, 'duration' => 60]);
+
+    $response = $this->getJson(route('user.home.hallServices', $hall));
+
+    $response->assertOk();
+    $response->assertJsonPath('data.0.price_min', 100000);
+    $response->assertJsonPath('data.0.price_max', 300000);
 });
 
 test('it returns an empty list when the hall has no services', function () {

@@ -11,7 +11,7 @@ use User\Domain\Exceptions\Reservation\ServiceNotPricedByExpertException;
 final readonly class Hall
 {
     /**
-     * @param  list<array{id: int, cat_id: int, cat_name: string, sub_cat_id: int, sub_cat_name: string, icon: ?string}>  $services  the hall's own service catalog, for browsing — carries no price, which is set per expert
+     * @param  list<array{id: int, cat_id: int, cat_name: string, sub_cat_id: int, sub_cat_name: string, icon: ?string}>  $services  the hall's own service catalog, for browsing — carries no price of its own, which is set per expert
      * @param  list<array{id: int, first_name: string, last_name: string, avatar: ?string, services: list<array{id: int, sub_cat_name: string, price: mixed, duration: mixed}>}>  $staff  staff assigned to the hall, each with the services they personally price
      */
     public function __construct(
@@ -22,11 +22,46 @@ final readonly class Hall
     ) {}
 
     /**
-     * @return list<array{id: int, cat_id: int, cat_name: string, sub_cat_id: int, sub_cat_name: string, icon: ?string}>
+     * The hall's catalog, each service annotated with the cheapest and
+     * priciest a staff member at this hall charges for it — null for a
+     * service no staff member has priced yet.
+     *
+     * @return list<array{id: int, cat_id: int, cat_name: string, sub_cat_id: int, sub_cat_name: string, icon: ?string, price_min: ?int, price_max: ?int}>
      */
     public function services(): array
     {
-        return $this->services;
+        $priceRange = $this->priceRangeByService();
+
+        return array_map(
+            fn (array $service) => [
+                ...$service,
+                'price_min' => $priceRange[$service['id']]['min'] ?? null,
+                'price_max' => $priceRange[$service['id']]['max'] ?? null,
+            ],
+            $this->services,
+        );
+    }
+
+    /**
+     * @return array<int, array{min: int, max: int}>
+     */
+    private function priceRangeByService(): array
+    {
+        $priceRange = [];
+
+        foreach ($this->staff as $member) {
+            foreach ($member['services'] as $service) {
+                if ($service['price'] === null) {
+                    continue;
+                }
+
+                $price = (int) $service['price'];
+                $priceRange[$service['id']]['min'] = min($priceRange[$service['id']]['min'] ?? $price, $price);
+                $priceRange[$service['id']]['max'] = max($priceRange[$service['id']]['max'] ?? $price, $price);
+            }
+        }
+
+        return $priceRange;
     }
 
     /**

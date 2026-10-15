@@ -18,14 +18,14 @@ beforeEach(function () {
         'expert_id' => $this->expertWithA->id,
         'hall_id' => $this->hall->id,
     ]);
-    $expertHallA->services()->attach($this->serviceA->id);
+    $expertHallA->services()->attach($this->serviceA->id, ['price' => 150000, 'duration' => 45]);
 
     $this->expertWithB = Expert::factory()->create();
     $expertHallB = ExpertHall::factory()->create([
         'expert_id' => $this->expertWithB->id,
         'hall_id' => $this->hall->id,
     ]);
-    $expertHallB->services()->attach($this->serviceB->id);
+    $expertHallB->services()->attach($this->serviceB->id, ['price' => 200000, 'duration' => 60]);
 });
 
 test('the user should be authenticated to see a hall staff', function () {
@@ -73,7 +73,12 @@ test('it returns only staff offering the requested service', function () {
 
     expect($data)->toHaveCount(1);
     expect($data[0]['id'])->toBe($this->expertWithA->id);
-    expect($data[0]['services'])->toBe([$this->serviceA->sub_cat_name]);
+    expect($data[0]['services'])->toBe([[
+        'id' => $this->serviceA->id,
+        'sub_cat_name' => $this->serviceA->sub_cat_name,
+        'price' => 150000,
+        'duration' => 45,
+    ]]);
 });
 
 test('it returns staff matching any of several requested services', function () {
@@ -107,5 +112,10 @@ test('services only lists the requested services a staff member actually offers'
     $data = $response->json('data');
 
     expect($data)->toHaveCount(1);
-    expect($data[0]['services'])->toBe([$this->serviceA->sub_cat_name]);
+    expect($data[0]['services'])->toBe([[
+        'id' => $this->serviceA->id,
+        'sub_cat_name' => $this->serviceA->sub_cat_name,
+        'price' => 150000,
+        'duration' => 45,
+    ]]);
 });

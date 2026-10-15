@@ -16,14 +16,33 @@ function staff(int $id, array $serviceIds): array
     ];
 }
 
-test('it returns the services it was given as-is', function () {
+test('a service with no staff pricing it yet has a null price range', function () {
     $services = [
         ['id' => 1, 'cat_id' => 1, 'cat_name' => 'Hair', 'sub_cat_id' => 10, 'sub_cat_name' => 'Cut', 'icon' => null],
     ];
 
     $hall = new Hall(1, 'Rose Salon', $services, []);
 
-    expect($hall->services())->toBe($services);
+    expect($hall->services())->toBe([
+        [...$services[0], 'price_min' => null, 'price_max' => null],
+    ]);
+});
+
+test('a service is annotated with the min and max price staff charge for it', function () {
+    $services = [
+        ['id' => 10, 'cat_id' => 1, 'cat_name' => 'Hair', 'sub_cat_id' => 10, 'sub_cat_name' => 'Cut', 'icon' => null],
+    ];
+    $staffA = staff(1, [10]);
+    $staffA['services'][0]['price'] = 100;
+    $staffB = staff(2, [10]);
+    $staffB['services'][0]['price'] = 300;
+
+    $hall = new Hall(1, 'Rose Salon', $services, [$staffA, $staffB]);
+
+    $result = $hall->services();
+
+    expect($result[0]['price_min'])->toBe(100)
+        ->and($result[0]['price_max'])->toBe(300);
 });
 
 test('staff offering at least one requested service is included', function () {
