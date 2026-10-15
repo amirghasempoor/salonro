@@ -38,7 +38,7 @@ class AuthService
 
         return [
             'token' => $expert->createToken('EXPERT_TOKEN', ['*'], now()->addWeek())->plainTextToken,
-            'role' => $expert->getRoleNames()->first(),
+            'roles' => $expert->getRoleNames()->values(),
         ];
     }
 
@@ -70,7 +70,7 @@ class AuthService
         return [
             'token' => $expert->createToken('EXPERT_TOKEN', ['*'], now()->addWeek())->plainTextToken,
             'is_verified' => $expert->is_verified,
-            'role' => $expert->getRoleNames()->first(),
+            'roles' => $expert->getRoleNames()->values(),
         ];
     }
 
@@ -85,7 +85,7 @@ class AuthService
         return [
             'token' => $expert->createToken('EXPERT_TOKEN', ['*'], now()->addWeek())->plainTextToken,
             'is_verified' => $expert->is_verified,
-            'role' => $expert->getRoleNames()->first(),
+            'roles' => $expert->getRoleNames()->values(),
         ];
     }
 

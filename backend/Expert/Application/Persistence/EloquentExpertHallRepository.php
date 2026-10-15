@@ -4,7 +4,9 @@ namespace Expert\Application\Persistence;
 
 use App\Models\Expert;
 use App\Models\ExpertHall;
+use App\Models\ExpertService;
 use App\Models\Hall;
+use App\Models\HallService;
 use App\Models\WorkingHour;
 use Expert\Domain\Repositories\ExpertHallRepositoryInterface;
 
@@ -82,5 +84,29 @@ class EloquentExpertHallRepository implements ExpertHallRepositoryInterface
         foreach ($workingHours as $workingHour) {
             $hall->workingHours()->create($workingHour);
         }
+    }
+
+    public function hallOffersService(int $hallId, int $serviceId): bool
+    {
+        return HallService::query()
+            ->where('hall_id', '=', $hallId)
+            ->where('service_id', '=', $serviceId)
+            ->where('is_active', '=', true)
+            ->exists();
+    }
+
+    public function defineService(ExpertHall $expertHall, int $serviceId, float $price, float $duration): ExpertService
+    {
+        return ExpertService::query()->updateOrCreate(
+            [
+                'serviceable_type' => ExpertHall::class,
+                'serviceable_id' => $expertHall->id,
+                'service_id' => $serviceId,
+            ],
+            [
+                'price' => $price,
+                'duration' => $duration,
+            ],
+        );
     }
 }

@@ -3,7 +3,6 @@
 namespace Expert\Application\Services\Manager;
 
 use App\Models\City;
-use App\Models\Expert;
 use App\Models\Hall;
 use App\Models\Province;
 use Expert\Application\Http\Requests\Manager\Hall\StoreRequest;
@@ -18,9 +17,12 @@ class HallManagementService
 {
     public function index(Request $request): array
     {
-        $query = Expert::query()
-            ->find(Auth::guard('expert')->user()->id)
-            ->halls()->select(['halls.id', 'owner_name', 'name', 'lat', 'lng', 'address']);
+        $expert = Auth::guard('expert')->user();
+
+        $query = $expert
+            ->halls()
+            ->select(['halls.id', 'owner_name', 'name', 'lat', 'lng', 'address', 'is_solo'])
+            ->withRoleFor($expert);
 
         return DataTableFacade::run(
             $query,
@@ -54,14 +56,10 @@ class HallManagementService
                 'city_id' => $city->id,
                 'city_name' => $city->name,
                 'description' => $request->description,
+                'is_solo' => $request->boolean('is_solo'),
             ]);
 
-            foreach ($request->services as $service) {
-                $hall->services()->attach($service['service_id'], [
-                    'price' => $service['price'],
-                    'duration' => $service['duration'],
-                ]);
-            }
+            $hall->services()->attach($request->services);
 
             $hall->experts()->attach($owner->id);
 

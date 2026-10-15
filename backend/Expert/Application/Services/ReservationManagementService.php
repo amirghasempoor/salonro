@@ -13,14 +13,14 @@ use Throwable;
 class ReservationManagementService
 {
     /**
-     * A plain expert sees only their own reservations in the hall; the owner
-     * and other managers see all of them.
+     * The hall's owner sees every reservation in it; any other staff member
+     * sees only their own.
      */
     public function index(Request $request, Hall $hall, Expert $expert): array
     {
         $query = Reservation::query()->with('services')->where('hall_id', '=', $hall->id);
 
-        if ($expert->hasRole('expert')) {
+        if ($hall->owner_id !== $expert->id) {
             $query->where('expert_id', '=', $expert->id);
         }
 

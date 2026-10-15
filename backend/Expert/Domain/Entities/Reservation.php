@@ -6,14 +6,15 @@ use DateTimeImmutable;
 use DateTimeInterface;
 use Expert\Domain\Exceptions\Reservation\OutsideWorkingHoursException;
 use Expert\Domain\Exceptions\Reservation\ReservationConflictException;
-use Expert\Domain\Exceptions\Reservation\ServiceNotOfferedByHallException;
+use Expert\Domain\Exceptions\Reservation\ServiceNotPricedByExpertException;
 
 /**
  * A booking of an expert for a customer at a hall.
  *
  * It owns the booking rules: the slot must fit the expert's working hours and
  * must not overlap any active reservation of the expert or the customer, and
- * services are priced from the hall — never from client input.
+ * services are priced from the expert's own prices — never from client
+ * input, and never from the hall.
  *
  * Immutable: rescheduling returns a new Reservation. $baseTotal is the price of
  * the services before any discount; discounts are applied afterwards.
@@ -44,7 +45,7 @@ final readonly class Reservation
      *
      * @throws OutsideWorkingHoursException
      * @throws ReservationConflictException
-     * @throws ServiceNotOfferedByHallException
+     * @throws ServiceNotPricedByExpertException
      */
     public static function book(
         Hall $hall,
@@ -107,7 +108,7 @@ final readonly class Reservation
      *
      * @throws OutsideWorkingHoursException
      * @throws ReservationConflictException
-     * @throws ServiceNotOfferedByHallException
+     * @throws ServiceNotPricedByExpertException
      */
     public function reschedule(
         Hall $hall,

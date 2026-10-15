@@ -2,6 +2,7 @@
 
 namespace Expert\Application\Http\Resources;
 
+use App\Enums\Roles;
 use App\Models\Expert;
 use App\Models\Service;
 use Illuminate\Http\Request;
@@ -23,12 +24,16 @@ class HallResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'id' => $this->id,
-            'name' => $this->name,
+            'id' => $this->resource->id,
+            'name' => $this->resource->name,
+            'role' => $this->expert === null
+                ? null
+                : ($this->owner_id === $this->expert->id ? Roles::Manager->value : Roles::Expert->value),
             'working_hours' => $this->expert
-                ?->workingHoursAtHall($this->id)
+                ?->workingHoursAtHall($this->resource->id)
                 ->get(['day', 'from', 'to']),
             'services' => $this->expertServices(),
+            'is_solo' => $this->resource->is_solo,
         ];
     }
 

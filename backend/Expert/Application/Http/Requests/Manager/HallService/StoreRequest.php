@@ -24,9 +24,6 @@ class StoreRequest extends FormRequest
     {
         return [
             'service_id' => 'required|integer|exists:services,id',
-            'description' => 'nullable|string|max:255',
-            'duration' => 'required|integer|between:1,1000000',
-            'price' => 'required|integer|between:1,1000000',
         ];
     }
 }

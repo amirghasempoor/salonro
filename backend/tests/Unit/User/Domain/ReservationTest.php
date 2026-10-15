@@ -5,19 +5,27 @@ use User\Domain\Entities\Hall;
 use User\Domain\Entities\Reservation;
 use User\Domain\Exceptions\Reservation\OutsideWorkingHoursException;
 use User\Domain\Exceptions\Reservation\ReservationConflictException;
-use User\Domain\Exceptions\Reservation\ServiceNotOfferedByHallException;
+use User\Domain\Exceptions\Reservation\ServiceNotPricedByExpertException;
 
 uses(TestCase::class);
 
 // 2026-09-21 is a Monday.
 const MONDAY_9_TO_17 = [['day' => 'mon', 'from' => '09:00', 'to' => '17:00']];
 
-function hallOffering(int $hallId = 7, string $hallName = 'Rose Salon'): Hall
+function hallOffering(int $hallId = 7, string $hallName = 'Rose Salon', int $expertId = 22): Hall
 {
-    return new Hall($hallId, $hallName, [
-        ['id' => 1, 'cat_id' => 1, 'cat_name' => 'Hair', 'sub_cat_id' => 10, 'sub_cat_name' => 'Haircut', 'icon' => null, 'price' => 100, 'duration' => 30],
-        ['id' => 2, 'cat_id' => 1, 'cat_name' => 'Hair', 'sub_cat_id' => 11, 'sub_cat_name' => 'Color', 'icon' => null, 'price' => 250, 'duration' => 90],
-    ], []);
+    return new Hall($hallId, $hallName, [], [
+        [
+            'id' => $expertId,
+            'first_name' => 'Neda',
+            'last_name' => 'Karimi',
+            'avatar' => null,
+            'services' => [
+                ['id' => 1, 'sub_cat_name' => 'Haircut', 'price' => 100, 'duration' => 30],
+                ['id' => 2, 'sub_cat_name' => 'Color', 'price' => 250, 'duration' => 90],
+            ],
+        ],
+    ]);
 }
 
 function busyReservation(int $id, string $start, string $finish): array
@@ -88,10 +96,10 @@ test('back-to-back reservations do not conflict', function () {
 
 test('booking a service the hall does not offer is rejected', function () {
     bookReservationAt('2026-09-21 10:00', '2026-09-21 11:00', [99]);
-})->throws(ServiceNotOfferedByHallException::class);
+})->throws(ServiceNotPricedByExpertException::class);
 
 test('rescheduling can move the reservation to a different hall and expert', function () {
-    $otherHall = hallOffering(9, 'Lotus Salon');
+    $otherHall = hallOffering(9, 'Lotus Salon', 33);
 
     $rescheduled = existingUserReservation()->reschedule(
         hall: $otherHall,

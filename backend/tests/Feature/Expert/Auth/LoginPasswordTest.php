@@ -66,7 +66,7 @@ test('expert can login with password', function () {
         'data' => [
             'token',
             'is_verified',
-            'role',
+            'roles',
         ],
     ]);
 });

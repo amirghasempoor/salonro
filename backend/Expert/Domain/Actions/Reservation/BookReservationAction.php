@@ -6,7 +6,7 @@ use Expert\Domain\DTOs\Reservation\BookReservationDto;
 use Expert\Domain\Entities\Reservation;
 use Expert\Domain\Exceptions\Reservation\OutsideWorkingHoursException;
 use Expert\Domain\Exceptions\Reservation\ReservationConflictException;
-use Expert\Domain\Exceptions\Reservation\ServiceNotOfferedByHallException;
+use Expert\Domain\Exceptions\Reservation\ServiceNotPricedByExpertException;
 use Expert\Domain\Repositories\ExpertHallRepositoryInterface;
 use Expert\Domain\Repositories\Reservation\ReservationRepositoryInterface;
 use Illuminate\Support\Facades\DB;
@@ -27,7 +27,7 @@ readonly class BookReservationAction
     /**
      * @throws OutsideWorkingHoursException when the slot does not fit the expert's working hours
      * @throws ReservationConflictException when the expert or the customer is already booked in that slot
-     * @throws ServiceNotOfferedByHallException when a requested service is not offered by the hall
+     * @throws ServiceNotPricedByExpertException when the expert has not priced a requested service
      * @throws Throwable
      */
     public function execute(BookReservationDto $dto): Reservation
@@ -36,7 +36,7 @@ readonly class BookReservationAction
             $customer = $this->reservations->findOrCreateCustomer($dto->phoneNumber, $dto->firstName, $dto->lastName);
 
             $reservation = Reservation::book(
-                hall: $this->reservations->findHall($dto->hallId),
+                hall: $this->reservations->findHall($dto->hallId, $dto->expertId),
                 userId: $customer['id'],
                 userName: $customer['name'],
                 expertId: $dto->expertId,

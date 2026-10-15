@@ -8,7 +8,7 @@ use User\Domain\DTOs\Reservation\RescheduleReservationDto;
 use User\Domain\Entities\Reservation;
 use User\Domain\Exceptions\Reservation\OutsideWorkingHoursException;
 use User\Domain\Exceptions\Reservation\ReservationConflictException;
-use User\Domain\Exceptions\Reservation\ServiceNotOfferedByHallException;
+use User\Domain\Exceptions\Reservation\ServiceNotPricedByExpertException;
 use User\Domain\Repositories\HallRepositoryInterface;
 use User\Domain\Repositories\Reservation\ReservationRepositoryInterface;
 
@@ -28,7 +28,7 @@ readonly class RescheduleReservationAction
     /**
      * @throws OutsideWorkingHoursException when the slot does not fit the expert's working hours
      * @throws ReservationConflictException when the expert or the customer is already booked in that slot
-     * @throws ServiceNotOfferedByHallException when a requested service is not offered by the hall
+     * @throws ServiceNotPricedByExpertException when the expert has not priced a requested service
      * @throws Throwable
      */
     public function execute(int $reservationId, RescheduleReservationDto $dto): Reservation

@@ -6,7 +6,6 @@ use App\Enums\ReservationStates;
 use App\Models\Expert;
 use App\Models\Hall;
 use App\Models\Reservation;
-use App\Models\Service;
 use App\Models\User;
 use App\Models\WorkingHour;
 use Illuminate\Database\Eloquent\Collection;
@@ -51,16 +50,15 @@ class ReservationManagementService
 
     /**
      * Staff at the hall who provide at least one of the requested services —
-     * so a customer booking can see who they're able to choose from, and
-     * which of the requested services each of them can actually perform.
+     * so a customer booking can see who they're able to choose from, what
+     * each of them charges, and how long it'll take.
      *
      * @param  list<int>  $serviceIds
-     * @return list<array{id: int, first_name: string, last_name: string, avatar: ?string, services: list<string>}>
+     * @return list<array{id: int, first_name: string, last_name: string, avatar: ?string, services: list<array{id: int, sub_cat_name: string, price: mixed, duration: mixed}>}>
      */
     public function staff(Hall $hall, array $serviceIds): array
     {
         $hallEntity = $this->hallRepository->find($hall->id);
-        $serviceNames = Service::query()->whereIn('id', $serviceIds)->pluck('sub_cat_name', 'id');
 
         return array_map(
             fn (array $member) => [
@@ -68,9 +66,9 @@ class ReservationManagementService
                 'first_name' => $member['first_name'],
                 'last_name' => $member['last_name'],
                 'avatar' => $member['avatar'],
-                'services' => array_values(array_map(
-                    fn (int $serviceId) => $serviceNames[$serviceId],
-                    array_intersect($member['service_ids'], $serviceIds),
+                'services' => array_values(array_filter(
+                    $member['services'],
+                    fn (array $service) => in_array($service['id'], $serviceIds),
                 )),
             ],
             $hallEntity->staffOffering($serviceIds),

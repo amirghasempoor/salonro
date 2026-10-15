@@ -51,3 +51,25 @@ test('manager cannot see a hall they do not own', function () {
     $this->getJson(route('expert.hall.show', [$this->expertHall->hall_id]))
         ->assertForbidden();
 });
+
+test('a staff member assigned to the hall can see its info without the manager role', function () {
+    $staff = Expert::factory()->create();
+    $staff->assignRole('expert');
+    ExpertHall::factory()->create([
+        'expert_id' => $staff->id,
+        'hall_id' => $this->expertHall->hall_id,
+    ]);
+    Sanctum::actingAs($staff, ['*'], 'expert');
+
+    $this->getJson(route('expert.hall.show', [$this->expertHall->hall_id]))
+        ->assertOk();
+});
+
+test('an expert not assigned to the hall cannot see its info', function () {
+    $stranger = Expert::factory()->create();
+    $stranger->assignRole('expert');
+    Sanctum::actingAs($stranger, ['*'], 'expert');
+
+    $this->getJson(route('expert.hall.show', [$this->expertHall->hall_id]))
+        ->assertForbidden();
+});

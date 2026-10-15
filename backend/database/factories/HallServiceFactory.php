@@ -22,9 +22,6 @@ class HallServiceFactory extends Factory
         return [
             'hall_id' => Hall::factory(),
             'service_id' => Service::factory(),
-            'description' => null,
-            'duration' => 60,
-            'price' => 150000,
             'is_active' => true,
         ];
     }

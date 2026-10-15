@@ -10,6 +10,7 @@ use Expert\Application\Policies\Manager\HallPolicy;
 use Expert\Application\Policies\Manager\HallServicePolicy;
 use Expert\Application\Policies\Manager\JobOfferPolicy;
 use Expert\Application\Policies\Manager\StaffPolicy;
+use Expert\Application\Policies\MyServicePolicy;
 use Expert\Application\Policies\ReservationPolicy;
 use Expert\Domain\Repositories\ExpertHallRepositoryInterface;
 use Expert\Domain\Repositories\Manager\JobOfferApplicationRepositoryInterface;
@@ -47,6 +48,10 @@ class ExpertServiceProvider extends ServiceProvider
         Gate::define('hallService.show', [HallServicePolicy::class, 'show']);
         Gate::define('hallService.update', [HallServicePolicy::class, 'update']);
         Gate::define('hallService.delete', [HallServicePolicy::class, 'delete']);
+
+        Gate::define('myService.show', [MyServicePolicy::class, 'show']);
+        Gate::define('myService.update', [MyServicePolicy::class, 'update']);
+        Gate::define('myService.delete', [MyServicePolicy::class, 'delete']);
 
         Gate::define('staff.view', [StaffPolicy::class, 'view']);
         Gate::define('staff.store', [StaffPolicy::class, 'store']);

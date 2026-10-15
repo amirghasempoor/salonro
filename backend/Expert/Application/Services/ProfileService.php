@@ -83,10 +83,12 @@ class ProfileService
 
     public function myHalls(Request $request): array
     {
-        $query = Auth::guard('expert')
-            ->user()
+        $expert = Auth::guard('expert')->user();
+
+        $query = $expert
             ->halls()
-            ->select(['halls.id', 'owner_name', 'name', 'lat', 'lng', 'address']);
+            ->select(['halls.id', 'owner_name', 'name', 'lat', 'lng', 'address', 'is_solo'])
+            ->withRoleFor($expert);
 
         return DataTableFacade::run(
             $query,

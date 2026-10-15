@@ -32,10 +32,9 @@ class StoreRequest extends FormRequest
             'province_id' => 'required|exists:provinces,id',
             'city_id' => 'required|exists:cities,id',
             'description' => 'string',
+            'is_solo' => 'boolean',
             'services' => 'required|array',
-            'services.*.duration' => 'required',
-            'services.*.price' => 'required',
-            'services.*.service_id' => 'required|exists:services,id',
+            'services.*' => 'required|integer|exists:services,id',
         ];
     }
 }

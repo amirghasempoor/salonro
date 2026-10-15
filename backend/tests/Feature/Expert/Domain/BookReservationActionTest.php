@@ -4,6 +4,7 @@ use App\Enums\ReservationStates;
 use App\Models\Discount;
 use App\Models\Expert;
 use App\Models\ExpertHall;
+use App\Models\ExpertService;
 use App\Models\Hall;
 use App\Models\HallService;
 use App\Models\Reservation;
@@ -13,7 +14,7 @@ use Expert\Domain\Actions\Reservation\BookReservationAction;
 use Expert\Domain\DTOs\Reservation\BookReservationDto;
 use Expert\Domain\Exceptions\Reservation\OutsideWorkingHoursException;
 use Expert\Domain\Exceptions\Reservation\ReservationConflictException;
-use Expert\Domain\Exceptions\Reservation\ServiceNotOfferedByHallException;
+use Expert\Domain\Exceptions\Reservation\ServiceNotPricedByExpertException;
 use Illuminate\Support\Carbon;
 
 beforeEach(function () {
@@ -26,8 +27,6 @@ beforeEach(function () {
     HallService::factory()->create([
         'hall_id' => $this->hall->id,
         'service_id' => $this->service->id,
-        'price' => 200000,
-        'duration' => 60,
     ]);
 
     $this->expertHall = ExpertHall::factory()->create([
@@ -35,6 +34,14 @@ beforeEach(function () {
         'hall_id' => $this->hall->id,
     ]);
     seedFullWeekWorkingHours($this->expertHall);
+
+    ExpertService::factory()->create([
+        'serviceable_type' => ExpertHall::class,
+        'serviceable_id' => $this->expertHall->id,
+        'service_id' => $this->service->id,
+        'price' => 200000,
+        'duration' => 60,
+    ]);
 
     $this->start = Carbon::now()->addDay()->setTime(10, 0)->toImmutable();
     $this->finish = $this->start->addHour();
@@ -172,11 +179,11 @@ test('a cancelled reservation does not block the slot', function () {
     expect($reservation->id)->not->toBeNull();
 });
 
-test('it rejects a service the hall does not offer and persists nothing', function () {
+test('it rejects a service the expert has not priced and persists nothing', function () {
     $other = Service::factory()->create();
 
     expect(fn () => app(BookReservationAction::class)->execute(bookDto($this, ['serviceIds' => [$other->id]])))
-        ->toThrow(ServiceNotOfferedByHallException::class);
+        ->toThrow(ServiceNotPricedByExpertException::class);
 
     expect(Reservation::query()->count())->toBe(0);
 });

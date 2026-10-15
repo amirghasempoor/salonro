@@ -56,54 +56,6 @@ test('service id should be existed', function () {
     ]);
 });
 
-test('duration is required', function () {
-    $expert = Expert::query()->find($this->expertHall->expert_id);
-    $expert->assignRole('manager');
-    Sanctum::actingAs($expert, ['*'], 'expert');
-    $response = $this->postJson(route('expert.services.update', $this->hallService->id));
-
-    $response->assertStatus(422);
-    $response->assertJsonValidationErrorFor('duration');
-});
-
-test('duration should be integer', function () {
-    $expert = Expert::query()->find($this->expertHall->expert_id);
-    $expert->assignRole('manager');
-    Sanctum::actingAs($expert, ['*'], 'expert');
-    $response = $this->postJson(route('expert.services.update', $this->hallService->id), [
-        'duration' => fake()->word(),
-    ]);
-
-    $response->assertStatus(422);
-    $response->assertJsonValidationErrors([
-        'duration' => __('validation.integer', ['attribute' => 'duration']),
-    ]);
-});
-
-test('price is required', function () {
-    $expert = Expert::query()->find($this->expertHall->expert_id);
-    $expert->assignRole('manager');
-    Sanctum::actingAs($expert, ['*'], 'expert');
-    $response = $this->postJson(route('expert.services.update', $this->hallService->id));
-
-    $response->assertStatus(422);
-    $response->assertJsonValidationErrorFor('price');
-});
-
-test('price should be integer', function () {
-    $expert = Expert::query()->find($this->expertHall->expert_id);
-    $expert->assignRole('manager');
-    Sanctum::actingAs($expert, ['*'], 'expert');
-    $response = $this->postJson(route('expert.services.update', $this->hallService->id), [
-        'price' => fake()->word(),
-    ]);
-
-    $response->assertStatus(422);
-    $response->assertJsonValidationErrors([
-        'price' => __('validation.integer', ['attribute' => 'price']),
-    ]);
-});
-
 test('is active is required', function () {
     $expert = Expert::query()->find($this->expertHall->expert_id);
     $expert->assignRole('manager');
@@ -137,9 +89,6 @@ test('manager can update a hall service', function () {
 
     $data = [
         'service_id' => $service->id,
-        'description' => fake()->sentence(),
-        'duration' => fake()->numberBetween(1, 100),
-        'price' => fake()->numberBetween(1, 100),
         'is_active' => false,
     ];
 
@@ -156,9 +105,6 @@ test('manager can update a hall service', function () {
     $this->assertDatabaseHas('hall_service', [
         'id' => $this->hallService->id,
         'service_id' => $service->id,
-        'description' => $data['description'],
-        'duration' => $data['duration'],
-        'price' => $data['price'],
         'is_active' => 0,
     ]);
 });

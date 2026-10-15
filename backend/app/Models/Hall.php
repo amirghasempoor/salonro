@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\Roles;
 use App\Support\Geo;
 use Database\Factories\HallFactory;
 use Illuminate\Database\Eloquent\Builder;
@@ -38,7 +39,7 @@ class Hall extends Model
 
     public function services(): BelongsToMany
     {
-        return $this->belongsToMany(Service::class)->withPivot('description', 'price', 'duration');
+        return $this->belongsToMany(Service::class);
     }
 
     public function jobOffers(): HasMany
@@ -66,5 +67,17 @@ class Hall extends Model
                 $this->getTable(),
             )
             ->where('distance', '<=', $radiusKm);
+    }
+
+    /**
+     * Annotate each hall with the part the expert plays in it: manager when
+     * she owns it, expert when she only works there.
+     */
+    public function scopeWithRoleFor(Builder $query, Expert $expert): Builder
+    {
+        return $query->selectRaw(
+            'case when halls.owner_id = ? then ? else ? end as role',
+            [$expert->id, Roles::Manager->value, Roles::Expert->value],
+        );
     }
 }

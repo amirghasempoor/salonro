@@ -53,7 +53,7 @@ class Expert extends Authenticatable
 
     public function services(): MorphToMany
     {
-        return $this->morphToMany(Service::class, 'serviceable', 'expert_service');
+        return $this->morphToMany(Service::class, 'serviceable', 'expert_service')->withPivot('price', 'duration');
     }
 
     public function jobOffers(): HasMany

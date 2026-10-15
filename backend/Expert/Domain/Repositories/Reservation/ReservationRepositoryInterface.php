@@ -18,9 +18,10 @@ interface ReservationRepositoryInterface
     public function expertName(int $expertId): string;
 
     /**
-     * The hall with the services it offers.
+     * The hall with the services the given expert personally offers and
+     * prices there.
      */
-    public function findHall(int $hallId): Hall;
+    public function findHall(int $hallId, int $expertId): Hall;
 
     /**
      * Active (not cancelled) reservations of the expert or the customer on the

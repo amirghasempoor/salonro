@@ -42,9 +42,6 @@ test('manager can see a hall service info', function () {
         'data' => [
             'id',
             'service_id',
-            'description',
-            'duration',
-            'price',
             'is_active',
             'service' => [
                 'id',

@@ -245,18 +245,7 @@ test('manager can store a hall', function () {
         'telephone' => fake()->phoneNumber,
         'province_id' => $province->id,
         'city_id' => $city->id,
-        'services' => [
-            [
-                'service_id' => $service1->id,
-                'duration' => fake()->numberBetween(1, 100),
-                'price' => fake()->numberBetween(1, 100),
-            ],
-            [
-                'service_id' => $service2->id,
-                'duration' => fake()->numberBetween(1, 100),
-                'price' => fake()->numberBetween(1, 100),
-            ],
-        ],
+        'services' => [$service1->id, $service2->id],
     ];
 
     $response = $this->postJson(route('expert.hall.store'), $data);
@@ -284,18 +273,79 @@ test('manager can store a hall', function () {
 
     $this->assertDatabaseHas('hall_service', [
         'service_id' => $service1->id,
-        'duration' => $data['services'][0]['duration'],
-        'price' => $data['services'][0]['price'],
     ]);
 
     $this->assertDatabaseHas('hall_service', [
         'service_id' => $service2->id,
-        'duration' => $data['services'][1]['duration'],
-        'price' => $data['services'][1]['price'],
     ]);
 
     $this->assertDatabaseHas('expert_hall', [
         'expert_id' => $expert->id,
         'hall_id' => Hall::query()->first()->id,
+    ]);
+});
+
+test('a hall is not solo by default', function () {
+    $expert = Expert::factory()->create();
+    $expert->assignRole('manager');
+    Sanctum::actingAs($expert, ['*'], 'expert');
+
+    $province = Province::factory()->create();
+    $city = City::factory()->create();
+    $service = Service::factory()->create();
+
+    $response = $this->postJson(route('expert.hall.store'), [
+        'name' => fake()->name,
+        'lat' => (string) fake()->latitude,
+        'lng' => (string) fake()->longitude,
+        'address' => fake()->address,
+        'postal_code' => fake()->numerify(),
+        'telephone' => fake()->phoneNumber,
+        'province_id' => $province->id,
+        'city_id' => $city->id,
+        'services' => [$service->id],
+    ]);
+
+    $response->assertOk();
+
+    $this->assertDatabaseHas('halls', [
+        'id' => $response->json('data.hall_id'),
+        'is_solo' => false,
+    ]);
+});
+
+test('manager can store a solo hall for herself as a freelancer', function () {
+    $expert = Expert::factory()->create();
+    $expert->assignRole('manager');
+    Sanctum::actingAs($expert, ['*'], 'expert');
+
+    $province = Province::factory()->create();
+    $city = City::factory()->create();
+    $service = Service::factory()->create();
+
+    $response = $this->postJson(route('expert.hall.store'), [
+        'name' => fake()->name,
+        'lat' => (string) fake()->latitude,
+        'lng' => (string) fake()->longitude,
+        'address' => fake()->address,
+        'postal_code' => fake()->numerify(),
+        'telephone' => fake()->phoneNumber,
+        'province_id' => $province->id,
+        'city_id' => $city->id,
+        'is_solo' => true,
+        'services' => [$service->id],
+    ]);
+
+    $response->assertOk();
+
+    $this->assertDatabaseHas('halls', [
+        'id' => $response->json('data.hall_id'),
+        'owner_id' => $expert->id,
+        'is_solo' => true,
+    ]);
+
+    $this->assertDatabaseHas('expert_hall', [
+        'expert_id' => $expert->id,
+        'hall_id' => $response->json('data.hall_id'),
     ]);
 });

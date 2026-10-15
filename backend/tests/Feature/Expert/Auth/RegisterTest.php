@@ -258,7 +258,7 @@ test('expert can be registered', function () {
     $response->assertOk();
     $response->assertJsonStructure([
         'data' => [
-            'role',
+            'roles',
             'token',
         ],
     ]);

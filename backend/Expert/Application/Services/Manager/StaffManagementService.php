@@ -8,6 +8,7 @@ use App\Models\ExpertHall;
 use App\Models\Hall;
 use Expert\Application\Http\Requests\Manager\Staff\StoreRequest;
 use Expert\Application\Http\Requests\Manager\Staff\ToggleActivationRequest;
+use Expert\Domain\Exceptions\Manager\SoloHallCannotHaveStaffException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Shared\Facades\DataTable\DataTableFacade;
@@ -31,6 +32,8 @@ class StaffManagementService
      */
     public function store(StoreRequest $request, Hall $hall): void
     {
+        throw_if($hall->is_solo, SoloHallCannotHaveStaffException::forHall());
+
         DB::transaction(function () use ($request, $hall) {
             $expert = Expert::query()->firstOrCreate(
                 [

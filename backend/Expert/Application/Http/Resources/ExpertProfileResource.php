@@ -19,7 +19,7 @@ class ExpertProfileResource extends JsonResource
             'last_name' => $this->resource->last_name,
             'avatar' => $this->resource->avatar,
             'phone_number' => $this->resource->phone_number,
-            'role' => $this->resource->getRoleNames()->first(),
+            'roles' => $this->resource->getRoleNames()->values(),
             'halls' => $this->resource->halls->map(
                 fn ($hall) => new HallResource($hall, $this->resource)
             ),

@@ -4,7 +4,7 @@ use Expert\Domain\Entities\Hall;
 use Expert\Domain\Entities\Reservation;
 use Expert\Domain\Exceptions\Reservation\OutsideWorkingHoursException;
 use Expert\Domain\Exceptions\Reservation\ReservationConflictException;
-use Expert\Domain\Exceptions\Reservation\ServiceNotOfferedByHallException;
+use Expert\Domain\Exceptions\Reservation\ServiceNotPricedByExpertException;
 use Tests\TestCase;
 
 uses(TestCase::class);
@@ -147,7 +147,7 @@ test('back-to-back reservations do not conflict', function () {
 
 test('booking a service the hall does not offer is rejected', function () {
     bookAt('2026-09-21 10:00', '2026-09-21 11:00', [1, 99]);
-})->throws(ServiceNotOfferedByHallException::class);
+})->throws(ServiceNotPricedByExpertException::class);
 
 // --- reschedule ---
 
@@ -198,4 +198,4 @@ test('rescheduling outside the working hours is rejected', function () {
 
 test('rescheduling to a service the hall does not offer is rejected', function () {
     rescheduleTo(existingReservation(), '2026-09-21 13:00', '2026-09-21 14:00', [99]);
-})->throws(ServiceNotOfferedByHallException::class);
+})->throws(ServiceNotPricedByExpertException::class);

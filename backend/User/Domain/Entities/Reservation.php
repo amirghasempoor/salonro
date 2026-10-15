@@ -6,14 +6,15 @@ use DateTimeImmutable;
 use DateTimeInterface;
 use User\Domain\Exceptions\Reservation\OutsideWorkingHoursException;
 use User\Domain\Exceptions\Reservation\ReservationConflictException;
-use User\Domain\Exceptions\Reservation\ServiceNotOfferedByHallException;
+use User\Domain\Exceptions\Reservation\ServiceNotPricedByExpertException;
 
 /**
  * A customer's booking of an expert at a hall.
  *
  * It owns the booking rules: the slot must fit the expert's working hours and
  * must not overlap any active reservation of the expert or the customer, and
- * services are priced from the hall — never from client input.
+ * services are priced from the chosen expert's own prices — never from
+ * client input, and never from the hall.
  *
  * Immutable: rescheduling returns a new Reservation. Unlike the expert-side
  * booking, a customer may rebook with a different expert or hall entirely, so
@@ -47,7 +48,7 @@ final readonly class Reservation
      *
      * @throws OutsideWorkingHoursException
      * @throws ReservationConflictException
-     * @throws ServiceNotOfferedByHallException
+     * @throws ServiceNotPricedByExpertException
      */
     public static function book(
         Hall $hall,
@@ -63,7 +64,7 @@ final readonly class Reservation
     ): self {
         self::assertAvailable($start, $finish, $workingHours, $busySlots, ignoreId: null);
 
-        $priced = $hall->priceServices($serviceIds);
+        $priced = $hall->priceServices($serviceIds, $expertId);
 
         return new self(
             id: null,
@@ -111,7 +112,7 @@ final readonly class Reservation
      *
      * @throws OutsideWorkingHoursException
      * @throws ReservationConflictException
-     * @throws ServiceNotOfferedByHallException
+     * @throws ServiceNotPricedByExpertException
      */
     public function reschedule(
         Hall $hall,
@@ -125,7 +126,7 @@ final readonly class Reservation
     ): self {
         self::assertAvailable($start, $finish, $workingHours, $busySlots, ignoreId: $this->id);
 
-        $priced = $hall->priceServices($serviceIds);
+        $priced = $hall->priceServices($serviceIds, $expertId);
 
         return new self(
             id: $this->id,

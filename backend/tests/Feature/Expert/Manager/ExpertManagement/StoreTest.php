@@ -129,3 +129,23 @@ test('manager cannot store a staff on a hall they do not own', function () {
 
     $this->postJson(route('expert.staff.store', [$this->hall->id]))->assertForbidden();
 });
+
+test('manager cannot store a staff on a solo hall', function () {
+    $this->owner->assignRole('manager');
+    Sanctum::actingAs($this->owner, ['*'], 'expert');
+
+    $soloHall = Hall::factory()->solo()->create(['owner_id' => $this->owner->id]);
+
+    $service = Service::factory()->create();
+
+    $response = $this->postJson(route('expert.staff.store', [$soloHall->id]), [
+        'phone_number' => '09'.fake()->numerify('#########'),
+        'services' => [$service->id],
+    ]);
+
+    $response->assertStatus(422);
+    $response->assertJson([
+        'type' => 'logical_exception',
+        'message' => __('messages.solo_hall_cannot_have_staff'),
+    ]);
+});
