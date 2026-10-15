@@ -29,7 +29,7 @@ test('expert can see the profile info', function () {
             'last_name',
             'avatar',
             'phone_number',
-            'role',
+            'roles',
             'halls',
             'is_verified',
             'bio',
@@ -96,4 +96,17 @@ test('profile info returns an empty services list for a hall where the expert ha
     $this->getJson(route('expert.profile.info'))
         ->assertOk()
         ->assertJsonPath('data.halls.0.services', []);
+});
+
+test('profile info lists every role the expert holds', function () {
+    seedRoles();
+    $expert = Expert::factory()->create();
+    $expert->assignRole('manager');
+    $expert->assignRole('expert');
+    Sanctum::actingAs($expert, ['*'], 'expert');
+
+    $response = $this->getJson(route('expert.profile.info'));
+
+    $response->assertOk();
+    expect($response->json('data.roles'))->toEqualCanonicalizing(['manager', 'expert']);
 });

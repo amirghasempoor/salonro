@@ -67,7 +67,7 @@ test('expert can login with otp', function () {
         'data' => [
             'token',
             'is_verified',
-            'role',
+            'roles',
         ],
     ]);
 });
