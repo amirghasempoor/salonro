@@ -10,6 +10,7 @@ use User\Application\Http\Controllers\ReservationManagementController;
 Route::prefix('home')
     ->name('home.')
     ->controller(HomePageController::class)
+    ->whereNumber('hall')
     ->group(function () {
         Route::get('halls', 'hallsInArea')->name('hallsInArea');
         Route::get('halls/{hall}', 'hallDetails')->name('hallDetails');
@@ -43,6 +44,7 @@ Route::prefix('reservations')
     ->name('reservation.')
     ->middleware('auth:user')
     ->controller(ReservationManagementController::class)
+    ->whereNumber(['hall', 'expert', 'reservation'])
     ->group(function () {
         Route::get('/', 'index')->name('index');
         Route::post('/', 'store')->name('store');
@@ -58,6 +60,7 @@ Route::prefix('discounts')
     ->name('discount.')
     ->middleware('auth:user')
     ->controller(DiscountManagementController::class)
+    ->whereNumber('discount')
     ->group(function () {
         Route::get('/', 'index')->name('index');
         Route::get('/available', 'available')->name('available');
