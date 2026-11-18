@@ -29,6 +29,9 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->web()->preventRequestForgery(['*']);
 
+        // There is no login page to send guests to; unauthenticated requests get a 401.
+        $middleware->redirectGuestsTo(fn () => null);
+
         $middleware->alias([
             'role' => RoleMiddleware::class,
             'permission' => PermissionMiddleware::class,
@@ -36,5 +39,8 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        //
+        // This is a JSON-only API: errors must be JSON even when the client sends no
+        // Accept header, otherwise unauthenticated requests redirect to a missing
+        // `login` route and surface as a 500.
+        $exceptions->shouldRenderJsonWhen(fn () => true);
     })->create();
