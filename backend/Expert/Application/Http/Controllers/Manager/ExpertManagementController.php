@@ -5,12 +5,14 @@ namespace Expert\Application\Http\Controllers\Manager;
 use App\Http\Controllers\Controller;
 use App\Models\Expert;
 use App\Models\Hall;
+use Expert\Application\Http\Requests\Manager\Staff\ShowRequest;
 use Expert\Application\Http\Requests\Manager\Staff\StoreRequest;
 use Expert\Application\Http\Requests\Manager\Staff\ToggleActivationRequest;
 use Expert\Application\Http\Resources\Manager\ExpertDetailsResource;
 use Expert\Application\Services\Manager\StaffManagementService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use Shared\Traits\ApiResponse;
 use Throwable;
 
@@ -46,11 +48,15 @@ class ExpertManagementController extends Controller
     }
 
     /**
-     * Display the specified resource.
+     * An expert's details as seen from one of the manager's halls (`hall_id`).
      */
-    public function show(Expert $expert): JsonResponse
+    public function show(ShowRequest $request, Expert $expert): JsonResponse
     {
-        return $this->successResponse(new ExpertDetailsResource($expert));
+        $hall = Hall::query()->findOrFail($request->integer('hall_id'));
+
+        Gate::authorize('staff.show', [$hall, $expert]);
+
+        return $this->successResponse(new ExpertDetailsResource($expert, $hall));
     }
 
     /**
