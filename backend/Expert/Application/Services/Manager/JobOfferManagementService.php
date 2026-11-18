@@ -8,6 +8,7 @@ use App\Models\JobOfferApplication;
 use App\Models\Profession;
 use Expert\Application\Http\Requests\Manager\JobOffer\StoreRequest;
 use Expert\Application\Http\Requests\Manager\JobOffer\UpdateRequest;
+use Expert\Domain\Exceptions\Manager\SoloHallCannotHaveStaffException;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
 use Shared\Facades\DataTable\DataTableFacade;
@@ -27,6 +28,8 @@ class JobOfferManagementService
 
     public function store(StoreRequest $request, Hall $hall): void
     {
+        throw_if($hall->is_solo, SoloHallCannotHaveStaffException::forHall());
+
         $profession = Profession::query()->find($request->profession_id);
 
         JobOffer::query()->create([

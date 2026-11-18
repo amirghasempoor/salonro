@@ -34,7 +34,7 @@ class StoreRequest extends FormRequest
             'description' => 'string',
             'is_solo' => 'boolean',
             'services' => 'required|array',
-            'services.*' => 'required|integer|exists:services,id',
+            'services.*' => 'required|integer|distinct|exists:services,id',
         ];
     }
 }

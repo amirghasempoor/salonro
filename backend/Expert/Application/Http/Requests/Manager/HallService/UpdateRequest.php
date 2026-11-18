@@ -4,6 +4,7 @@ namespace Expert\Application\Http\Requests\Manager\HallService;
 
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class UpdateRequest extends FormRequest
 {
@@ -23,7 +24,12 @@ class UpdateRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'service_id' => 'required|integer|exists:services,id',
+            'service_id' => [
+                'required', 'integer', 'exists:services,id',
+                Rule::unique('hall_service', 'service_id')
+                    ->where('hall_id', $this->route('hallService')->hall_id)
+                    ->ignore($this->route('hallService')->id),
+            ],
             'is_active' => 'required|boolean',
         ];
     }

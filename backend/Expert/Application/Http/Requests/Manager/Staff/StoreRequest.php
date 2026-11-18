@@ -23,7 +23,7 @@ class StoreRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'phone_number' => 'required|string|max:255',
+            'phone_number' => ['required', 'string', 'regex:/^09\d{9}$/'],
             'services' => 'required|array',
             'services.*' => 'integer|exists:services,id',
         ];
