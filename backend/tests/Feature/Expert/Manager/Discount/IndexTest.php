@@ -3,6 +3,7 @@
 use App\Models\Discount;
 use App\Models\Expert;
 use App\Models\Hall;
+use App\Models\User;
 use Laravel\Sanctum\Sanctum;
 
 beforeEach(function () {
@@ -37,6 +38,32 @@ test('manager sees only their hall discounts', function () {
 
     $response->assertOk();
     expect($response->json('data'))->toHaveCount(2);
+});
+
+test('the customer on a manual discount is exposed by name only, never with credentials or contact data', function () {
+    $customer = User::factory()->create(['first_name' => 'Sara', 'last_name' => 'Ahmadi']);
+    Discount::factory()->manual($customer)->create(['hall_id' => $this->hall->id]);
+
+    $this->owner->assignRole('manager');
+    Sanctum::actingAs($this->owner, ['*'], 'expert');
+
+    $response = $this->getJson(route('expert.discount.index', [
+        'hall' => $this->hall->id,
+        'start' => 0,
+        'size' => 10,
+        'filters' => json_encode([]),
+        'sorting' => json_encode([]),
+    ]));
+
+    $response->assertOk();
+    expect($response->json('data.0.user'))->toBe([
+        'id' => $customer->id,
+        'first_name' => 'Sara',
+        'last_name' => 'Ahmadi',
+    ]);
+    expect($response->getContent())
+        ->not->toContain('password')
+        ->not->toContain($customer->phone_number);
 });
 
 test('manager cannot list discounts of a hall they do not own', function () {

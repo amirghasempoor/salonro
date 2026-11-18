@@ -12,9 +12,12 @@ class EloquentHallRepository implements HallRepositoryInterface
 {
     public function find(int $hallId): Hall
     {
-        $hall = HallModel::query()->findOrFail($hallId);
+        // A deactivated hall is gone for customers: no catalog, staff or booking.
+        $hall = HallModel::query()->where('is_active', true)->findOrFail($hallId);
 
-        $services = $hall->services()->get()
+        // The catalog is only what the hall currently offers: a service the manager
+        // switched off or removed is not bookable, whatever an expert still has priced.
+        $services = $hall->services()->wherePivot('is_active', true)->get()
             ->map(fn (Service $service) => [
                 'id' => $service->id,
                 'cat_id' => $service->cat_id,
@@ -27,6 +30,9 @@ class EloquentHallRepository implements HallRepositoryInterface
 
         $staff = ExpertHall::query()
             ->where('hall_id', '=', $hallId)
+            // Staff the manager switched off, or who switched themselves off, cannot be booked.
+            ->where('is_active', true)
+            ->whereHas('expert', fn ($query) => $query->where('is_active', true))
             ->with(['expert:id,first_name,last_name,avatar', 'services:services.id,sub_cat_name'])
             ->get()
             ->map(fn (ExpertHall $expertHall) => [

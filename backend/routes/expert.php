@@ -18,9 +18,9 @@ Route::prefix('auth')
     ->controller(AuthController::class)
     ->group(function () {
         Route::post('register', 'register')->name('register');
-        Route::post('send_otp', 'sendOtp')->name('sendOtp');
-        Route::post('login_with_otp', 'loginWithOtp')->name('loginWithOtp');
-        Route::post('login_with_password', 'loginWithPassword')->name('loginWithPassword');
+        Route::post('send_otp', 'sendOtp')->name('sendOtp')->middleware('throttle:otp');
+        Route::post('login_with_otp', 'loginWithOtp')->name('loginWithOtp')->middleware('throttle:login');
+        Route::post('login_with_password', 'loginWithPassword')->name('loginWithPassword')->middleware('throttle:login');
         Route::post('logout', 'logout')->middleware('auth:expert')->name('logout');
     });
 
@@ -28,6 +28,7 @@ Route::prefix('profile')
     ->name('profile.')
     ->middleware(['auth:expert'])
     ->controller(ProfileController::class)
+    ->whereNumber('hall')
     ->group(function () {
         Route::get('info', 'info')->name('info');
         Route::post('complete', 'complete')->name('complete');
@@ -43,6 +44,7 @@ Route::prefix('halls')
     ->name('hall.')
     ->middleware(['auth:expert', 'role:manager|admin'])
     ->controller(HallManagementController::class)
+    ->whereNumber('hall')
     ->group(function () {
         Route::get('/', 'index')->name('index');
         Route::post('/', 'store')->name('store');
@@ -58,6 +60,7 @@ Route::prefix('reservations')
     ->name('reservation.')
     ->middleware(['auth:expert'])
     ->controller(ReservationManagementController::class)
+    ->whereNumber(['hall', 'reservation'])
     ->group(function () {
         Route::get('/{hall}', 'index')->name('index')->can('reservation.view', 'hall');
         Route::post('/{hall}', 'store')->name('store')->can('reservation.store', 'hall');
@@ -70,8 +73,9 @@ Route::prefix('my_services')
     ->name('myService.')
     ->middleware(['auth:expert'])
     ->controller(MyServiceController::class)
+    ->whereNumber(['hall', 'expertService'])
     ->group(function () {
-        Route::get('/{hall}', 'index')->name('index');
+        Route::get('/{hall}', 'index')->name('index')->can('hall.view', 'hall');
         Route::post('/{hall}', 'store')->name('store');
         Route::get('/show/{expertService}', 'show')->name('show')->can('myService.show', 'expertService');
         Route::post('/update/{expertService}', 'update')->name('update')->can('myService.update', 'expertService');
@@ -82,19 +86,25 @@ Route::prefix('service_categories')
     ->name('service_categories.')
     ->middleware(['auth:expert'])
     ->controller(ServiceManagementController::class)
+    ->whereNumber('category')
     ->group(function () {
         Route::get('/', 'index')->name('index');
         Route::get('/list', 'list')->name('list');
-        Route::post('/', 'store')->name('store');
         Route::get('/{category}', 'show')->name('show');
-        Route::post('/{category}', 'update')->name('update');
-        Route::delete('/{category}', 'destroy')->name('destroy');
+
+        // The catalog is shared by every salon: only a platform admin may change it.
+        Route::middleware('role:admin')->group(function () {
+            Route::post('/', 'store')->name('store');
+            Route::post('/{category}', 'update')->name('update');
+            Route::delete('/{category}', 'destroy')->name('destroy');
+        });
     });
 
 Route::prefix('staff')
     ->name('staff.')
     ->middleware(['auth:expert', 'role:manager|admin'])
     ->controller(ExpertManagementController::class)
+    ->whereNumber(['hall', 'expert'])
     ->group(function () {
         Route::get('/list/{hall}', 'staffList')->name('list')->where('hall', '[0-9]+')->can('staff.view', 'hall');
         Route::get('/{hall}', 'index')->name('index')->can('staff.view', 'hall');
@@ -108,6 +118,7 @@ Route::prefix('services')
     ->name('services.')
     ->middleware(['auth:expert', 'role:manager|admin'])
     ->controller(HallServicesManagementController::class)
+    ->whereNumber(['hall', 'hallService'])
     ->group(function () {
         Route::get('/{hall}', 'index')->name('index')->can('hallService.view', 'hall');
         Route::post('/{hall}', 'store')->name('store')->can('hallService.store', 'hall');
@@ -120,6 +131,7 @@ Route::prefix('discounts')
     ->name('discount.')
     ->middleware(['auth:expert'])
     ->controller(DiscountManagementController::class)
+    ->whereNumber(['hall', 'discount'])
     ->group(function () {
         Route::get('/{hall}', 'index')->name('index')->can('discount.view', 'hall');
         Route::post('/{hall}', 'store')->name('store')->can('discount.store', 'hall');
@@ -132,6 +144,7 @@ Route::prefix('job_offers')
     ->name('job_offers.')
     ->middleware(['auth:expert', 'role:manager|admin'])
     ->controller(ManagerJobOfferController::class)
+    ->whereNumber(['hall', 'jobOffer', 'application'])
     ->group(function () {
         Route::get('/{hall}', 'index')->name('index')->can('jobOffer.view', 'hall');
         Route::post('/{hall}', 'store')->name('store')->can('jobOffer.store', 'hall');
@@ -147,6 +160,7 @@ Route::prefix('jobs')
     ->name('jobs.')
     ->middleware(['auth:expert', 'role:expert|admin'])
     ->controller(JobApplicationController::class)
+    ->whereNumber('jobOffer')
     ->group(function () {
         Route::get('/', 'index')->name('index');
         Route::get('/my_applications', 'myApplications')->name('myApplications');

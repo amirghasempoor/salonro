@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\ReservationStates;
 use App\Models\Expert;
 use App\Models\Hall;
 use App\Models\Reservation;
@@ -7,9 +8,13 @@ use App\Models\Service;
 use Laravel\Sanctum\Sanctum;
 
 beforeEach(function () {
+    seedReservationStates();
     $this->hall = Hall::factory()->create();
     $this->owner = Expert::query()->find($this->hall->owner_id);
-    $this->reservation = Reservation::factory()->create(['hall_id' => $this->hall->id]);
+    $this->reservation = Reservation::factory()->create([
+        'hall_id' => $this->hall->id,
+        'state_id' => ReservationStates::Reserve->value,
+    ]);
 });
 
 test('expert should be authenticated to delete a reservation', function () {
@@ -39,7 +44,7 @@ test('deleting a reservation that does not belong to the hall returns 404', func
         ->assertNotFound();
 });
 
-test('hall owner can delete a reservation and its services', function () {
+test('hall owner can cancel a reservation, which is kept as a record', function () {
     $service = Service::factory()->create();
     $this->reservation->services()->attach($service->id, [
         'service_name' => $service->sub_cat_name,
@@ -57,6 +62,9 @@ test('hall owner can delete a reservation and its services', function () {
     $response->assertOk();
     $response->assertExactJson(['message' => __('messages.successful')]);
 
-    $this->assertDatabaseMissing('reservations', ['id' => $this->reservation->id]);
-    $this->assertDatabaseMissing('reservation_services', ['reservation_id' => $this->reservation->id]);
+    $this->assertDatabaseHas('reservations', [
+        'id' => $this->reservation->id,
+        'state_id' => ReservationStates::Cancel->value,
+    ]);
+    $this->assertDatabaseHas('reservation_services', ['reservation_id' => $this->reservation->id]);
 });

@@ -4,6 +4,7 @@ namespace Expert\Application\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Models\ExpertService;
+use App\Models\Hall;
 use Expert\Application\Http\Requests\MyService\StoreRequest;
 use Expert\Application\Http\Requests\MyService\UpdateRequest;
 use Expert\Application\Http\Resources\MyServiceResource;
@@ -23,11 +24,11 @@ class MyServiceController extends Controller
     /**
      * The authenticated expert's own priced services at this hall.
      */
-    public function index(int $hall): JsonResponse
+    public function index(Hall $hall): JsonResponse
     {
         return $this->successResponse(
             MyServiceResource::collection(
-                $this->myServiceManagementService->index(Auth::guard('expert')->user(), $hall)
+                $this->myServiceManagementService->index(Auth::guard('expert')->user(), $hall->id)
             )
         );
     }

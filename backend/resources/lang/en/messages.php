@@ -17,5 +17,12 @@ return [
     'hall_schedule_below_staff_schedule' => "The hall's new schedule would leave one or more staff members outside their assigned working hours.",
     'solo_hall_cannot_have_staff' => 'This hall belongs to a solo expert and cannot have additional staff.',
     'hall_does_not_offer_service' => 'This hall does not offer the selected service.',
+    'expert_already_in_hall' => 'This expert already works in this hall.',
+    'hall_has_upcoming_reservations' => 'This hall still has upcoming reservations. Cancel them first.',
+    'expert_has_upcoming_reservations' => 'This expert still has upcoming reservations at this hall. Cancel or move them first.',
+    'profile_already_completed' => 'The profile is already completed. Use the update option to change it.',
+    'slot_too_short' => 'The selected time is shorter than the services need.',
     'service_not_priced_by_expert' => 'The expert has not set a price for one or more selected services.',
+    'not_found' => 'The requested resource was not found.',
+    'service_in_use' => 'This service is used by a hall, an expert or a reservation and cannot be deleted.',
 ];

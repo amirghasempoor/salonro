@@ -14,7 +14,9 @@ class JobApplicationService
     public function index(Request $request): array
     {
         return DataTableFacade::run(
-            JobOffer::query()->where('is_active', true),
+            // Offers of solo or deactivated halls are not open to applicants.
+            JobOffer::query()->where('is_active', true)
+                ->whereHas('hall', fn ($hall) => $hall->where('is_solo', false)->where('is_active', true)),
             $request,
             allowedFilters: ['*'],
             allowedSortings: ['*'],

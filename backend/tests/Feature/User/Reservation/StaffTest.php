@@ -3,6 +3,7 @@
 use App\Models\Expert;
 use App\Models\ExpertHall;
 use App\Models\Hall;
+use App\Models\HallService;
 use App\Models\Service;
 use App\Models\User;
 use Laravel\Sanctum\Sanctum;
@@ -12,6 +13,10 @@ beforeEach(function () {
     $this->hall = Hall::factory()->create();
     $this->serviceA = Service::factory()->create();
     $this->serviceB = Service::factory()->create();
+
+    // Both services are in the hall's catalog: only then can anyone be booked for them.
+    HallService::factory()->create(['hall_id' => $this->hall->id, 'service_id' => $this->serviceA->id]);
+    HallService::factory()->create(['hall_id' => $this->hall->id, 'service_id' => $this->serviceB->id]);
 
     $this->expertWithA = Expert::factory()->create();
     $expertHallA = ExpertHall::factory()->create([

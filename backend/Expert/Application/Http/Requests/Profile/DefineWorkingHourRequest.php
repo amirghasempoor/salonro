@@ -6,6 +6,7 @@ use Expert\Domain\DTOs\SetWorkingHoursDto;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
+use Shared\Rules\WorkingHoursWindows;
 
 class DefineWorkingHourRequest extends FormRequest
 {
@@ -25,7 +26,7 @@ class DefineWorkingHourRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'workingHours' => 'required|array',
+            'workingHours' => ['required', 'array', new WorkingHoursWindows],
             'workingHours.*' => 'required|array',
             'workingHours.*.day' => ['required', Rule::in(['sat', 'sun', 'mon', 'tue', 'wed', 'thu', 'fri'])],
             'workingHours.*.from' => 'required|string',

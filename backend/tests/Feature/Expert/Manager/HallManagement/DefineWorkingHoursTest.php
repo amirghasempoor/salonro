@@ -39,6 +39,38 @@ test('each working hour needs a valid day, from and to', function () {
     ])->assertStatus(422)->assertJsonValidationErrors(['workingHours.0.day', 'workingHours.0.from', 'workingHours.0.to']);
 });
 
+test('a solo hall copies its hours onto the owner so she can be booked', function () {
+    $this->owner->assignRole('manager');
+    $solo = Hall::factory()->create(['owner_id' => $this->owner->id, 'is_solo' => true]);
+    $membership = ExpertHall::factory()->create(['expert_id' => $this->owner->id, 'hall_id' => $solo->id]);
+    $membership->workingHours()->create(['day' => 'mon', 'from' => '01:00', 'to' => '02:00']);
+    Sanctum::actingAs($this->owner, ['*'], 'expert');
+
+    $this->postJson(route('expert.hall.defineWorkingHours', $solo->id), [
+        'workingHours' => [['day' => 'sat', 'from' => '08:00', 'to' => '20:00']],
+    ])->assertOk();
+
+    expect($membership->workingHours()->get(['day', 'from', 'to'])->toArray())
+        ->toHaveCount(1)
+        ->and($membership->workingHours()->first()->day)->toBe('sat')
+        ->and($membership->workingHours()->first()->from)->toStartWith('08:00')
+        ->and($membership->workingHours()->first()->to)->toStartWith('20:00');
+});
+
+test('a regular hall does not touch the owner personal hours', function () {
+    $this->owner->assignRole('manager');
+    $membership = ExpertHall::factory()->create(['expert_id' => $this->owner->id, 'hall_id' => $this->hall->id]);
+    $membership->workingHours()->create(['day' => 'sat', 'from' => '10:00', 'to' => '12:00']);
+    Sanctum::actingAs($this->owner, ['*'], 'expert');
+
+    $this->postJson(route('expert.hall.defineWorkingHours', $this->hall->id), [
+        'workingHours' => [['day' => 'sat', 'from' => '08:00', 'to' => '20:00']],
+    ])->assertOk();
+
+    expect($membership->workingHours()->count())->toBe(1)
+        ->and($membership->workingHours()->first()->from)->toStartWith('10:00');
+});
+
 test('manager can define the hall working hours', function () {
     $this->owner->assignRole('manager');
     Sanctum::actingAs($this->owner, ['*'], 'expert');

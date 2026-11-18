@@ -19,7 +19,9 @@ class DiscountManagementService
             Discount::query()->where('hall_id', '=', $hall->id),
             $request,
             allowedFilters: ['*'],
-            allowedRelations: ['user'],
+            // Only who the discount is for: the customer's contact and profile data
+            // is not the manager's to read from here.
+            allowedRelations: ['user:id,first_name,last_name'],
             allowedSortings: ['*'],
             allowedSelects: [
                 'id', 'type', 'title', 'user_id', 'amount_type', 'amount',

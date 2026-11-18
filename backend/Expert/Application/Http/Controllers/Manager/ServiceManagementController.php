@@ -10,7 +10,6 @@ use Expert\Application\Services\Manager\ServiceManagementService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Shared\Traits\ApiResponse;
-use Throwable;
 
 class ServiceManagementController extends Controller
 {
@@ -30,13 +29,9 @@ class ServiceManagementController extends Controller
 
     public function store(StoreRequest $request): JsonResponse
     {
-        try {
-            $this->serviceManagementService->store($request);
+        $this->serviceManagementService->store($request);
 
-            return $this->successResponse();
-        } catch (Throwable $e) {
-            return $this->errorResponse($e->getMessage());
-        }
+        return $this->successResponse();
     }
 
     public function show(Service $category): JsonResponse
@@ -46,17 +41,17 @@ class ServiceManagementController extends Controller
 
     public function update(UpdateRequest $request, Service $category): JsonResponse
     {
-        try {
-            $this->serviceManagementService->update($request, $category);
+        $this->serviceManagementService->update($request, $category);
 
-            return $this->successResponse();
-        } catch (Throwable $e) {
-            return $this->errorResponse($e->getMessage());
-        }
+        return $this->successResponse();
     }
 
     public function destroy(Service $category): JsonResponse
     {
+        if ($this->serviceManagementService->isInUse($category)) {
+            return $this->errorResponse(__('messages.service_in_use'), 'conflict', 409);
+        }
+
         $this->serviceManagementService->destroy($category);
 
         return $this->successResponse();

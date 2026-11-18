@@ -10,6 +10,12 @@ api.salonro.ir {
 	root * /var/www/salonro/public
 	encode gzip
 
+	# Don't advertise the server stack or PHP version to clients.
+	header {
+		-Server
+		-X-Powered-By
+	}
+
 	route {
 		request_body {
 			max_size 20MB

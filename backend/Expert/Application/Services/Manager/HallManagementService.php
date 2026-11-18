@@ -2,11 +2,15 @@
 
 namespace Expert\Application\Services\Manager;
 
+use App\Enums\ReservationStates;
 use App\Models\City;
+use App\Models\ExpertHall;
 use App\Models\Hall;
 use App\Models\Province;
+use App\Models\Reservation;
 use Expert\Application\Http\Requests\Manager\Hall\StoreRequest;
 use Expert\Application\Http\Requests\Manager\Hall\UpdateRequest;
+use Expert\Domain\Exceptions\Manager\UpcomingReservationsException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -97,7 +101,25 @@ class HallManagementService
      */
     public function destroy(Hall $hall): void
     {
+        throw_if(
+            Reservation::query()
+                ->where('hall_id', $hall->id)
+                ->where('state_id', '!=', ReservationStates::Cancel->value)
+                ->where('finish_time', '>', now())
+                ->exists(),
+            UpcomingReservationsException::forHall(),
+        );
+
         DB::transaction(function () use ($hall) {
+            // Everything that hangs off the hall goes with it, so nothing is orphaned
+            // and no foreign key blocks the delete.
+            foreach (ExpertHall::query()->where('hall_id', $hall->id)->get() as $membership) {
+                $membership->services()->detach();
+                $membership->workingHours()->delete();
+            }
+
+            $hall->workingHours()->delete();
+            $hall->jobOffers()->delete();
             $hall->experts()->detach();
             $hall->services()->detach();
             $hall->delete();

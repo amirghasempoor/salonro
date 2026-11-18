@@ -6,12 +6,14 @@ use App\Models\Expert;
 use App\Models\Hall;
 use App\Models\Reservation;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Shared\Facades\DataTable\DataTableFacade;
+use Shared\Services\ReservationCancellation;
 use Throwable;
 
 class ReservationManagementService
 {
+    public function __construct(private readonly ReservationCancellation $cancellation) {}
+
     /**
      * The hall's owner sees every reservation in it; any other staff member
      * sees only their own.
@@ -41,9 +43,6 @@ class ReservationManagementService
      */
     public function destroy(Reservation $reservation): void
     {
-        DB::transaction(function () use ($reservation) {
-            $reservation->services()->detach();
-            $reservation->delete();
-        });
+        $this->cancellation->execute($reservation);
     }
 }

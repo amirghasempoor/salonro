@@ -7,6 +7,7 @@ use App\Models\Expert;
 use App\Models\ExpertHall;
 use App\Models\ExpertService;
 use App\Models\Hall as HallModel;
+use App\Models\HallService;
 use App\Models\Reservation as ReservationModel;
 use App\Models\User;
 use DateTimeImmutable;
@@ -42,11 +43,13 @@ class EloquentReservationRepository implements ReservationRepositoryInterface
 
     public function findHall(int $hallId, int $expertId): Hall
     {
-        $hall = HallModel::query()->findOrFail($hallId);
+        $hall = HallModel::query()->where('is_active', true)->findOrFail($hallId);
 
+        // Only an active membership offers services: a deactivated staff member books nothing.
         $expertHall = ExpertHall::query()
             ->where('expert_id', $expertId)
             ->where('hall_id', $hallId)
+            ->where('is_active', true)
             ->first();
 
         $offered = $expertHall === null
@@ -54,6 +57,9 @@ class EloquentReservationRepository implements ReservationRepositoryInterface
             : ExpertService::query()
                 ->where('serviceable_type', ExpertHall::class)
                 ->where('serviceable_id', $expertHall->id)
+                // A service without both a price and a duration is not offered yet.
+                ->whereNotNull('price')
+                ->whereNotNull('duration')
                 ->with('service')
                 ->get()
                 ->mapWithKeys(fn (ExpertService $expertService) => [
@@ -65,7 +71,14 @@ class EloquentReservationRepository implements ReservationRepositoryInterface
                 ])
                 ->all();
 
-        return new Hall($hall->id, $hall->name, $offered);
+        $hallServiceIds = HallService::query()
+            ->where('hall_id', $hallId)
+            ->where('is_active', true)
+            ->pluck('service_id')
+            ->map(fn ($id) => (int) $id)
+            ->all();
+
+        return new Hall($hall->id, $hall->name, $offered, $hallServiceIds);
     }
 
     /**
@@ -73,6 +86,12 @@ class EloquentReservationRepository implements ReservationRepositoryInterface
      */
     public function busySlotsOn(DateTimeInterface $day, int $expertId, int $userId): array
     {
+        // Serialize concurrent bookings of the same expert and customer: the second
+        // request waits here, then sees the first one's slot and is refused. Always
+        // expert first, then customer, so two requests can never deadlock.
+        Expert::query()->whereKey($expertId)->lockForUpdate()->first(['id']);
+        User::query()->whereKey($userId)->lockForUpdate()->first(['id']);
+
         $dayStart = Carbon::instance($day)->startOfDay();
         $dayEnd = $dayStart->copy()->addDay();
 

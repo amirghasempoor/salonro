@@ -55,6 +55,7 @@ class ExpertServiceProvider extends ServiceProvider
 
         Gate::define('staff.view', [StaffPolicy::class, 'view']);
         Gate::define('staff.store', [StaffPolicy::class, 'store']);
+        Gate::define('staff.show', [StaffPolicy::class, 'show']);
         Gate::define('staff.toggleActivation', [StaffPolicy::class, 'toggleActivation']);
         Gate::define('staff.delete', [StaffPolicy::class, 'delete']);
 

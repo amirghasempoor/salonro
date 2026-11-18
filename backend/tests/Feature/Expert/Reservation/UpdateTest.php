@@ -34,7 +34,7 @@ beforeEach(function () {
         'serviceable_id' => $this->expertHall->id,
         'service_id' => $this->service->id,
         'price' => 200000,
-        'duration' => 90,
+        'duration' => 60,
     ]);
 
     $this->reservation = Reservation::factory()->create([

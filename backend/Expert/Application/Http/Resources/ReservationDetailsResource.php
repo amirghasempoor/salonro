@@ -19,8 +19,8 @@ class ReservationDetailsResource extends JsonResource
             'user_name' => $this->resource->user_name,
             'discount_amount' => $this->resource->discount_amount,
             'total_price' => $this->resource->total_price,
-            'start_time' => $this->resource->start_time,
-            'finish_time' => $this->resource->finish_time,
+            'start_time' => $this->resource->start_time->format(DATE_ATOM),
+            'finish_time' => $this->resource->finish_time->format(DATE_ATOM),
             'hall_name' => $this->resource->hall_name,
         ];
     }

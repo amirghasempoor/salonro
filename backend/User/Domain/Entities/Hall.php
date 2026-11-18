@@ -2,6 +2,7 @@
 
 namespace User\Domain\Entities;
 
+use User\Domain\Exceptions\Reservation\HallDoesNotOfferServiceException;
 use User\Domain\Exceptions\Reservation\ServiceNotPricedByExpertException;
 
 /**
@@ -22,24 +23,25 @@ final readonly class Hall
     ) {}
 
     /**
-     * The hall's catalog, each service annotated with the cheapest and
-     * priciest a staff member at this hall charges for it — null for a
-     * service no staff member has priced yet.
+     * The services a customer can actually book here, each annotated with the
+     * cheapest and priciest a staff member at this hall charges for it. A
+     * service no staff member has priced yet is left out: it is in the hall's
+     * catalog but cannot be booked, and it returns as soon as someone prices it.
      *
-     * @return list<array{id: int, cat_id: int, cat_name: string, sub_cat_id: int, sub_cat_name: string, icon: ?string, price_min: ?int, price_max: ?int}>
+     * @return list<array{id: int, cat_id: int, cat_name: string, sub_cat_id: int, sub_cat_name: string, icon: ?string, price_min: int, price_max: int}>
      */
     public function services(): array
     {
         $priceRange = $this->priceRangeByService();
 
-        return array_map(
+        return array_values(array_map(
             fn (array $service) => [
                 ...$service,
-                'price_min' => $priceRange[$service['id']]['min'] ?? null,
-                'price_max' => $priceRange[$service['id']]['max'] ?? null,
+                'price_min' => $priceRange[$service['id']]['min'],
+                'price_max' => $priceRange[$service['id']]['max'],
             ],
-            $this->services,
-        );
+            array_filter($this->services, fn (array $service) => isset($priceRange[$service['id']])),
+        ));
     }
 
     /**
@@ -51,7 +53,7 @@ final readonly class Hall
 
         foreach ($this->staff as $member) {
             foreach ($member['services'] as $service) {
-                if ($service['price'] === null) {
+                if (! $this->isBookable($service)) {
                     continue;
                 }
 
@@ -74,10 +76,48 @@ final readonly class Hall
      */
     public function staffOffering(array $serviceIds): array
     {
-        return array_values(array_filter(
-            $this->staff,
-            fn (array $member) => array_intersect(array_column($member['services'], 'id'), $serviceIds) !== [],
-        ));
+        $offering = [];
+
+        foreach ($this->staff as $member) {
+            // Only services she can really be booked for: priced by her (a hired
+            // expert starts with none) and still offered by the hall.
+            $priced = array_values(array_filter($member['services'], $this->isBookable(...)));
+
+            if (array_intersect(array_column($priced, 'id'), $serviceIds) !== []) {
+                $offering[] = [...$member, 'services' => $priced];
+            }
+        }
+
+        return $offering;
+    }
+
+    /**
+     * A service is priced once the expert has set both her price and her duration;
+     * either one missing means she has not offered it yet.
+     *
+     * @param  array{id: int, sub_cat_name: string, price: mixed, duration: mixed}  $service
+     */
+    private function isPriced(array $service): bool
+    {
+        return $service['price'] !== null && $service['duration'] !== null;
+    }
+
+    /**
+     * Whether the hall's own catalog still offers this service.
+     */
+    private function offers(int $serviceId): bool
+    {
+        return in_array($serviceId, array_column($this->services, 'id'), true);
+    }
+
+    /**
+     * Bookable means both: the expert has priced it and the hall still offers it.
+     *
+     * @param  array{id: int, sub_cat_name: string, price: mixed, duration: mixed}  $service
+     */
+    private function isBookable(array $service): bool
+    {
+        return $this->isPriced($service) && $this->offers($service['id']);
     }
 
     /**
@@ -98,6 +138,8 @@ final readonly class Hall
         $baseTotal = 0;
 
         foreach (array_unique($serviceIds) as $serviceId) {
+            throw_unless($this->offers($serviceId), HallDoesNotOfferServiceException::forService($serviceId));
+
             $priced = $member === null ? null : $this->findPricedService($member['services'], $serviceId);
 
             throw_if($priced === null, ServiceNotPricedByExpertException::forService($serviceId));
@@ -130,7 +172,7 @@ final readonly class Hall
     private function findPricedService(array $services, int $serviceId): ?array
     {
         foreach ($services as $service) {
-            if ($service['id'] === $serviceId) {
+            if ($service['id'] === $serviceId && $this->isPriced($service)) {
                 return $service;
             }
         }

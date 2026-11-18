@@ -7,6 +7,7 @@ use DateTimeInterface;
 use User\Domain\Exceptions\Reservation\OutsideWorkingHoursException;
 use User\Domain\Exceptions\Reservation\ReservationConflictException;
 use User\Domain\Exceptions\Reservation\ServiceNotPricedByExpertException;
+use User\Domain\Exceptions\Reservation\SlotTooShortException;
 
 /**
  * A customer's booking of an expert at a hall.
@@ -65,6 +66,7 @@ final readonly class Reservation
         self::assertAvailable($start, $finish, $workingHours, $busySlots, ignoreId: null);
 
         $priced = $hall->priceServices($serviceIds, $expertId);
+        self::assertLongEnough($priced['lines'], $start, $finish);
 
         return new self(
             id: null,
@@ -127,6 +129,7 @@ final readonly class Reservation
         self::assertAvailable($start, $finish, $workingHours, $busySlots, ignoreId: $this->id);
 
         $priced = $hall->priceServices($serviceIds, $expertId);
+        self::assertLongEnough($priced['lines'], $start, $finish);
 
         return new self(
             id: $this->id,
@@ -156,6 +159,21 @@ final readonly class Reservation
     ): void {
         throw_unless(self::fitsWorkingHours($start, $finish, $workingHours), OutsideWorkingHoursException::forSlot());
         throw_if(self::conflicts($start, $finish, $busySlots, $ignoreId), ReservationConflictException::forSlot());
+    }
+
+    /**
+     * The slot must be at least as long as the chosen services take together;
+     * a longer slot is allowed (buffer time).
+     *
+     * @param  array<int, array{service_name: string, price: int, duration: int|null}>  $lines
+     *
+     * @throws SlotTooShortException
+     */
+    private static function assertLongEnough(array $lines, DateTimeInterface $start, DateTimeInterface $finish): void
+    {
+        $needed = array_sum(array_column($lines, 'duration')) * 60;
+
+        throw_if($finish->getTimestamp() - $start->getTimestamp() < $needed, SlotTooShortException::forSlot());
     }
 
     /**

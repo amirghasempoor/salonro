@@ -4,6 +4,7 @@ namespace Expert\Domain\Actions\Manager;
 
 use App\Models\JobOfferApplication;
 use Expert\Domain\Exceptions\Manager\JobOfferApplicationNotPendingException;
+use Expert\Domain\Exceptions\Manager\SoloHallCannotHaveStaffException;
 use Expert\Domain\Repositories\Manager\JobOfferApplicationRepositoryInterface;
 use Illuminate\Support\Facades\DB;
 use Throwable;
@@ -29,10 +30,14 @@ class AcceptJobOfferApplicationAction
             JobOfferApplicationNotPendingException::forApplication()
         );
 
-        DB::transaction(function () use ($application) {
+        $hall = $application->jobOffer->hall;
+
+        // A solo hall belongs to one expert; an old offer must not bring staff in.
+        throw_if($hall->is_solo, SoloHallCannotHaveStaffException::forHall());
+
+        DB::transaction(function () use ($application, $hall) {
             $this->repository->markAccepted($application);
 
-            $hall = $application->jobOffer->hall;
             $expert = $application->expert;
 
             if (! $this->repository->isActiveMember($hall, $expert)) {

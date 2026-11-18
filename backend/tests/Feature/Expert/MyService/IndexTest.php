@@ -19,6 +19,20 @@ test('expert should be authenticated to list her services', function () {
     $this->getJson(route('expert.myService.index', [$this->hall->id]))->assertUnauthorized();
 });
 
+test('an expert with no access to the hall is forbidden, not given an empty list', function () {
+    $stranger = Expert::factory()->create(['is_verified' => true]);
+
+    Sanctum::actingAs($stranger, ['*'], 'expert');
+
+    $this->getJson(route('expert.myService.index', [$this->hall->id]))->assertForbidden();
+});
+
+test('a hall that does not exist is a 404', function () {
+    Sanctum::actingAs($this->expert, ['*'], 'expert');
+
+    $this->getJson(route('expert.myService.index', [999999]))->assertNotFound();
+});
+
 test('an expert sees only her own priced services at the hall', function () {
     $mine = ExpertService::factory()->create([
         'serviceable_type' => ExpertHall::class,

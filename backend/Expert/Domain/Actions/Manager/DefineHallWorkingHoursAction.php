@@ -8,6 +8,7 @@ use Expert\Domain\Exceptions\Manager\HallScheduleBelowStaffScheduleException;
 use Expert\Domain\Repositories\ExpertHallRepositoryInterface;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 use Throwable;
 
 /**
@@ -29,11 +30,37 @@ readonly class DefineHallWorkingHoursAction
     {
         $newSchedule = collect($dto->workingHours);
 
-        foreach ($this->expertHallRepository->staffWorkingHours($hall->id) as $staffWindow) {
-            $this->assertCoveredByNewSchedule($staffWindow, $newSchedule);
+        // A solo hall has no staff, and the owner's own hours are replaced below to
+        // match, so there is nothing to protect from being stranded.
+        if (! $hall->is_solo) {
+            foreach ($this->expertHallRepository->staffWorkingHours($hall->id) as $staffWindow) {
+                $this->assertCoveredByNewSchedule($staffWindow, $newSchedule);
+            }
         }
 
-        $this->expertHallRepository->replaceHallWorkingHours($hall, $dto->workingHours);
+        DB::transaction(function () use ($hall, $dto) {
+            $this->expertHallRepository->replaceHallWorkingHours($hall, $dto->workingHours);
+
+            if ($hall->is_solo) {
+                $this->mirrorOntoOwner($hall, $dto->workingHours);
+            }
+        });
+    }
+
+    /**
+     * A solo hall is its owner's own practice, so the hall's hours are the owner's
+     * hours. Bookings are checked against the expert's personal hours, which a solo
+     * owner has no other screen to set.
+     *
+     * @param  array<int, array{day: string, from: string, to: string}>  $workingHours
+     */
+    private function mirrorOntoOwner(Hall $hall, array $workingHours): void
+    {
+        $membership = $this->expertHallRepository->findActiveMembership($hall->owner, $hall->id);
+
+        if ($membership !== null) {
+            $this->expertHallRepository->replaceWorkingHours($membership, $workingHours);
+        }
     }
 
     /**

@@ -7,7 +7,7 @@ use Laravel\Sanctum\Sanctum;
 beforeEach(function () {
     seedRoles();
     $this->manager = Expert::factory()->create();
-    $this->manager->assignRole('manager');
+    $this->manager->assignRole('admin');
     $this->service = Service::factory()->create();
 });
 

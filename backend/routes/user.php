@@ -10,6 +10,7 @@ use User\Application\Http\Controllers\ReservationManagementController;
 Route::prefix('home')
     ->name('home.')
     ->controller(HomePageController::class)
+    ->whereNumber('hall')
     ->group(function () {
         Route::get('halls', 'hallsInArea')->name('hallsInArea');
         Route::get('halls/{hall}', 'hallDetails')->name('hallDetails');
@@ -21,9 +22,9 @@ Route::prefix('auth')
     ->controller(AuthController::class)
     ->group(function () {
         Route::post('register', 'register')->name('register');
-        Route::post('send_otp', 'sendOtp')->name('sendOtp');
-        Route::post('login_with_otp', 'loginWithOtp')->name('loginWithOtp');
-        Route::post('login_with_password', 'loginWithPassword')->name('loginWithPassword');
+        Route::post('send_otp', 'sendOtp')->name('sendOtp')->middleware('throttle:otp');
+        Route::post('login_with_otp', 'loginWithOtp')->name('loginWithOtp')->middleware('throttle:login');
+        Route::post('login_with_password', 'loginWithPassword')->name('loginWithPassword')->middleware('throttle:login');
         Route::post('logout', 'logout')->middleware('auth:user')->name('logout');
     });
 
@@ -43,6 +44,7 @@ Route::prefix('reservations')
     ->name('reservation.')
     ->middleware('auth:user')
     ->controller(ReservationManagementController::class)
+    ->whereNumber(['hall', 'expert', 'reservation'])
     ->group(function () {
         Route::get('/', 'index')->name('index');
         Route::post('/', 'store')->name('store');
@@ -58,6 +60,7 @@ Route::prefix('discounts')
     ->name('discount.')
     ->middleware('auth:user')
     ->controller(DiscountManagementController::class)
+    ->whereNumber('discount')
     ->group(function () {
         Route::get('/', 'index')->name('index');
         Route::get('/available', 'available')->name('available');

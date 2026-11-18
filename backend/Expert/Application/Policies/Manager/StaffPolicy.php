@@ -17,15 +17,34 @@ class StaffPolicy
         return $manager->id === $hall->owner_id;
     }
 
-    public function toggleActivation(Expert $manager, Hall $hall, Expert $expert): bool
+    /**
+     * A manager may read the details of an expert who works in a hall she owns,
+     * and nobody else's.
+     */
+    public function show(Expert $manager, Hall $hall, Expert $expert): bool
     {
         return $manager->id === $hall->owner_id
             && $hall->experts()->where('experts.id', $expert->id)->exists();
     }
 
+    /**
+     * The owner can switch staff off, but never herself: a hall without its
+     * owner among the active members cannot be managed or booked.
+     */
+    public function toggleActivation(Expert $manager, Hall $hall, Expert $expert): bool
+    {
+        return $manager->id === $hall->owner_id
+            && $expert->id !== $hall->owner_id
+            && $hall->experts()->where('experts.id', $expert->id)->exists();
+    }
+
+    /**
+     * The owner can remove staff, but never herself — she deletes the hall instead.
+     */
     public function delete(Expert $manager, Hall $hall, Expert $expert): bool
     {
         return $manager->id === $hall->owner_id
+            && $expert->id !== $hall->owner_id
             && $hall->experts()->where('experts.id', $expert->id)->exists();
     }
 }

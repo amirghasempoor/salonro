@@ -19,7 +19,13 @@ return [
 
     'allowed_methods' => ['*'],
 
-    'allowed_origins' => ['*'],
+    'allowed_origins' => array_values(array_filter(array_map(
+        'trim',
+        explode(',', (string) env(
+            'CORS_ALLOWED_ORIGINS',
+            'https://user.salonro.ir,https://expert.salonro.ir,http://localhost:3000,http://localhost:5173',
+        )),
+    ))),
 
     'allowed_origins_patterns' => [],
 

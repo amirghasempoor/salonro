@@ -5,6 +5,7 @@ namespace User\Application\Persistence\Reservation;
 use App\Enums\ReservationStates;
 use App\Models\Expert;
 use App\Models\Reservation as ReservationModel;
+use App\Models\User;
 use DateTimeImmutable;
 use DateTimeInterface;
 use Illuminate\Support\Carbon;
@@ -43,6 +44,12 @@ class EloquentReservationRepository implements ReservationRepositoryInterface
      */
     public function busySlotsOn(DateTimeInterface $day, int $expertId, int $userId): array
     {
+        // Serialize concurrent bookings of the same expert and customer: the second
+        // request waits here, then sees the first one's slot and is refused. Always
+        // expert first, then customer, so two requests can never deadlock.
+        Expert::query()->whereKey($expertId)->lockForUpdate()->first(['id']);
+        User::query()->whereKey($userId)->lockForUpdate()->first(['id']);
+
         $dayStart = Carbon::instance($day)->startOfDay();
         $dayEnd = $dayStart->copy()->addDay();
 

@@ -12,6 +12,7 @@ use App\Models\Service;
 use App\Models\User;
 use Expert\Domain\Actions\Reservation\BookReservationAction;
 use Expert\Domain\DTOs\Reservation\BookReservationDto;
+use Expert\Domain\Exceptions\HallDoesNotOfferServiceException;
 use Expert\Domain\Exceptions\Reservation\OutsideWorkingHoursException;
 use Expert\Domain\Exceptions\Reservation\ReservationConflictException;
 use Expert\Domain\Exceptions\Reservation\ServiceNotPricedByExpertException;
@@ -181,9 +182,29 @@ test('a cancelled reservation does not block the slot', function () {
 
 test('it rejects a service the expert has not priced and persists nothing', function () {
     $other = Service::factory()->create();
+    HallService::factory()->create(['hall_id' => $this->hall->id, 'service_id' => $other->id]);
 
     expect(fn () => app(BookReservationAction::class)->execute(bookDto($this, ['serviceIds' => [$other->id]])))
         ->toThrow(ServiceNotPricedByExpertException::class);
 
     expect(Reservation::query()->count())->toBe(0);
+});
+
+test('it rejects a service the hall does not offer, even when the expert has a price for it', function () {
+    $dropped = Service::factory()->create();
+    $this->expertHall->services()->attach($dropped->id, ['price' => 50000, 'duration' => 30]);
+
+    expect(fn () => app(BookReservationAction::class)->execute(bookDto($this, ['serviceIds' => [$dropped->id]])))
+        ->toThrow(HallDoesNotOfferServiceException::class);
+
+    expect(Reservation::query()->count())->toBe(0);
+});
+
+test('it rejects a service the hall has switched off, even when the expert has a price for it', function () {
+    $switchedOff = Service::factory()->create();
+    HallService::factory()->create(['hall_id' => $this->hall->id, 'service_id' => $switchedOff->id, 'is_active' => false]);
+    $this->expertHall->services()->attach($switchedOff->id, ['price' => 50000, 'duration' => 30]);
+
+    expect(fn () => app(BookReservationAction::class)->execute(bookDto($this, ['serviceIds' => [$switchedOff->id]])))
+        ->toThrow(HallDoesNotOfferServiceException::class);
 });

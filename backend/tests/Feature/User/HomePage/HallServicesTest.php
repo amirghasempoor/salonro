@@ -6,6 +6,19 @@ use App\Models\Hall;
 use App\Models\HallService;
 use App\Models\Service;
 
+/**
+ * Have a staff member at the hall charge for the service, which is what makes it
+ * bookable and therefore visible in the customer catalog.
+ */
+function priceServiceAtHall(Hall $hall, Service $service, int $price = 100000): void
+{
+    $expertHall = ExpertHall::factory()->create([
+        'expert_id' => Expert::factory()->create()->id,
+        'hall_id' => $hall->id,
+    ]);
+    $expertHall->services()->attach($service->id, ['price' => $price, 'duration' => 30]);
+}
+
 test('the hall services endpoint is public and requires no authentication', function () {
     $hall = Hall::factory()->create();
 
@@ -22,6 +35,7 @@ test('it returns the services attached to the hall', function () {
         'hall_id' => $hall->id,
         'service_id' => $service->id,
     ]);
+    priceServiceAtHall($hall, $service);
 
     $response = $this->getJson(route('user.home.hallServices', $hall));
 
@@ -38,16 +52,19 @@ test('it returns the services attached to the hall', function () {
     $response->assertJsonMissingPath('data.0.price');
 });
 
-test('a service with no staff pricing it yet has a null price range', function () {
+test('a service no staff member has priced yet is hidden from customers', function () {
     $hall = Hall::factory()->create();
-    $service = Service::factory()->create();
-    HallService::factory()->create(['hall_id' => $hall->id, 'service_id' => $service->id]);
+    $priced = Service::factory()->create();
+    $unpriced = Service::factory()->create();
+    HallService::factory()->create(['hall_id' => $hall->id, 'service_id' => $priced->id]);
+    HallService::factory()->create(['hall_id' => $hall->id, 'service_id' => $unpriced->id]);
+    priceServiceAtHall($hall, $priced);
 
     $response = $this->getJson(route('user.home.hallServices', $hall));
 
     $response->assertOk();
-    $response->assertJsonPath('data.0.price_min', null);
-    $response->assertJsonPath('data.0.price_max', null);
+    $response->assertJsonCount(1, 'data');
+    $response->assertJsonPath('data.0.id', $priced->id);
 });
 
 test('a service is annotated with the min and max price staff at the hall charge for it', function () {
@@ -85,6 +102,7 @@ test('it only returns services attached to the requested hall', function () {
     $service = Service::factory()->create();
     HallService::factory()->create(['hall_id' => $hall->id, 'service_id' => $service->id]);
     HallService::factory()->create(['hall_id' => $otherHall->id]);
+    priceServiceAtHall($hall, $service);
 
     $this->getJson(route('user.home.hallServices', $hall))
         ->assertOk()
