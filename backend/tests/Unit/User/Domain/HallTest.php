@@ -16,16 +16,36 @@ function staff(int $id, array $serviceIds): array
     ];
 }
 
-test('a service with no staff pricing it yet has a null price range', function () {
+test('a service no staff member has priced yet is left out of the catalog', function () {
+    $services = [
+        ['id' => 1, 'cat_id' => 1, 'cat_name' => 'Hair', 'sub_cat_id' => 10, 'sub_cat_name' => 'Cut', 'icon' => null],
+        ['id' => 2, 'cat_id' => 1, 'cat_name' => 'Hair', 'sub_cat_id' => 11, 'sub_cat_name' => 'Color', 'icon' => null],
+    ];
+    $staff = staff(1, [2]);
+
+    $hall = new Hall(1, 'Rose Salon', $services, [$staff]);
+
+    expect(array_column($hall->services(), 'id'))->toBe([2]);
+});
+
+test('a staff service with a null price does not count as priced', function () {
+    $services = [
+        ['id' => 1, 'cat_id' => 1, 'cat_name' => 'Hair', 'sub_cat_id' => 10, 'sub_cat_name' => 'Cut', 'icon' => null],
+    ];
+    $unpriced = staff(1, [1]);
+    $unpriced['services'][0]['price'] = null;
+
+    $hall = new Hall(1, 'Rose Salon', $services, [$unpriced]);
+
+    expect($hall->services())->toBe([]);
+});
+
+test('a hall with no staff has an empty catalog', function () {
     $services = [
         ['id' => 1, 'cat_id' => 1, 'cat_name' => 'Hair', 'sub_cat_id' => 10, 'sub_cat_name' => 'Cut', 'icon' => null],
     ];
 
-    $hall = new Hall(1, 'Rose Salon', $services, []);
-
-    expect($hall->services())->toBe([
-        [...$services[0], 'price_min' => null, 'price_max' => null],
-    ]);
+    expect((new Hall(1, 'Rose Salon', $services, []))->services())->toBe([]);
 });
 
 test('a service is annotated with the min and max price staff charge for it', function () {
