@@ -17,6 +17,8 @@ class User extends Authenticatable
 
     protected $guarded = ['id'];
 
+    protected $hidden = ['password', 'remember_token'];
+
     protected function avatar(): Attribute
     {
         return Attribute::make(
