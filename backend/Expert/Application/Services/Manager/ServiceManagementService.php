@@ -7,6 +7,7 @@ use Expert\Application\Http\Requests\Manager\ServiceCategory\StoreRequest;
 use Expert\Application\Http\Requests\Manager\ServiceCategory\UpdateRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 use Shared\Facades\DataTable\DataTableFacade;
 use Shared\Facades\File\File;
 
@@ -59,10 +60,13 @@ class ServiceManagementService
             'cat_name' => $request->cat_name,
             'sub_cat_id' => $request->sub_cat_id,
             'sub_cat_name' => $request->sub_cat_name,
-            'icon' => File::save($request->icon, '/categories'),
+            'icon' => $request->hasFile('icon') ? File::save($request->file('icon'), '/categories') : null,
         ]);
     }
 
+    /**
+     * The icon is optional: without a new upload the existing one is kept.
+     */
     public function update(UpdateRequest $request, Service $category): void
     {
         $category->update([
@@ -70,8 +74,20 @@ class ServiceManagementService
             'cat_name' => $request->cat_name,
             'sub_cat_id' => $request->sub_cat_id,
             'sub_cat_name' => $request->sub_cat_name,
-            'icon' => File::save($request->icon, '/categories'),
+            ...($request->hasFile('icon') ? ['icon' => File::save($request->file('icon'), '/categories')] : []),
         ]);
+    }
+
+    /**
+     * Whether a hall, an expert's price list or a reservation still refers to this
+     * service. Deleting it would fail on a foreign key, or silently remove the line
+     * from existing reservations.
+     */
+    public function isInUse(Service $category): bool
+    {
+        return DB::table('hall_service')->where('service_id', $category->id)->exists()
+            || DB::table('expert_service')->where('service_id', $category->id)->exists()
+            || DB::table('reservation_services')->where('service_id', $category->id)->exists();
     }
 
     public function destroy(Service $category): void

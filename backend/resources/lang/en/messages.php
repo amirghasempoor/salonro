@@ -19,4 +19,5 @@ return [
     'hall_does_not_offer_service' => 'This hall does not offer the selected service.',
     'service_not_priced_by_expert' => 'The expert has not set a price for one or more selected services.',
     'not_found' => 'The requested resource was not found.',
+    'service_in_use' => 'This service is used by a hall, an expert or a reservation and cannot be deleted.',
 ];

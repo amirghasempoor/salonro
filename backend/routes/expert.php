@@ -90,10 +90,14 @@ Route::prefix('service_categories')
     ->group(function () {
         Route::get('/', 'index')->name('index');
         Route::get('/list', 'list')->name('list');
-        Route::post('/', 'store')->name('store');
         Route::get('/{category}', 'show')->name('show');
-        Route::post('/{category}', 'update')->name('update');
-        Route::delete('/{category}', 'destroy')->name('destroy');
+
+        // The catalog is shared by every salon: only a platform admin may change it.
+        Route::middleware('role:admin')->group(function () {
+            Route::post('/', 'store')->name('store');
+            Route::post('/{category}', 'update')->name('update');
+            Route::delete('/{category}', 'destroy')->name('destroy');
+        });
     });
 
 Route::prefix('staff')

@@ -10,7 +10,7 @@ beforeEach(function () {
     seedRoles();
     Storage::fake('public');
     $this->manager = Expert::factory()->create();
-    $this->manager->assignRole('manager');
+    $this->manager->assignRole('admin');
     $this->service = Service::factory()->create();
     $this->payload = [
         'cat_id' => 5,
