@@ -11,6 +11,7 @@ use App\Models\Reservation;
 use App\Models\Service;
 use Expert\Domain\Actions\Reservation\RescheduleReservationAction;
 use Expert\Domain\DTOs\Reservation\RescheduleReservationDto;
+use Expert\Domain\Exceptions\HallDoesNotOfferServiceException;
 use Expert\Domain\Exceptions\Reservation\OutsideWorkingHoursException;
 use Expert\Domain\Exceptions\Reservation\ReservationConflictException;
 use Expert\Domain\Exceptions\Reservation\ServiceNotPricedByExpertException;
@@ -39,7 +40,7 @@ beforeEach(function () {
         'serviceable_id' => $this->expertHall->id,
         'service_id' => $this->service->id,
         'price' => 200000,
-        'duration' => 90,
+        'duration' => 60,
     ]);
 
     $this->start = Carbon::now()->addDays(2)->setTime(10, 0)->toImmutable();
@@ -79,7 +80,7 @@ test('it moves the reservation and re-prices it from the hall services', functio
         'reservation_id' => $this->reservation->id,
         'service_id' => $this->service->id,
         'price' => 200000,
-        'duration' => 90,
+        'duration' => 60,
     ]);
 });
 
@@ -138,6 +139,14 @@ test('it rejects a slot outside the expert working hours and leaves the reservat
 
 test('it rejects a service the expert has not priced', function () {
     $other = Service::factory()->create();
+    HallService::factory()->create(['hall_id' => $this->hall->id, 'service_id' => $other->id]);
 
     app(RescheduleReservationAction::class)->execute($this->reservation->id, rescheduleDto($this, ['serviceIds' => [$other->id]]));
 })->throws(ServiceNotPricedByExpertException::class);
+
+test('it rejects a service the hall does not offer, even when the expert has a price for it', function () {
+    $dropped = Service::factory()->create();
+    $this->expertHall->services()->attach($dropped->id, ['price' => 50000, 'duration' => 30]);
+
+    app(RescheduleReservationAction::class)->execute($this->reservation->id, rescheduleDto($this, ['serviceIds' => [$dropped->id]]));
+})->throws(HallDoesNotOfferServiceException::class);

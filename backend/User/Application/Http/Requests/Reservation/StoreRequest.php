@@ -30,7 +30,7 @@ class StoreRequest extends FormRequest
             'hall_id' => 'required|exists:halls,id',
             'services' => 'required|array|min:1',
             'services.*' => 'required|integer|exists:services,id',
-            'start_time' => 'required|date',
+            'start_time' => 'required|date|after:now',
             'finish_time' => 'required|date|after:start_time',
         ];
     }

@@ -36,7 +36,7 @@ beforeEach(function () {
         'serviceable_id' => $this->expertHall->id,
         'service_id' => $this->service->id,
         'price' => 200000,
-        'duration' => 90,
+        'duration' => 60,
     ]);
 
     $this->reservation = Reservation::factory()->create([
@@ -53,6 +53,35 @@ beforeEach(function () {
         'start_time' => now()->addDays(2)->toDateTimeString(),
         'finish_time' => now()->addDays(2)->addHour()->toDateTimeString(),
     ];
+});
+
+test('a time sent with an offset is converted to salon time when rescheduling', function () {
+    Sanctum::actingAs($this->user, ['*'], 'user');
+
+    // 06:30Z is 10:00 in Tehran (+03:30).
+    $this->postJson(route('user.reservation.update', $this->reservation->id), [
+        ...$this->payload,
+        'start_time' => '2030-01-02T06:30:00Z',
+        'finish_time' => '2030-01-02T07:30:00Z',
+    ])->assertOk();
+
+    $this->assertDatabaseHas('reservations', [
+        'id' => $this->reservation->id,
+        'start_time' => '2030-01-02 10:00:00',
+        'finish_time' => '2030-01-02 11:00:00',
+    ]);
+});
+
+test('a plain time without an offset is taken as salon time when rescheduling', function () {
+    Sanctum::actingAs($this->user, ['*'], 'user');
+
+    $this->postJson(route('user.reservation.update', $this->reservation->id), [
+        ...$this->payload,
+        'start_time' => '2030-01-02 10:00:00',
+        'finish_time' => '2030-01-02 11:00:00',
+    ])->assertOk();
+
+    $this->assertDatabaseHas('reservations', ['id' => $this->reservation->id, 'start_time' => '2030-01-02 10:00:00']);
 });
 
 test('user should be authenticated to update a reservation', function () {

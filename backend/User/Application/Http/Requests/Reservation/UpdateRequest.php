@@ -29,7 +29,7 @@ class UpdateRequest extends FormRequest
             'hall_id' => 'required|exists:halls,id',
             'services' => 'required|array|min:1',
             'services.*' => 'required|integer|exists:services,id',
-            'start_time' => 'required|date',
+            'start_time' => 'required|date|after:now',
             'finish_time' => 'required|date|after:start_time',
         ];
     }
@@ -40,8 +40,8 @@ class UpdateRequest extends FormRequest
             hallId: (int) $this->hall_id,
             expertId: (int) $this->expert_id,
             serviceIds: collect($this->services)->all(),
-            start: Carbon::parse($this->start_time)->toImmutable(),
-            finish: Carbon::parse($this->finish_time)->toImmutable(),
+            start: Carbon::parse($this->start_time)->setTimezone(config('app.timezone'))->toImmutable(),
+            finish: Carbon::parse($this->finish_time)->setTimezone(config('app.timezone'))->toImmutable(),
         );
     }
 }

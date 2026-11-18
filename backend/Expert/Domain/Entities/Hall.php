@@ -2,6 +2,7 @@
 
 namespace Expert\Domain\Entities;
 
+use Expert\Domain\Exceptions\HallDoesNotOfferServiceException;
 use Expert\Domain\Exceptions\Reservation\ServiceNotPricedByExpertException;
 
 /**
@@ -13,11 +14,13 @@ final readonly class Hall
 {
     /**
      * @param  array<int, array{name: string, price: int, duration: int|null}>  $offeredServices  keyed by service id — the expert's own priced services at this hall
+     * @param  list<int>  $hallServiceIds  the services the hall currently offers (its active catalog)
      */
     public function __construct(
         public int $id,
         public string $name,
         private array $offeredServices,
+        private array $hallServiceIds,
     ) {}
 
     /**
@@ -26,6 +29,7 @@ final readonly class Hall
      * @param  array<int, int>  $serviceIds
      * @return array{lines: array<int, array{service_name: string, price: int, duration: int|null}>, baseTotal: int}
      *
+     * @throws HallDoesNotOfferServiceException when the hall no longer offers a requested service
      * @throws ServiceNotPricedByExpertException when the expert has not priced a requested service
      */
     public function priceServices(array $serviceIds): array
@@ -34,6 +38,11 @@ final readonly class Hall
         $baseTotal = 0;
 
         foreach (array_unique($serviceIds) as $serviceId) {
+            throw_unless(
+                in_array($serviceId, $this->hallServiceIds, true),
+                HallDoesNotOfferServiceException::forService($serviceId),
+            );
+
             $service = $this->offeredServices[$serviceId] ?? null;
 
             throw_if($service === null, ServiceNotPricedByExpertException::forService($serviceId));

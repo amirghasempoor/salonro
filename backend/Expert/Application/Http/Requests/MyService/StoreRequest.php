@@ -26,8 +26,8 @@ class StoreRequest extends FormRequest
         return [
             'services' => 'required|array|min:1',
             'services.*.service_id' => 'required|integer|exists:services,id|distinct',
-            'services.*.price' => 'required|numeric',
-            'services.*.duration' => 'required|numeric|between:1,1000000',
+            'services.*.price' => 'required|integer|min:0|max:100000000000',
+            'services.*.duration' => 'required|integer|between:1,1440',
         ];
     }
 
@@ -37,8 +37,8 @@ class StoreRequest extends FormRequest
             services: array_map(
                 fn (array $service) => [
                     'service_id' => (int) $service['service_id'],
-                    'price' => (float) $service['price'],
-                    'duration' => (float) $service['duration'],
+                    'price' => (int) $service['price'],
+                    'duration' => (int) $service['duration'],
                 ],
                 $this->services,
             ),

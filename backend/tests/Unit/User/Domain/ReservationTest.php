@@ -3,9 +3,10 @@
 use Tests\TestCase;
 use User\Domain\Entities\Hall;
 use User\Domain\Entities\Reservation;
+use User\Domain\Exceptions\Reservation\HallDoesNotOfferServiceException;
 use User\Domain\Exceptions\Reservation\OutsideWorkingHoursException;
 use User\Domain\Exceptions\Reservation\ReservationConflictException;
-use User\Domain\Exceptions\Reservation\ServiceNotPricedByExpertException;
+use User\Domain\Exceptions\Reservation\SlotTooShortException;
 
 uses(TestCase::class);
 
@@ -14,7 +15,12 @@ const MONDAY_9_TO_17 = [['day' => 'mon', 'from' => '09:00', 'to' => '17:00']];
 
 function hallOffering(int $hallId = 7, string $hallName = 'Rose Salon', int $expertId = 22): Hall
 {
-    return new Hall($hallId, $hallName, [], [
+    $catalog = array_map(
+        fn (int $id) => ['id' => $id, 'cat_id' => 1, 'cat_name' => 'Hair', 'sub_cat_id' => $id, 'sub_cat_name' => "Service{$id}", 'icon' => null],
+        [1, 2],
+    );
+
+    return new Hall($hallId, $hallName, $catalog, [
         [
             'id' => $expertId,
             'first_name' => 'Neda',
@@ -67,13 +73,22 @@ function existingUserReservation(): Reservation
 }
 
 test('booking snapshots the people and hall and prices the services from the hall', function () {
-    $reservation = bookReservationAt('2026-09-21 10:00', '2026-09-21 11:00', [1, 2]);
+    $reservation = bookReservationAt('2026-09-21 10:00', '2026-09-21 12:00', [1, 2]);
 
     expect($reservation->id)->toBeNull()
         ->and($reservation->hallId)->toBe(7)
         ->and($reservation->hallName)->toBe('Rose Salon')
         ->and($reservation->baseTotal)->toBe(350)
         ->and(array_keys($reservation->lines))->toBe([1, 2]);
+});
+
+test('a slot shorter than the services need is rejected', function () {
+    bookReservationAt('2026-09-21 10:00', '2026-09-21 10:20', [1]);
+})->throws(SlotTooShortException::class);
+
+test('a slot exactly as long as the services need, or longer, is allowed', function () {
+    expect(bookReservationAt('2026-09-21 10:00', '2026-09-21 10:30', [1])->baseTotal)->toBe(100)
+        ->and(bookReservationAt('2026-09-21 10:00', '2026-09-21 11:00', [1])->baseTotal)->toBe(100);
 });
 
 test('booking that starts before the working window is rejected', function () {
@@ -96,7 +111,7 @@ test('back-to-back reservations do not conflict', function () {
 
 test('booking a service the hall does not offer is rejected', function () {
     bookReservationAt('2026-09-21 10:00', '2026-09-21 11:00', [99]);
-})->throws(ServiceNotPricedByExpertException::class);
+})->throws(HallDoesNotOfferServiceException::class);
 
 test('rescheduling can move the reservation to a different hall and expert', function () {
     $otherHall = hallOffering(9, 'Lotus Salon', 33);

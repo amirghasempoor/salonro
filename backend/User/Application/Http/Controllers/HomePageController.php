@@ -22,6 +22,8 @@ class HomePageController extends Controller
 
     public function hallDetails(Hall $hall): JsonResponse
     {
+        abort_unless($hall->is_active, 404);
+
         return $this->successResponse($hall);
     }
 

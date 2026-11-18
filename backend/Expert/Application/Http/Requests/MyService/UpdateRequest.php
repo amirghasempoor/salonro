@@ -23,8 +23,8 @@ class UpdateRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'price' => 'required|numeric',
-            'duration' => 'required|numeric|between:1,1000000',
+            'price' => 'required|integer|min:0|max:100000000000',
+            'duration' => 'required|integer|between:1,1440',
         ];
     }
 }

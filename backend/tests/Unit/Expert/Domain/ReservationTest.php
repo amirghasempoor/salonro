@@ -2,9 +2,10 @@
 
 use Expert\Domain\Entities\Hall;
 use Expert\Domain\Entities\Reservation;
+use Expert\Domain\Exceptions\HallDoesNotOfferServiceException;
 use Expert\Domain\Exceptions\Reservation\OutsideWorkingHoursException;
 use Expert\Domain\Exceptions\Reservation\ReservationConflictException;
-use Expert\Domain\Exceptions\Reservation\ServiceNotPricedByExpertException;
+use Expert\Domain\Exceptions\Reservation\SlotTooShortException;
 use Tests\TestCase;
 
 uses(TestCase::class);
@@ -17,7 +18,7 @@ function reservationHall(): Hall
     return new Hall(7, 'Rose Salon', [
         1 => ['name' => 'Haircut', 'price' => 100, 'duration' => 30],
         2 => ['name' => 'Color', 'price' => 250, 'duration' => 90],
-    ]);
+    ], [1, 2]);
 }
 
 function busy(int $id, string $start, string $finish): array
@@ -73,7 +74,7 @@ function rescheduleTo(Reservation $reservation, string $start, string $finish, a
 // --- book ---
 
 test('booking snapshots the people and hall and prices the services from the hall', function () {
-    $reservation = bookAt('2026-09-21 10:00', '2026-09-21 11:00', [1, 2]);
+    $reservation = bookAt('2026-09-21 10:00', '2026-09-21 12:00', [1, 2]);
 
     expect($reservation->id)->toBeNull()
         ->and($reservation->userId)->toBe(11)
@@ -85,8 +86,21 @@ test('booking snapshots the people and hall and prices the services from the hal
         ->and($reservation->baseTotal)->toBe(350)
         ->and(array_keys($reservation->lines))->toBe([1, 2])
         ->and($reservation->start->format('Y-m-d H:i'))->toBe('2026-09-21 10:00')
-        ->and($reservation->finish->format('Y-m-d H:i'))->toBe('2026-09-21 11:00');
+        ->and($reservation->finish->format('Y-m-d H:i'))->toBe('2026-09-21 12:00');
 });
+
+test('a slot shorter than the services need is rejected', function () {
+    bookAt('2026-09-21 10:00', '2026-09-21 10:20', [1]);
+})->throws(SlotTooShortException::class);
+
+test('a slot exactly as long as the services need, or longer, is allowed', function () {
+    expect(bookAt('2026-09-21 10:00', '2026-09-21 10:30', [1])->baseTotal)->toBe(100)
+        ->and(bookAt('2026-09-21 10:00', '2026-09-21 11:00', [1])->baseTotal)->toBe(100);
+});
+
+test('rescheduling into a slot shorter than the services need is rejected', function () {
+    rescheduleTo(existingReservation(), '2026-09-21 13:00', '2026-09-21 14:00', [2]);
+})->throws(SlotTooShortException::class);
 
 test('booking exactly filling the working window is allowed', function () {
     expect(bookAt('2026-09-21 09:00', '2026-09-21 17:00'))->toBeInstanceOf(Reservation::class);
@@ -147,7 +161,7 @@ test('back-to-back reservations do not conflict', function () {
 
 test('booking a service the hall does not offer is rejected', function () {
     bookAt('2026-09-21 10:00', '2026-09-21 11:00', [1, 99]);
-})->throws(ServiceNotPricedByExpertException::class);
+})->throws(HallDoesNotOfferServiceException::class);
 
 // --- reschedule ---
 
@@ -198,4 +212,4 @@ test('rescheduling outside the working hours is rejected', function () {
 
 test('rescheduling to a service the hall does not offer is rejected', function () {
     rescheduleTo(existingReservation(), '2026-09-21 13:00', '2026-09-21 14:00', [99]);
-})->throws(ServiceNotPricedByExpertException::class);
+})->throws(HallDoesNotOfferServiceException::class);
