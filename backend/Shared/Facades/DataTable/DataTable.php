@@ -26,8 +26,11 @@ class DataTable
         array $allowedGroupBy = []
     ): array {
 
-        $filters = json_decode($request->filters);
-        $sorting = json_decode($request->sorting);
+        // Both are optional: a missing, malformed or non-array value means "no filters / no sorting".
+        $filters = json_decode((string) $request->filters);
+        $filters = is_array($filters) ? $filters : [];
+        $sorting = json_decode((string) $request->sorting);
+        $sorting = is_array($sorting) ? $sorting : [];
         $rels = $request->rels ?: [];
 
         $dataTableInput = new DataTableInput(
