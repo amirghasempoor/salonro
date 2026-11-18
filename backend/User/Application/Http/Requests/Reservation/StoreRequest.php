@@ -43,8 +43,8 @@ class StoreRequest extends FormRequest
             userId: $user->id,
             userName: $user->first_name.' '.$user->last_name,
             serviceIds: collect($this->services)->all(),
-            start: Carbon::parse($this->start_time)->toImmutable(),
-            finish: Carbon::parse($this->finish_time)->toImmutable(),
+            start: Carbon::parse($this->start_time)->setTimezone(config('app.timezone'))->toImmutable(),
+            finish: Carbon::parse($this->finish_time)->setTimezone(config('app.timezone'))->toImmutable(),
         );
     }
 }
