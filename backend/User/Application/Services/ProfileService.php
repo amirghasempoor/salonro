@@ -11,11 +11,15 @@ use User\Application\Http\Requests\Profile\ChangeAvatarRequest;
 use User\Application\Http\Requests\Profile\ChangePasswordRequest;
 use User\Application\Http\Requests\Profile\CompleteRequest;
 use User\Application\Http\Requests\Profile\EditRequest;
+use User\Domain\Exceptions\ProfileAlreadyCompletedException;
 
 class ProfileService
 {
     public function complete(CompleteRequest $request, User $user): void
     {
+        // Completing is a one-time step; changing details later goes through edit.
+        throw_if($user->kyc_status, ProfileAlreadyCompletedException::forProfile());
+
         $province = Province::query()->find($request->province_id);
         $city = City::query()->find($request->city_id);
 

@@ -20,6 +20,7 @@ return [
     'expert_already_in_hall' => 'This expert already works in this hall.',
     'hall_has_upcoming_reservations' => 'This hall still has upcoming reservations. Cancel them first.',
     'expert_has_upcoming_reservations' => 'This expert still has upcoming reservations at this hall. Cancel or move them first.',
+    'profile_already_completed' => 'The profile is already completed. Use the update option to change it.',
     'slot_too_short' => 'The selected time is shorter than the services need.',
     'service_not_priced_by_expert' => 'The expert has not set a price for one or more selected services.',
     'not_found' => 'The requested resource was not found.',

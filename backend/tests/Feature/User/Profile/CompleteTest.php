@@ -176,3 +176,24 @@ test('user can complete the profile', function () {
 
     expect(Hash::check('pass123@word', $this->user->fresh()->password))->toBeTrue();
 });
+
+test('a completed profile cannot be completed again', function () {
+    $province = Province::factory()->create();
+    $city = City::factory()->create(['province_id' => $province->id]);
+    $payload = [
+        'first_name' => 'John',
+        'last_name' => 'Doe',
+        'email' => 'john.doe@example.com',
+        'gender' => 1,
+        'birth_date' => '2000-01-01',
+        'password' => 'pass123@word',
+        'province_id' => $province->id,
+        'city_id' => $city->id,
+    ];
+
+    $this->postJson(route('user.profile.complete'), $payload)->assertOk();
+
+    $this->postJson(route('user.profile.complete'), [...$payload, 'first_name' => 'Hacker'])
+        ->assertStatus(409)->assertJsonPath('message', __('messages.profile_already_completed'));
+    $this->assertDatabaseHas('users', ['id' => $this->user->id, 'first_name' => 'John']);
+});

@@ -133,6 +133,23 @@ class DiscountService
     }
 
     /**
+     * Give back the use a manual discount consumed for this reservation, e.g. when
+     * the reservation is cancelled, so the customer's limited discount is not burned.
+     */
+    public function release(Reservation $reservation): void
+    {
+        if ($reservation->discount_id === null) {
+            return;
+        }
+
+        $discount = Discount::query()->lockForUpdate()->find($reservation->discount_id);
+
+        if ($discount !== null && $discount->type === DiscountType::Manual && $discount->used_count > 0) {
+            $discount->decrement('used_count');
+        }
+    }
+
+    /**
      * Recalculate an already-granted discount against a new base total (e.g. when a
      * reservation is edited), without granting new discounts or consuming extra uses.
      * Drops the discount if it is no longer active or no longer belongs to the hall.
@@ -146,6 +163,11 @@ class DiscountService
             && $discount->hall_id === $hallId;
 
         $amount = $applicable ? $this->reductionFor($discount, $baseTotal) : 0;
+
+        // The discount is being dropped: its use goes back to the customer.
+        if ($discount !== null && $amount <= 0) {
+            $this->release($reservation);
+        }
 
         $reservation->forceFill([
             'discount_id' => $amount > 0 ? $discount->id : null,

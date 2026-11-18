@@ -11,15 +11,18 @@ use App\Models\WorkingHour;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\DB;
 use Shared\Facades\DataTable\DataTableFacade;
+use Shared\Services\ReservationCancellation;
 use Throwable;
 use User\Domain\Entities\StaffAvailability;
 use User\Domain\Repositories\HallRepositoryInterface;
 
 class ReservationManagementService
 {
-    public function __construct(private readonly HallRepositoryInterface $hallRepository) {}
+    public function __construct(
+        private readonly HallRepositoryInterface $hallRepository,
+        private readonly ReservationCancellation $cancellation,
+    ) {}
 
     public function index(Request $request, User $user): array
     {
@@ -42,10 +45,7 @@ class ReservationManagementService
      */
     public function destroy(Reservation $reservation): void
     {
-        DB::transaction(function () use ($reservation) {
-            $reservation->services()->detach();
-            $reservation->delete();
-        });
+        $this->cancellation->execute($reservation);
     }
 
     /**

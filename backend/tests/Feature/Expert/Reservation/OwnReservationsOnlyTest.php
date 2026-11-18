@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\ReservationStates;
 use App\Models\Expert;
 use App\Models\ExpertHall;
 use App\Models\Hall;
@@ -7,6 +8,7 @@ use App\Models\Reservation;
 use Laravel\Sanctum\Sanctum;
 
 beforeEach(function () {
+    seedReservationStates();
     $this->hall = Hall::factory()->create();
     $this->owner = Expert::query()->find($this->hall->owner_id);
 
@@ -61,7 +63,7 @@ test('a staff member can delete her own reservation', function () {
 
     $this->deleteJson(destroyUrl($this->hall, $this->mine))->assertOk();
 
-    $this->assertDatabaseMissing('reservations', ['id' => $this->mine->id]);
+    $this->assertDatabaseHas('reservations', ['id' => $this->mine->id, 'state_id' => ReservationStates::Cancel->value]);
 });
 
 test('the hall owner still manages every reservation in her hall', function () {
@@ -70,7 +72,7 @@ test('the hall owner still manages every reservation in her hall', function () {
     $this->getJson(route('expert.reservation.show', $this->colleaguesOne->id))->assertOk();
     $this->deleteJson(destroyUrl($this->hall, $this->colleaguesOne))->assertOk();
 
-    $this->assertDatabaseMissing('reservations', ['id' => $this->colleaguesOne->id]);
+    $this->assertDatabaseHas('reservations', ['id' => $this->colleaguesOne->id, 'state_id' => ReservationStates::Cancel->value]);
 });
 
 test('a reservation from another hall is still a 404 through the hall route', function () {
