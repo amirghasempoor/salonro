@@ -18,4 +18,5 @@ return [
     'solo_hall_cannot_have_staff' => 'This hall belongs to a solo expert and cannot have additional staff.',
     'hall_does_not_offer_service' => 'This hall does not offer the selected service.',
     'service_not_priced_by_expert' => 'The expert has not set a price for one or more selected services.',
+    'not_found' => 'The requested resource was not found.',
 ];

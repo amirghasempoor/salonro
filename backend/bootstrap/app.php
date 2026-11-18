@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -7,6 +8,7 @@ use Illuminate\Routing\Middleware\SubstituteBindings;
 use Spatie\Permission\Middleware\PermissionMiddleware;
 use Spatie\Permission\Middleware\RoleMiddleware;
 use Spatie\Permission\Middleware\RoleOrPermissionMiddleware;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -43,4 +45,17 @@ return Application::configure(basePath: dirname(__DIR__))
         // Accept header, otherwise unauthenticated requests redirect to a missing
         // `login` route and surface as a 500.
         $exceptions->shouldRenderJsonWhen(fn () => true);
+
+        // Route-model binding failures would otherwise print "No query results for
+        // model [App\Models\Hall] 999999" to end users.
+        $exceptions->render(function (NotFoundHttpException $e) {
+            if (! $e->getPrevious() instanceof ModelNotFoundException) {
+                return null;
+            }
+
+            return response()->json([
+                'type' => 'not_found',
+                'message' => __('messages.not_found'),
+            ], 404);
+        });
     })->create();
