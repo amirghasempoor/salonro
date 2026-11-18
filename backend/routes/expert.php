@@ -75,7 +75,7 @@ Route::prefix('my_services')
     ->controller(MyServiceController::class)
     ->whereNumber(['hall', 'expertService'])
     ->group(function () {
-        Route::get('/{hall}', 'index')->name('index');
+        Route::get('/{hall}', 'index')->name('index')->can('hall.view', 'hall');
         Route::post('/{hall}', 'store')->name('store');
         Route::get('/show/{expertService}', 'show')->name('show')->can('myService.show', 'expertService');
         Route::post('/update/{expertService}', 'update')->name('update')->can('myService.update', 'expertService');
