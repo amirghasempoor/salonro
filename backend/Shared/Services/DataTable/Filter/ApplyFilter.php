@@ -3,6 +3,9 @@
 namespace Shared\Services\DataTable\Filter;
 
 use Illuminate\Contracts\Database\Query\Builder;
+use Illuminate\Database\Eloquent\Relations\Relation;
+use ReflectionMethod;
+use ReflectionNamedType;
 use Shared\Services\DataTable\Enums\SearchType;
 use Shared\Services\DataTable\Exceptions\InvalidFilterException;
 use Shared\Services\DataTable\Filter\SearchFunctions\FilterBetween;
@@ -63,7 +66,26 @@ class ApplyFilter
 
         $relation = $this->filter->getRelation();
 
-        return method_exists($this->query->getModel(), $relation) ? $this->applyFilterToRelation($relation) : $this->searchFilter->apply();
+        return $this->isRelation($relation) ? $this->applyFilterToRelation($relation) : $this->searchFilter->apply();
+    }
+
+    /**
+     * Only a method that really returns an Eloquent relation counts. A bare
+     * method_exists() would accept any method name from the request (delete,
+     * save, ...) and whereHas() would then call it on the model.
+     */
+    private function isRelation(string $name): bool
+    {
+        $model = $this->query->getModel();
+
+        if ($name === '' || ! method_exists($model, $name)) {
+            return false;
+        }
+
+        $returnType = (new ReflectionMethod($model, $name))->getReturnType();
+
+        return $returnType instanceof ReflectionNamedType
+            && is_subclass_of($returnType->getName(), Relation::class);
     }
 
     protected function applyFilterToRelation(string $relation): Builder

@@ -26,6 +26,6 @@ class FilterContains extends SearchFilter
     {
         $value = strtolower($value);
 
-        return $this->query->whereRaw("LOWER($column) LIKE ?", [$value]);
+        return $this->query->whereRaw('LOWER('.$this->wrapColumn($column).') LIKE ?', [$value]);
     }
 }

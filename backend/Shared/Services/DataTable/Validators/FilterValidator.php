@@ -46,9 +46,35 @@ class FilterValidator
         return true;
     }
 
+    /**
+     * Columns that must never be filterable, however the endpoint is configured:
+     * a filter is an oracle, so letting a client match against a password hash or
+     * a token one prefix at a time would disclose it.
+     */
+    private const array SENSITIVE_COLUMNS = [
+        'password', 'remember_token', 'token', 'verification_code', 'api_token',
+    ];
+
     protected function isAllowed(Filter $filter, array $allowedFilters): bool
     {
+        if (! $this->isSafeIdentifier($filter->getId())) {
+            return false;
+        }
+
+        if (in_array(strtolower($filter->getColumn()), self::SENSITIVE_COLUMNS, true)) {
+            return false;
+        }
+
         return $allowedFilters == ['*'] || in_array($filter->getId(), $allowedFilters);
+    }
+
+    /**
+     * A filter id is a column, or a relation and a column ("owner.name"). Anything
+     * else - spaces, quotes, parentheses, operators - is an attempt to smuggle SQL.
+     */
+    private function isSafeIdentifier(string $id): bool
+    {
+        return preg_match('/^[A-Za-z_][A-Za-z0-9_]*(\.[A-Za-z_][A-Za-z0-9_]*)?$/', $id) === 1;
     }
 
     protected function isValidSearchFunction(Filter $filter): bool
