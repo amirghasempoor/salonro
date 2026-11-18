@@ -4,6 +4,7 @@ namespace User\Domain\Entities;
 
 use DateTimeImmutable;
 use DateTimeInterface;
+use Shared\Exceptions\ReservationNotChangeableException;
 use User\Domain\Exceptions\Reservation\OutsideWorkingHoursException;
 use User\Domain\Exceptions\Reservation\ReservationConflictException;
 use User\Domain\Exceptions\Reservation\ServiceNotPricedByExpertException;
@@ -40,6 +41,7 @@ final readonly class Reservation
         public DateTimeImmutable $finish,
         public array $lines,
         public int $baseTotal,
+        public bool $open = true,
     ) {}
 
     /**
@@ -126,6 +128,9 @@ final readonly class Reservation
         array $workingHours,
         array $busySlots,
     ): self {
+        // Only a reservation that is still reserved and has not started can move.
+        throw_unless($this->open, ReservationNotChangeableException::forReschedule());
+
         self::assertAvailable($start, $finish, $workingHours, $busySlots, ignoreId: $this->id);
 
         $priced = $hall->priceServices($serviceIds, $expertId);

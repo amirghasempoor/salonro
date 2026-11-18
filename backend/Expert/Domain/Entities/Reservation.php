@@ -8,6 +8,7 @@ use Expert\Domain\Exceptions\Reservation\OutsideWorkingHoursException;
 use Expert\Domain\Exceptions\Reservation\ReservationConflictException;
 use Expert\Domain\Exceptions\Reservation\ServiceNotPricedByExpertException;
 use Expert\Domain\Exceptions\Reservation\SlotTooShortException;
+use Shared\Exceptions\ReservationNotChangeableException;
 
 /**
  * A booking of an expert for a customer at a hall.
@@ -37,6 +38,7 @@ final readonly class Reservation
         public DateTimeImmutable $finish,
         public array $lines,
         public int $baseTotal,
+        public bool $open = true,
     ) {}
 
     /**
@@ -120,6 +122,9 @@ final readonly class Reservation
         array $workingHours,
         array $busySlots,
     ): self {
+        // Only a reservation that is still reserved and has not started can move.
+        throw_unless($this->open, ReservationNotChangeableException::forReschedule());
+
         self::assertAvailable($start, $finish, $workingHours, $busySlots, ignoreId: $this->id);
 
         $priced = $hall->priceServices($serviceIds);

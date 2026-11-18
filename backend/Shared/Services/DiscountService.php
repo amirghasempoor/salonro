@@ -4,6 +4,7 @@ namespace Shared\Services;
 
 use App\Enums\DiscountAmountType;
 use App\Enums\DiscountType;
+use App\Enums\ReservationStates;
 use App\Models\Discount;
 use App\Models\Reservation;
 use Carbon\CarbonInterface;
@@ -133,6 +134,17 @@ class DiscountService
     }
 
     /**
+     * Whether the discount's date window (open on either side when not set) includes the day.
+     */
+    private function coversDate(Discount $discount, CarbonInterface $date): bool
+    {
+        $day = $date->toDateString();
+
+        return ($discount->starts_at === null || $discount->starts_at->toDateString() <= $day)
+            && ($discount->ends_at === null || $discount->ends_at->toDateString() >= $day);
+    }
+
+    /**
      * Give back the use a manual discount consumed for this reservation, e.g. when
      * the reservation is cancelled, so the customer's limited discount is not burned.
      */
@@ -156,11 +168,17 @@ class DiscountService
      */
     public function recomputeExisting(Reservation $reservation, int $hallId, int $baseTotal): void
     {
+        // A cancelled reservation is a closed record: its price and discount stay as they were.
+        if ($reservation->state_id === ReservationStates::Cancel->value) {
+            return;
+        }
+
         $discount = $reservation->discount;
 
         $applicable = $discount !== null
             && $discount->is_active
-            && $discount->hall_id === $hallId;
+            && $discount->hall_id === $hallId
+            && $this->coversDate($discount, $reservation->start_time);
 
         $amount = $applicable ? $this->reductionFor($discount, $baseTotal) : 0;
 

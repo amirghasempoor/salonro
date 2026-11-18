@@ -95,7 +95,7 @@ test('it replaces the previous services', function () {
 });
 
 test('it recomputes an already granted discount against the new total', function () {
-    $discount = Discount::factory()->holiday()->percentage(10)->create(['hall_id' => $this->hall->id]);
+    $discount = Discount::factory()->holiday()->percentage(10)->create(['hall_id' => $this->hall->id, 'ends_at' => now()->addDays(10)->toDateString()]);
     $this->reservation->update(['discount_id' => $discount->id, 'discount_amount' => 1, 'total_price' => 1]);
 
     app(RescheduleReservationAction::class)->execute($this->reservation->id, rescheduleDto($this));

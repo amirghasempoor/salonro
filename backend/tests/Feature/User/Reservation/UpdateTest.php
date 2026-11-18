@@ -43,6 +43,7 @@ beforeEach(function () {
         'user_id' => $this->user->id,
         'expert_id' => $this->expert->id,
         'hall_id' => $this->hall->id,
+        'state_id' => ReservationStates::Reserve->value,
         'total_price' => 5,
     ]);
 
@@ -184,7 +185,7 @@ test('user can update a reservation and reprice from hall services', function ()
 });
 
 test('updating recomputes an already granted discount against the new total', function () {
-    $discount = Discount::factory()->holiday()->percentage(10)->create(['hall_id' => $this->hall->id]);
+    $discount = Discount::factory()->holiday()->percentage(10)->create(['hall_id' => $this->hall->id, 'ends_at' => now()->addDays(10)->toDateString()]);
     $this->reservation->update([
         'discount_id' => $discount->id,
         'discount_amount' => 1,
