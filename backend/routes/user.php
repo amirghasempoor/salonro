@@ -22,9 +22,9 @@ Route::prefix('auth')
     ->controller(AuthController::class)
     ->group(function () {
         Route::post('register', 'register')->name('register');
-        Route::post('send_otp', 'sendOtp')->name('sendOtp');
-        Route::post('login_with_otp', 'loginWithOtp')->name('loginWithOtp');
-        Route::post('login_with_password', 'loginWithPassword')->name('loginWithPassword');
+        Route::post('send_otp', 'sendOtp')->name('sendOtp')->middleware('throttle:otp');
+        Route::post('login_with_otp', 'loginWithOtp')->name('loginWithOtp')->middleware('throttle:login');
+        Route::post('login_with_password', 'loginWithPassword')->name('loginWithPassword')->middleware('throttle:login');
         Route::post('logout', 'logout')->middleware('auth:user')->name('logout');
     });
 
