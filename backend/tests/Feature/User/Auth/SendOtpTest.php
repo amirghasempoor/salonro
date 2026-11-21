@@ -43,3 +43,10 @@ test('otp will send successfully', function () {
         'message' => __('messages.successful'),
     ]);
 });
+
+test('a number that only contains ten digits somewhere is refused', function () {
+    foreach (['zzz1234567890zzz', '9121234567', '0912123456789', '+989121234567', 'hello'] as $phone) {
+        $this->postJson(route('user.auth.sendOtp'), ['phone_number' => $phone])
+            ->assertStatus(422)->assertJsonValidationErrors('phone_number');
+    }
+});

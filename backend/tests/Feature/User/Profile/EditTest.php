@@ -209,3 +209,40 @@ test('user can edit the profile', function () {
         'kyc_status' => 1,
     ]);
 });
+
+test('a customer can keep their own email while changing other details', function () {
+    $province = Province::factory()->create();
+    $city = City::factory()->create(['province_id' => $province->id]);
+    $payload = [
+        'first_name' => 'John',
+        'last_name' => 'Doe',
+        'phone_number' => '09123456789',
+        'email' => 'john.doe@example.com',
+        'gender' => 1,
+        'birth_date' => '2000-01-01',
+        'province_id' => $province->id,
+        'city_id' => $city->id,
+    ];
+
+    $this->postJson(route('user.profile.edit'), $payload)->assertOk();
+    $this->postJson(route('user.profile.edit'), [...$payload, 'first_name' => 'Johnny'])->assertOk();
+
+    $this->assertDatabaseHas('users', ['id' => $this->user->id, 'first_name' => 'Johnny', 'email' => 'john.doe@example.com']);
+});
+
+test('an email that belongs to another customer is still refused', function () {
+    $province = Province::factory()->create();
+    $city = City::factory()->create(['province_id' => $province->id]);
+    User::factory()->create(['email' => 'taken@example.com']);
+
+    $this->postJson(route('user.profile.edit'), [
+        'first_name' => 'John',
+        'last_name' => 'Doe',
+        'phone_number' => '09123456789',
+        'email' => 'taken@example.com',
+        'gender' => 1,
+        'birth_date' => '2000-01-01',
+        'province_id' => $province->id,
+        'city_id' => $city->id,
+    ])->assertStatus(422)->assertJsonValidationErrors('email');
+});

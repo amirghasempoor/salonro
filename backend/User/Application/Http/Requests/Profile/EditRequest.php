@@ -30,7 +30,10 @@ class EditRequest extends FormRequest
                 'required', 'regex:/^09\d{9}$/', 'numeric', 'digits:11',
                 Rule::unique('users', 'phone_number')->ignore($this->user('user')?->id),
             ],
-            'email' => 'required|string|email|unique:users,email',
+            'email' => [
+                'required', 'string', 'email',
+                Rule::unique('users', 'email')->ignore($this->user('user')?->id),
+            ],
             'gender' => 'required|in:0,1',
             'birth_date' => 'required|date',
             'province_id' => 'required|exists:provinces,id',

@@ -26,7 +26,7 @@ class RegisterRequest extends FormRequest
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
             'password' => 'required|string|min:8',
-            'phone_number' => 'required|string|max:11|unique:experts,phone_number',
+            'phone_number' => ['required', 'string', 'max:11', 'regex:/^09\d{9}$/', 'unique:experts,phone_number'],
             'email' => 'string|email|max:255|unique:experts,email',
             'province_id' => 'required|exists:provinces,id',
             'city_id' => 'required|exists:cities,id',

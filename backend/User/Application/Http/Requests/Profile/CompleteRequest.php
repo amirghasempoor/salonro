@@ -4,6 +4,7 @@ namespace User\Application\Http\Requests\Profile;
 
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class CompleteRequest extends FormRequest
 {
@@ -25,7 +26,9 @@ class CompleteRequest extends FormRequest
         return [
             'first_name' => 'required|string',
             'last_name' => 'required|string',
-            'email' => 'string|email|unique:experts,email',
+            'email' => ['string', 'email', Rule::unique('users', 'email')->ignore($this->user('user')?->id)],
+            'password' => ['required', 'string', 'min:8', 'max:72', 'regex:/^(?=.*[a-zA-Z])(?=.*\d).+$/'],
+            'avatar' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             'gender' => 'in:0,1',
             'birth_date' => 'date',
             'province_id' => 'required|exists:provinces,id',
