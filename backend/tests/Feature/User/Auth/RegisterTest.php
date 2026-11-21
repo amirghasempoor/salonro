@@ -137,15 +137,27 @@ test('phone number should be string', function () {
     ]);
 });
 
-test('phone number should not exceed 255 characters', function () {
+test('phone number should not exceed 11 characters', function () {
     $response = $this->postJson(route('user.auth.register'), [
         'phone_number' => fake()->numerify(str_repeat('#', 260)),
     ]);
 
     $response->assertStatus(422);
     $response->assertJsonValidationErrors([
-        'phone_number' => __('validation.max.string', ['attribute' => 'phone number', 'max' => 255]),
+        'phone_number' => __('validation.max.string', ['attribute' => 'phone number', 'max' => 11]),
     ]);
+});
+
+test('phone number must be an Iranian mobile number', function () {
+    foreach (['hello', 'hello <b>x</b>', '123', '9121234567', '0812345678', '091234567890', '+989121234567', '09 12345678'] as $phone) {
+        $this->postJson(route('user.auth.register'), [
+            'first_name' => 'Sara',
+            'last_name' => 'Ahmadi',
+            'password' => 'pass1234',
+            'password_confirmation' => 'pass1234',
+            'phone_number' => $phone,
+        ])->assertStatus(422)->assertJsonValidationErrors('phone_number');
+    }
 });
 
 test('phone number should be unique in users table', function () {

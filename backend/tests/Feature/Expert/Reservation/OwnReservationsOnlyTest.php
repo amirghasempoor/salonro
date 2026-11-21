@@ -18,8 +18,16 @@ beforeEach(function () {
     $this->colleague = Expert::factory()->create();
     ExpertHall::factory()->create(['expert_id' => $this->colleague->id, 'hall_id' => $this->hall->id]);
 
-    $this->mine = Reservation::factory()->create(['hall_id' => $this->hall->id, 'expert_id' => $this->staff->id]);
-    $this->colleaguesOne = Reservation::factory()->create(['hall_id' => $this->hall->id, 'expert_id' => $this->colleague->id]);
+    $this->mine = Reservation::factory()->create([
+        'hall_id' => $this->hall->id,
+        'expert_id' => $this->staff->id,
+        'state_id' => ReservationStates::Reserve->value,
+    ]);
+    $this->colleaguesOne = Reservation::factory()->create([
+        'hall_id' => $this->hall->id,
+        'expert_id' => $this->colleague->id,
+        'state_id' => ReservationStates::Reserve->value,
+    ]);
 });
 
 function destroyUrl(Hall $hall, Reservation $reservation): string

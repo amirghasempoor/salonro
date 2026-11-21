@@ -21,6 +21,8 @@ return [
     'hall_has_upcoming_reservations' => 'This hall still has upcoming reservations. Cancel them first.',
     'expert_has_upcoming_reservations' => 'This expert still has upcoming reservations at this hall. Cancel or move them first.',
     'profile_already_completed' => 'The profile is already completed. Use the update option to change it.',
+    'reservation_cannot_be_cancelled' => 'This reservation is already finished and cannot be cancelled.',
+    'reservation_cannot_be_rescheduled' => 'Only an upcoming, active reservation can be rescheduled.',
     'slot_too_short' => 'The selected time is shorter than the services need.',
     'service_not_priced_by_expert' => 'The expert has not set a price for one or more selected services.',
     'not_found' => 'The requested resource was not found.',

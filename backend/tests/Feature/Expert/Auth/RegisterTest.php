@@ -247,7 +247,7 @@ test('expert can be registered', function () {
     $response = $this->postJson(route('expert.auth.register'), [
         'first_name' => fake()->firstName,
         'last_name' => fake()->lastName,
-        'phone_number' => fake()->numerify('0##########'),
+        'phone_number' => fake()->numerify('09#########'),
         'password' => fake()->password(8),
         'email' => fake()->email,
         'province_id' => $province->id,
@@ -262,4 +262,11 @@ test('expert can be registered', function () {
             'token',
         ],
     ]);
+});
+
+test('phone number must be an Iranian mobile number', function () {
+    foreach (['hello', 'hello <b>x</b>', '123', '9121234567', '0812345678', '091234567890', '+989121234567'] as $phone) {
+        $this->postJson(route('expert.auth.register'), ['phone_number' => $phone])
+            ->assertStatus(422)->assertJsonValidationErrors('phone_number');
+    }
 });

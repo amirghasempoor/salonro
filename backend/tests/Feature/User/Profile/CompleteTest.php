@@ -70,8 +70,8 @@ test('email should be a valid email address', function () {
     ]);
 });
 
-test('email should be unique among experts', function () {
-    Expert::factory()->create(['email' => 'taken@example.com']);
+test('email should be unique among customers', function () {
+    User::factory()->create(['email' => 'taken@example.com']);
 
     $response = $this->postJson(route('user.profile.complete'), [
         'email' => 'taken@example.com',
@@ -196,4 +196,56 @@ test('a completed profile cannot be completed again', function () {
     $this->postJson(route('user.profile.complete'), [...$payload, 'first_name' => 'Hacker'])
         ->assertStatus(409)->assertJsonPath('message', __('messages.profile_already_completed'));
     $this->assertDatabaseHas('users', ['id' => $this->user->id, 'first_name' => 'John']);
+});
+
+function completePayload(array $overrides = []): array
+{
+    $province = Province::factory()->create();
+    $city = City::factory()->create(['province_id' => $province->id]);
+
+    return [
+        'first_name' => 'John',
+        'last_name' => 'Doe',
+        'email' => 'john.doe@example.com',
+        'gender' => 1,
+        'birth_date' => '2000-01-01',
+        'password' => 'pass123@word',
+        'province_id' => $province->id,
+        'city_id' => $city->id,
+        ...$overrides,
+    ];
+}
+
+test('completing without a password is refused and nothing is saved', function () {
+    $payload = completePayload();
+    unset($payload['password']);
+
+    $this->postJson(route('user.profile.complete'), $payload)
+        ->assertStatus(422)->assertJsonValidationErrors('password');
+
+    expect($this->user->fresh()->kyc_status)->toBe(0);
+});
+
+test('a weak or oversized password is refused', function () {
+    foreach (['short1', 'onlyletters', '12345678', str_repeat('a1', 40)] as $password) {
+        $this->postJson(route('user.profile.complete'), completePayload(['password' => $password]))
+            ->assertStatus(422)->assertJsonValidationErrors('password');
+    }
+});
+
+test('an avatar that is not an image is a validation error, not a server error', function () {
+    $this->postJson(route('user.profile.complete'), completePayload(['avatar' => 'notafile']))
+        ->assertStatus(422)->assertJsonValidationErrors('avatar');
+});
+
+test('the email is checked against customers, not experts', function () {
+    Expert::factory()->create(['email' => 'shared@example.com']);
+    $this->postJson(route('user.profile.complete'), completePayload(['email' => 'shared@example.com']))->assertOk();
+
+    $other = User::factory()->create(['first_name' => null, 'last_name' => null, 'kyc_status' => 0]);
+    User::factory()->create(['email' => 'taken@example.com']);
+    Sanctum::actingAs($other, ['*'], 'user');
+
+    $this->postJson(route('user.profile.complete'), completePayload(['email' => 'taken@example.com']))
+        ->assertStatus(422)->assertJsonValidationErrors('email');
 });

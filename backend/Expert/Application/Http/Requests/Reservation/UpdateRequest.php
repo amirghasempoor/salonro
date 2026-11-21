@@ -27,7 +27,7 @@ class UpdateRequest extends FormRequest
         return [
             'services' => 'required|array|min:1',
             'services.*.service_id' => 'required|integer|exists:services,id',
-            'start_time' => 'required|date',
+            'start_time' => 'required|date|after:now',
             'finish_time' => 'required|date|after:start_time',
         ];
     }

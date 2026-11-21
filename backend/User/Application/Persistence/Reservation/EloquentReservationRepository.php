@@ -95,6 +95,7 @@ class EloquentReservationRepository implements ReservationRepositoryInterface
             finish: DateTimeImmutable::createFromInterface($model->finish_time),
             lines: $lines,
             baseTotal: array_sum(array_column($lines, 'price')),
+            open: $model->state_id === ReservationStates::Reserve->value && $model->start_time->isFuture(),
         );
     }
 
